@@ -1,0 +1,4 @@
+enum AvailabilityStatus {
+  available,
+  full,
+}

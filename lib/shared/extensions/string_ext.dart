@@ -1,0 +1,11 @@
+extension StringExt on String {
+  String get capitalizeFirst {
+    if (isEmpty) return this;
+    return '${this[0].toUpperCase()}${substring(1)}';
+  }
+
+  String get toTitleCase {
+    if (isEmpty) return this;
+    return split(' ').map((word) => word.capitalizeFirst).join(' ');
+  }
+}
