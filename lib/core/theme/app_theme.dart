@@ -35,6 +35,4 @@ class AppTheme {
         ),
       );
 
-  // TODO: dark-mode
-  static ThemeData get dark => light;
 }

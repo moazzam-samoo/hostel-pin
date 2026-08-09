@@ -8,8 +8,7 @@ class AppStrings {
   static const String continueButton = 'Continue';
 
   // Role Selection
-  static const String chooseRoleTitle = 'Choose your role';
-  static const String chooseRoleSubtitle = 'Are you looking for a hostel or listing one?';
+
   static const String studentSectionTitle = 'Student';
   static const String studentDescriptionTitle = "I'm a Student";
   static const String studentDescriptionBody = 'Looking for a hostel to stay';
@@ -39,8 +38,8 @@ class AppStrings {
   static const String haveAccountLogin = 'Already have an account? Login';
 
   static const String sendResetLink = 'Send Reset Link';
-  static String resetLinkSentBody(String email) =>
-      'We sent a password reset link to $email. The link expires in 1 hour.';
+  static const String resetLinkSentPrefix = 'We sent a password reset link to ';
+  static const String resetLinkSentSuffix = '. The link expires in 1 hour.';
   static const String checkEmailTitle = 'Check Your Email';
   static const String backToLogin = 'Back to Login';
 
@@ -48,8 +47,9 @@ class AppStrings {
   static const String otpExpireText = 'This code will expire in 10 minutes';
   static const String resendCode = 'Resend';
   static const String verifyEmailTitle = 'Verify Your Email';
-  static String otpSentToBody(String email) =>
-      'We texted you a code to verify your email address: $email';
+  static const String otpFieldHint = 'Enter 4-digit OTP';
+  static const String otpSentToPrefix = 'We texted you a code to verify your email address: ';
+  static const String otpSentToSuffix = '';
   static const String verifyButton = 'Verify';
 
   static const String changePasswordTitle = 'Change password';

@@ -34,9 +34,9 @@ class OtpView extends GetView<OtpController> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   HighlightedBodyText(
-                    textBefore: 'We texted you a code to verify your email address: ',
+                    textBefore: AppStrings.otpSentToPrefix,
                     highlightedText: email,
-                    textAfter: '',
+                    textAfter: AppStrings.otpSentToSuffix,
                   ),
                   SizedBox(height: AppSpacing.xl),
                   const FieldLabel(AppStrings.enterOtp,
@@ -44,6 +44,7 @@ class OtpView extends GetView<OtpController> {
                   ),
                   SizedBox(height: AppSpacing.xs),
                   OtpFieldRow(
+                    controller: controller.otpController,
                     onResend: () {},
                   ),
                   SizedBox(height: AppSpacing.md),

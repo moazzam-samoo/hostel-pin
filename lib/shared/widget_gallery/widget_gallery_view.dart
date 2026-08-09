@@ -115,7 +115,7 @@ class _WidgetGalleryViewState extends State<WidgetGalleryView> {
           _buildSection('Layout', _buildLayouts()),
           _buildSection('Feedback', _buildFeedback(context)),
           _buildSection('Media', _buildMedia()),
-          const AppGap.xl(),
+          AppGap.xl(),
         ],
       ),
     );
@@ -126,13 +126,13 @@ class _WidgetGalleryViewState extends State<WidgetGalleryView> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SectionHeader(title: title),
-        const AppGap.md(),
+        AppGap.md(),
         ...children.map((child) => Padding(
               padding: EdgeInsets.only(bottom: AppSpacing.lg),
               child: child,
             )),
         const Divider(),
-        const AppGap.lg(),
+        AppGap.lg(),
       ],
     );
   }
@@ -190,9 +190,9 @@ class _WidgetGalleryViewState extends State<WidgetGalleryView> {
         child: Column(
           children: [
             Text('Sign In', style: AppTextStyles.authTitle),
-            const AppGap.md(),
+            AppGap.md(),
             const AppTextField(hintText: 'Email', leadingIcon: Icons.email),
-            const AppGap.md(),
+            AppGap.md(),
             PrimaryButton(text: 'Login', onPressed: () {}),
           ],
         ),
@@ -221,12 +221,12 @@ class _WidgetGalleryViewState extends State<WidgetGalleryView> {
     return [
       const FieldLabel('Full Name', isRequired: true),
       const AppTextField(hintText: 'Enter your name', leadingIcon: Icons.person),
-      const AppGap.md(),
+      AppGap.md(),
       const FieldLabel('Password'),
       const AppPasswordField(hintText: 'Enter your password'),
-      const AppGap.md(),
+      AppGap.md(),
       const AppSearchBar(hintText: 'Search hostels...'),
-      const AppGap.md(),
+      AppGap.md(),
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -237,11 +237,11 @@ class _WidgetGalleryViewState extends State<WidgetGalleryView> {
           ),
         ],
       ),
-      const AppGap.md(),
+      AppGap.md(),
       OtpFieldRow(onResend: () {}),
-      const AppGap.md(),
+      AppGap.md(),
       const FormSectionHeader(title: 'Select Amenities', description: 'Choose what you offer'),
-      const AppGap.md(),
+      AppGap.md(),
       AmenitySelector(
         selectedAmenities: _selectedAmenities,
         onToggle: (amenity) {
@@ -254,7 +254,7 @@ class _WidgetGalleryViewState extends State<WidgetGalleryView> {
           });
         },
       ),
-      const AppGap.md(),
+      AppGap.md(),
       AppDropdownField<String>(
         value: _dropdownValue,
         hintText: 'Select City',
@@ -279,7 +279,7 @@ class _WidgetGalleryViewState extends State<WidgetGalleryView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('Welcome Back', style: AppTextStyles.authTitle),
-                const AppGap.sm(),
+                AppGap.sm(),
                 Text('Hello there, sign in to continue', style: AppTextStyles.screenSubtitle),
               ],
             ),
@@ -452,9 +452,9 @@ class _WidgetGalleryViewState extends State<WidgetGalleryView> {
           ),
         ),
       ),
-      const AppGap.md(),
+      AppGap.md(),
       const MapPanel(mode: MapPanelMode.readonly),
-      const AppGap.md(),
+      AppGap.md(),
       MapPanel(mode: MapPanelMode.picker, onTap: () {}),
     ];
   }

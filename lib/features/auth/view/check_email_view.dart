@@ -43,9 +43,9 @@ class CheckEmailView extends StatelessWidget {
                   ),
                   SizedBox(height: AppSpacing.md),
                   HighlightedBodyText(
-                    textBefore: 'We sent a password reset link to ',
+                    textBefore: AppStrings.resetLinkSentPrefix,
                     highlightedText: email,
-                    textAfter: '. The link expires in 1 hour.',
+                    textAfter: AppStrings.resetLinkSentSuffix,
                   ),
                   SizedBox(height: AppSpacing.xl),
                   SecondaryButton(text: AppStrings.resendCode, onPressed: () {},

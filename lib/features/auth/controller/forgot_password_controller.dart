@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import '../../../core/routes/app_routes.dart';
+import '../../../shared/widgets/feedback/app_snackbar.dart';
 
 class ForgotPasswordController extends GetxController {
   final formKey = GlobalKey<FormState>();
@@ -15,6 +16,12 @@ class ForgotPasswordController extends GetxController {
 
   Future<void> sendResetLink() async {
     if (!formKey.currentState!.validate()) return;
+    
+    if (emailController.text == 'notfound@test.com') {
+      AppSnackbar.showGlobal(message: 'No account found with this email.', type: SnackbarType.error);
+      return;
+    }
+
     isLoading.value = true;
     await Future.delayed(const Duration(milliseconds: 1200));
     isLoading.value = false;

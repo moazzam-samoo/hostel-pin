@@ -28,7 +28,7 @@ class OtpFieldRow extends StatelessWidget {
         Expanded(
           child: AppTextField(
             controller: controller,
-            hintText: 'Enter 4-digit OTP',
+            hintText: AppStrings.otpFieldHint,
             keyboardType: TextInputType.number,
             errorText: errorText,
             onChanged: onChanged,

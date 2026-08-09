@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import '../../../core/routes/app_routes.dart';
+import '../../../shared/widgets/feedback/app_snackbar.dart';
 
 class SignupController extends GetxController {
   final formKey = GlobalKey<FormState>();
@@ -26,13 +27,13 @@ class SignupController extends GetxController {
   Future<void> submit() async {
     if (!formKey.currentState!.validate()) return;
     if (!acceptedTerms.value) {
-      Get.snackbar('Error', 'Please accept the Terms of Service to continue');
+      AppSnackbar.showGlobal(message: 'Please accept the Terms of Service to continue', type: SnackbarType.error);
       return;
     }
 
     // Trigger failure path for testing error UI
     if (emailController.text == 'error@test.com') {
-      Get.snackbar('Error', 'Email already in use (Mock Error)');
+      AppSnackbar.showGlobal(message: 'Email already in use (Mock Error)', type: SnackbarType.error);
       return;
     }
 

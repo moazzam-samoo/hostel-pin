@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import '../../../core/routes/app_routes.dart';
+import '../../../shared/widgets/feedback/app_snackbar.dart';
 import '../auth_controller.dart';
 
 class LoginController extends GetxController {
@@ -24,7 +25,7 @@ class LoginController extends GetxController {
 
     // Trigger failure path for testing error UI
     if (emailController.text == 'error@test.com') {
-      Get.snackbar('Error', 'Invalid credentials (Mock Error)');
+      AppSnackbar.showGlobal(message: 'Invalid credentials (Mock Error)', type: SnackbarType.error);
       return;
     }
 

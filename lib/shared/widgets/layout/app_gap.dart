@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-
+import '../../../core/theme/app_spacing.dart';
 class AppGap extends StatelessWidget {
   final double? height;
   final double? width;
 
   const AppGap({super.key, this.height, this.width});
 
-  const AppGap.xs({super.key}) : height = 4.0, width = 4.0;
-  const AppGap.sm({super.key}) : height = 8.0, width = 8.0;
-  const AppGap.md({super.key}) : height = 12.0, width = 12.0;
-  const AppGap.lg({super.key}) : height = 24.0, width = 24.0;
-  const AppGap.xl({super.key}) : height = 32.0, width = 32.0;
+  AppGap.xs({super.key}) : height = AppSpacing.xs, width = AppSpacing.xs;
+  AppGap.sm({super.key}) : height = AppSpacing.sm, width = AppSpacing.sm;
+  AppGap.md({super.key}) : height = AppSpacing.md, width = AppSpacing.md;
+  AppGap.lg({super.key}) : height = AppSpacing.lg, width = AppSpacing.lg;
+  AppGap.xl({super.key}) : height = AppSpacing.xl, width = AppSpacing.xl;
 
   @override
   Widget build(BuildContext context) {

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controller/login_controller.dart';
 import '../../../core/constants/app_strings.dart';
+import '../../../core/constants/app_sizes.dart';
 import '../../../core/constants/app_assets.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/routes/app_routes.dart';
@@ -37,26 +37,20 @@ class LoginView extends GetView<LoginController> {
                 SizedBox(height: AppSpacing.xl),
                 Text(
                   AppStrings.welcomeBack,
-                  style: AppTextStyles.authTitle.copyWith(
-                    color: AppColors.primary,
-                    fontSize: 24,
-                  ),
+                  style: AppTextStyles.authTitle,
                 ),
                 SizedBox(height: AppSpacing.xs),
                 Text(
                   AppStrings.loginSubtitle,
-                  style: AppTextStyles.body.copyWith(
-                    color: AppColors.textSecondary,
-                    fontSize: 13,
-                  ),
+                  style: AppTextStyles.labelSentence,
                 ),
                 SizedBox(height: AppSpacing.xl),
                 Center(
                   child: ConfettiDots(
                     child: Image.asset(
                       AppAssets.appLogo,
-                      width: 100,
-                      height: 100,
+                      width: AppSizes.authLogo,
+                      height: AppSizes.authLogo,
                     ),
                   ),
                 ),

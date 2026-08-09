@@ -15,7 +15,6 @@ class HostelFinderApp extends StatelessWidget {
       title: AppStrings.appName,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
-      darkTheme: AppTheme.dark,
       themeMode: ThemeMode.light, // Default to light theme as requested
       initialBinding: InitialBinding(),
       initialRoute: Routes.splash,

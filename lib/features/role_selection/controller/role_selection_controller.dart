@@ -1,25 +1,18 @@
 import 'package:get/get.dart';
 import '../../../core/enums/user_role.dart';
 import '../../../core/routes/app_routes.dart';
+import '../../auth/auth_controller.dart';
 
 class RoleSelectionController extends GetxController {
-  final isLoading = false.obs;
-  final selectedRole = Rx<UserRole?>(null);
-
-  void selectRole(UserRole role) {
-    selectedRole.value = role;
-  }
-
-  Future<void> confirmRole() async {
-    if (selectedRole.value == null) return;
-    isLoading.value = true;
-    await Future.delayed(const Duration(milliseconds: 1200));
-    isLoading.value = false;
-    
-    if (selectedRole.value == UserRole.student) {
-      Get.offAllNamed(Routes.studentHome);
+  // AuthController is guaranteed to be available here as it's registered
+  // by AuthBinding during Login/Signup before reaching Role Selection.
+  // Note: Deep linking directly to Role Selection would require checking if AuthController exists.
+  Future<void> selectRole(UserRole role) async {
+    Get.find<AuthController>().selectedRole.value = role;
+    if (role == UserRole.student) {
+      Get.offAllNamed(Routes.studentShell);
     } else {
-      Get.offAllNamed(Routes.ownerDashboard);
+      Get.offAllNamed(Routes.ownerShell);
     }
   }
 }

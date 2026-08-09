@@ -32,10 +32,7 @@ class PasswordSuccessView extends StatelessWidget {
             SizedBox(height: AppSpacing.xl),
             Text(
               AppStrings.passwordSuccessTitle,
-              style: AppTextStyles.authTitle.copyWith(
-                color: AppColors.primary,
-                fontSize: 20,
-              ),
+              style: AppTextStyles.successTitle,
               textAlign: TextAlign.center,
             ),
             SizedBox(height: AppSpacing.md),

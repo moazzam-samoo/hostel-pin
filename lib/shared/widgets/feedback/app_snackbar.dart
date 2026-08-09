@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_radius.dart';
 import '../../../core/theme/app_text_styles.dart';
@@ -6,6 +7,16 @@ import '../../../core/theme/app_text_styles.dart';
 enum SnackbarType { success, error, info }
 
 class AppSnackbar {
+  static void showGlobal({
+    required String message,
+    SnackbarType type = SnackbarType.info,
+    Duration duration = const Duration(seconds: 3),
+  }) {
+    final context = Get.context;
+    if (context == null) return;
+    show(context, message: message, type: type, duration: duration);
+  }
+
   static void show(
     BuildContext context, {
     required String message,
