@@ -1,14 +1,27 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-// import '../../features/splash/splash_view.dart';
+import '../../features/splash/splash_view.dart';
+import '../../features/splash/splash_binding.dart';
+import '../../features/welcome/welcome_view.dart';
+import '../../features/welcome/welcome_binding.dart';
+import '../../features/auth/view/login_view.dart';
+import '../../features/auth/view/signup_view.dart';
+import '../../features/auth/view/forgot_password_view.dart';
+import '../../features/auth/view/check_email_view.dart';
+import '../../features/auth/view/change_password_view.dart';
+import '../../features/auth/view/password_success_view.dart';
+import '../../features/auth/view/otp_view.dart';
+import '../../features/auth/auth_binding.dart';
+import '../../features/role_selection/view/role_selection_view.dart';
+import '../../features/role_selection/role_selection_binding.dart';
 import '../../shared/widget_gallery/widget_gallery_view.dart';
 import 'app_routes.dart';
-
 class AppPages {
   static final List<GetPage> pages = [
     GetPage(
       name: Routes.splash,
-      page: () => const Scaffold(body: Center(child: Text('Splash Screen'))),
+      page: () => const SplashView(),
+      binding: SplashBinding(),
     ),
     GetPage(
       name: Routes.widgetGallery,
@@ -16,39 +29,46 @@ class AppPages {
     ),
     GetPage(
       name: Routes.welcome,
-      page: () => const Scaffold(body: Center(child: Text('Welcome Screen'))),
+      page: () => const WelcomeView(),
+      binding: WelcomeBinding(),
     ),
     GetPage(
       name: Routes.roleSelection,
-      page: () => const Scaffold(body: Center(child: Text('Role Selection'))),
+      page: () => const RoleSelectionView(),
+      binding: RoleSelectionBinding(),
     ),
     GetPage(
       name: Routes.login,
-      page: () => const Scaffold(body: Center(child: Text('Login Screen'))),
+      page: () => const LoginView(),
+      binding: AuthBinding(),
     ),
     GetPage(
       name: Routes.signup,
-      page: () => const Scaffold(body: Center(child: Text('Signup Screen'))),
+      page: () => const SignupView(),
+      binding: AuthBinding(),
     ),
     GetPage(
       name: Routes.forgotPassword,
-      page: () => const Scaffold(body: Center(child: Text('Forgot Password Screen'))),
+      page: () => const ForgotPasswordView(),
+      binding: AuthBinding(),
     ),
     GetPage(
       name: Routes.checkEmail,
-      page: () => const Scaffold(body: Center(child: Text('Check Email'))),
+      page: () => const CheckEmailView(),
     ),
     GetPage(
       name: Routes.changePassword,
-      page: () => const Scaffold(body: Center(child: Text('Change Password'))),
+      page: () => const ChangePasswordView(),
+      binding: AuthBinding(),
     ),
     GetPage(
       name: Routes.passwordSuccess,
-      page: () => const Scaffold(body: Center(child: Text('Password Success'))),
+      page: () => const PasswordSuccessView(),
     ),
     GetPage(
       name: Routes.otp,
-      page: () => const Scaffold(body: Center(child: Text('OTP Verification'))),
+      page: () => const OtpView(),
+      binding: AuthBinding(),
     ),
     GetPage(
       name: Routes.studentShell,
