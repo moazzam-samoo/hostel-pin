@@ -8,12 +8,16 @@ class AppSearchBar extends StatelessWidget {
   final String hintText;
   final TextEditingController? controller;
   final void Function(String)? onChanged;
+  final bool readOnly;
+  final VoidCallback? onTap;
 
   const AppSearchBar({
     super.key,
     this.hintText = 'Search...',
     this.controller,
     this.onChanged,
+    this.readOnly = false,
+    this.onTap,
   });
 
   @override
@@ -23,6 +27,8 @@ class AppSearchBar extends StatelessWidget {
       child: TextField(
         controller: controller,
         onChanged: onChanged,
+        readOnly: readOnly,
+        onTap: onTap,
         style: AppTextStyles.body,
         decoration: InputDecoration(
           hintText: hintText,

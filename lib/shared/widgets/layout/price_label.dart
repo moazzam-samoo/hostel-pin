@@ -19,7 +19,7 @@ class PriceLabel extends StatelessWidget {
       textBaseline: TextBaseline.alphabetic,
       children: [
         Text(
-          'Rs ${Formatters.compact(price)}',
+          Formatters.currency(price),
           style: AppTextStyles.sectionHeader.copyWith(color: AppColors.primary),
         ),
         Text(

@@ -95,4 +95,81 @@ class AppStrings {
       'Enter a valid number starting with +92';
   static const String errorPriceInvalid = 'Enter a valid price';
   static const String errorRoomsInvalid = 'Enter a valid number of rooms';
+
+  // Home & Shared
+  static const String searchHint = 'Search...';
+  static const String featuredHostels = 'Featured Hostels';
+  static const String viewAll = 'View all';
+  static const String ratingFallback = '0.0';
+  static const String gymLabel = 'Gym';
+  static const String security247 = '24/7 Sec';
+  static const String allHostelsSection = 'All Hostels';
+
+  // Hostel Detail
+  static const String availableStatus = 'Available';
+  static const String locationPrefix = 'Location : ';
+  static const String callButton = 'Call';
+  static const String whatsappButton = 'Whatsapp';
+  static const String premiumFacilities = 'Premium Facilities...';
+  static const String aboutHostel = 'About the Hostel..';
+  static const String hostelLocationHeader = 'Location of our Hostel...';
+  static const String dropYourLocation = 'Drop your location';
+
+  // Map
+  static const String viewDetailsLink = 'View details';
+
+  // Saved
+  static const String savedEmptyTitle = 'No saved hostels yet';
+  static const String savedEmptyMessage = 'Save hostels while you explore to see them all here in your personal curated list.';
+  static const String startBrowsing = 'Start Browsing';
+  static const String youMightAlsoLike = 'You might also like';
+  static const String detailsLink = 'Details';
+
+  // Profile
+  static const String profileScreenTitle = 'Profile';
+  static const String editProfileButton = 'Edit Profile';
+  static const String appPreferencesSection = 'App Preferences';
+  static const String securityPrivacySection = 'Security & Privacy';
+  static const String darkModeTitle = 'Dark Mode';
+  static const String darkModeSubtitle = 'Switch to dark mode';
+  static const String notificationsTitle = 'Notifications';
+  static const String notificationsSubtitle = 'Stay updated';
+  static const String languageSelectionTitle = 'Language Selection';
+  static const String languageSelectionValue = 'English(US)';
+  static const String accountSettingsTitle = 'Account Settings';
+  static const String accountSettingsSubtitle = 'Preferences & Privacy';
+  static const String savedHostelsTitle = 'Saved Hostels';
+  static String savedHostelsSubtitle(int count) => '$count places you love';
+  static const String changePasswordRowTitle = 'Change Password';
+  static const String changePasswordRowSubtitle = 'Keep your account secure';
+  static const String privacySettingsTitle = 'Privacy Settings';
+  static const String logoutTitle = 'Logout';
+  static const String logoutSubtitle = 'Securely sign out';
+  static const String comingSoonSuffix = ' (Coming soon)';
+  static const String editProfileNameLabel = 'Full Name';
+  static const String editProfileSaved = 'Profile updated';
+  static const String logoutConfirmTitle = 'Log Out';
+  static const String logoutConfirmMessage = 'Are you sure you want to log out?';
+  static const String settingsPlaceholder = 'More account settings are coming soon.';
+  static const String privacyPlaceholder = 'Privacy controls are coming soon.';
+  static const String languageSheetTitle = 'Select Language';
+
+  // Search / Filter
+  static const String searchResultsTitle = 'Search Results';
+  static const String noResultsTitle = 'No Results Found';
+  static const String noResultsMessage = 'We could not find any hostels matching your criteria.';
+  static const String recentSearches = 'Recent Searches';
+  static const String filterTitle = 'Filters';
+  static const String priceRangeLabel = 'Price Range';
+  static const String amenitiesLabel = 'Amenities';
+  static const String genderPreferenceLabel = 'Gender Preference';
+  static const String distanceLabel = 'Distance';
+  static const String ratingLabel = 'Minimum Rating';
+  static const String applyFilters = 'Apply';
+  static const String resetFilters = 'Reset';
+  static const String sortTitle = 'Sort By';
+  static const String sortPriceLowHigh = 'Price: Low to High';
+  static const String sortPriceHighLow = 'Price: High to Low';
+  static const String sortRating = 'Rating: High to Low';
+  static const String sortDistance = 'Distance: Nearest First';
 }

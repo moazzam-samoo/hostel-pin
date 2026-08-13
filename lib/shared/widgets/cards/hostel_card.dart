@@ -6,6 +6,7 @@ import '../../../core/constants/app_sizes.dart';
 import '../../../core/theme/app_shadows.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/utils/formatters.dart';
+import '../media/network_image_box.dart';
 
 enum HostelCardSurface { tonal, lavender, outlined, elevated }
 enum HostelCardLayout { compact, featured, saved }
@@ -205,13 +206,13 @@ class HostelCard extends StatelessWidget {
   }
 
   Widget _buildImage() {
-    return Image.network(
-      imageUrl,
+    // Outer containers already clip (Container.clipBehavior on the card,
+    // or an explicit ClipRRect around the compact thumbnail), so this
+    // renders unrounded and lets the parent own the corners.
+    return NetworkImageBox(
+      imageUrl: imageUrl,
       fit: BoxFit.cover,
-      errorBuilder: (context, error, stackTrace) => Container(
-        color: AppColors.placeholder,
-        child: const Icon(Icons.image_not_supported, color: AppColors.textTertiary),
-      ),
+      borderRadius: BorderRadius.zero,
     );
   }
 
@@ -253,7 +254,7 @@ class HostelCard extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          'Rs ${Formatters.compact(price)}',
+          Formatters.currency(price),
           style: AppTextStyles.cardTitle.copyWith(color: AppColors.primary),
         ),
         Text(

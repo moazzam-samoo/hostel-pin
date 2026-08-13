@@ -17,7 +17,7 @@ class HostelFinderApp extends StatelessWidget {
       theme: AppTheme.light,
       themeMode: ThemeMode.light, // Default to light theme as requested
       initialBinding: InitialBinding(),
-      initialRoute: Routes.roleSelection,
+      initialRoute: Routes.splash,
       getPages: AppPages.pages,
       builder: (context, child) {
         final mediaQueryData = MediaQuery.of(context);

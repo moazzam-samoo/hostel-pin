@@ -8,6 +8,7 @@ enum SettingsRowTrailing { chevron, toggle, none }
 class SettingsRow extends StatelessWidget {
   final IconData icon;
   final String title;
+  final String? subtitle;
   final bool isDestructive;
   final SettingsRowTrailing trailing;
   final VoidCallback? onTap;
@@ -18,6 +19,7 @@ class SettingsRow extends StatelessWidget {
     super.key,
     required this.icon,
     required this.title,
+    this.subtitle,
     this.isDestructive = false,
     this.trailing = SettingsRowTrailing.chevron,
     this.onTap,
@@ -55,9 +57,22 @@ class SettingsRow extends StatelessWidget {
             Icon(icon, color: color, size: 24),
             SizedBox(width: AppSpacing.md),
             Expanded(
-              child: Text(
-                title,
-                style: AppTextStyles.body.copyWith(color: color),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    title,
+                    style: AppTextStyles.body.copyWith(color: color),
+                  ),
+                  if (subtitle != null) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle!,
+                      style: AppTextStyles.caption,
+                    ),
+                  ],
+                ],
               ),
             ),
             if (trailingWidget != null) trailingWidget,

@@ -14,6 +14,16 @@ import '../../features/auth/view/otp_view.dart';
 import '../../features/auth/auth_binding.dart';
 import '../../features/role_selection/view/role_selection_view.dart';
 import '../../features/role_selection/role_selection_binding.dart';
+import '../../features/student/shell/student_shell_view.dart';
+import '../../features/student/shell/student_shell_binding.dart';
+import '../../features/student/hostel_detail/hostel_detail_view.dart';
+import '../../features/student/hostel_detail/hostel_detail_binding.dart';
+import '../../features/student/search/search_view.dart';
+import '../../features/student/search/search_binding.dart';
+import '../../features/student/profile/edit_profile_view.dart';
+import '../../features/student/profile/edit_profile_controller.dart';
+import '../../features/student/profile/settings_view.dart';
+import '../../features/student/profile/privacy_settings_view.dart';
 import '../../shared/widget_gallery/widget_gallery_view.dart';
 import 'app_routes.dart';
 class AppPages {
@@ -72,7 +82,8 @@ class AppPages {
     ),
     GetPage(
       name: Routes.studentShell,
-      page: () => const Scaffold(body: Center(child: Text('Student Shell'))),
+      page: () => const StudentShellView(),
+      binding: StudentShellBinding(),
     ),
     GetPage(
       name: Routes.studentHome,
@@ -80,11 +91,13 @@ class AppPages {
     ),
     GetPage(
       name: Routes.studentSearch,
-      page: () => const Scaffold(body: Center(child: Text('Student Search'))),
+      page: () => const SearchView(),
+      binding: SearchBinding(),
     ),
     GetPage(
       name: Routes.studentHostelDetail,
-      page: () => const Scaffold(body: Center(child: Text('Hostel Detail'))),
+      page: () => const HostelDetailView(),
+      binding: HostelDetailBinding(),
     ),
     GetPage(
       name: Routes.studentMap,
@@ -104,15 +117,18 @@ class AppPages {
     ),
     GetPage(
       name: Routes.studentEditProfile,
-      page: () => const Scaffold(body: Center(child: Text('Edit Profile'))),
+      page: () => const EditProfileView(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut<EditProfileController>(() => EditProfileController());
+      }),
     ),
     GetPage(
       name: Routes.studentSettings,
-      page: () => const Scaffold(body: Center(child: Text('Settings'))),
+      page: () => const SettingsView(),
     ),
     GetPage(
       name: Routes.studentPrivacy,
-      page: () => const Scaffold(body: Center(child: Text('Privacy'))),
+      page: () => const PrivacySettingsView(),
     ),
     GetPage(
       name: Routes.ownerShell,
