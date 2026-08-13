@@ -19,12 +19,12 @@ class WelcomeView extends GetView<WelcomeController> {
       backgroundColor: Colors.white,
       body: Column(
         children: [
-          // Top band
-          Container(
-            height: 45 + MediaQuery.of(context).padding.top,
-            width: double.infinity,
-            color: AppColors.primaryVariant,
-          ),
+          // // Top band
+          // Container(
+          //   height: 45 + MediaQuery.of(context).padding.top,
+          //   width: double.infinity,
+          //   color: AppColors.primaryVariant,
+          // ),
           Expanded(
             child: Stack(
               fit: StackFit.expand,
@@ -40,55 +40,53 @@ class WelcomeView extends GetView<WelcomeController> {
                   ),
                 ),
                 // Content
-                SafeArea(
-                  top: false,
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: AppSpacing.gutter,
-                      vertical: AppSpacing.xl,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        SizedBox(height: AppSpacing.xl),
-                        Text(
-                          AppStrings.welcome,
-                          style: AppTextStyles.authTitle.copyWith(
-                            fontSize: 28,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        SizedBox(height: AppSpacing.xs),
-                        Text(
-                          AppStrings.welcomeTo,
-                          style: AppTextStyles.body.copyWith(
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: AppSpacing.gutter,
+                    vertical: AppSpacing.xl,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SizedBox(height: AppSpacing.xl),
+                      Text(
+                        AppStrings.welcome,
+                        style: AppTextStyles.authTitle.copyWith(
+                            fontSize: 28, fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(height: AppSpacing.xs),
+                      Text(
+                        AppStrings.welcomeTo,
+                        style: AppTextStyles.body.copyWith(
                             color: AppColors.textSecondary,
-                          ),
-                          textAlign: TextAlign.center,
+                            fontWeight: FontWeight.w600),
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(height: AppSpacing.xl),
+                      ConfettiDots(
+                        child: Image.asset(
+                          AppAssets.appLogo,
+                          width: AppSizes.authLogo,
+                          height: AppSizes.authLogo,
                         ),
-                        SizedBox(height: AppSpacing.xl),
-                        ConfettiDots(
-                          child: Image.asset(
-                            AppAssets.appLogo,
-                            width: AppSizes.authLogo,
-                            height: AppSizes.authLogo,
-                          ),
-                        ),
-                        SizedBox(height: AppSpacing.md),
-                        Text(
-                          AppStrings.appName,
-                          style: AppTextStyles.authTitle.copyWith(
+                      ),
+                      SizedBox(height: AppSpacing.md),
+                      Text(
+                        AppStrings.appName,
+                        style: AppTextStyles.authTitle.copyWith(
                             color: AppColors.textPrimary,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const Spacer(),
-                        PrimaryButton(text: AppStrings.continueButton, onPressed: controller.onContinue,
-                          expand: true,
-                        ),
-                        SizedBox(height: AppSpacing.md),
-                      ],
-                    ),
+                            fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.center,
+                      ),
+                      const Spacer(),
+                      PrimaryButton(
+                        text: AppStrings.continueButton,
+                        onPressed: controller.onContinue,
+                        expand: true,
+                      ),
+                      SizedBox(height: AppSpacing.md),
+                    ],
                   ),
                 ),
               ],

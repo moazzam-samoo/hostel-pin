@@ -16,11 +16,13 @@ class SignupController extends GetxController {
 
   @override
   void onClose() {
-    nameController.dispose();
-    emailController.dispose();
-    phoneController.dispose();
-    passwordController.dispose();
-    confirmPasswordController.dispose();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      nameController.dispose();
+      emailController.dispose();
+      phoneController.dispose();
+      passwordController.dispose();
+      confirmPasswordController.dispose();
+    });
     super.onClose();
   }
 

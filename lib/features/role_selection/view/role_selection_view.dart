@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controller/role_selection_controller.dart';
 import '../../../core/constants/app_strings.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/enums/user_role.dart';
@@ -14,7 +15,7 @@ class RoleSelectionView extends GetView<RoleSelectionController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.primaryVariant,
       body: AuthHeroSheet(
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(

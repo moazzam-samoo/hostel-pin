@@ -18,6 +18,7 @@ import '../../../shared/widgets/buttons/primary_button.dart';
 import '../../../shared/widgets/buttons/google_auth_button.dart';
 import '../widgets/auth_divider.dart';
 import '../widgets/auth_footer_prompt.dart';
+import '../../../core/theme/app_colors.dart';
 
 class LoginView extends GetView<LoginController> {
   const LoginView({super.key});
@@ -25,16 +26,19 @@ class LoginView extends GetView<LoginController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.primaryVariant,
       body: AuthHeroSheet(
         child: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(horizontal: AppSpacing.gutter),
+          padding: EdgeInsets.symmetric(
+            horizontal: AppSpacing.gutter,
+            vertical: AppSpacing.lg,
+          ),
           child: Form(
             key: controller.formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(height: AppSpacing.xl),
+                SizedBox(height: AppSpacing.md),
                 Text(
                   AppStrings.welcomeBack,
                   style: AppTextStyles.authTitle,
@@ -44,7 +48,7 @@ class LoginView extends GetView<LoginController> {
                   AppStrings.loginSubtitle,
                   style: AppTextStyles.labelSentence,
                 ),
-                SizedBox(height: AppSpacing.xl),
+                SizedBox(height: AppSpacing.lg),
                 Center(
                   child: ConfettiDots(
                     child: Image.asset(
@@ -54,13 +58,15 @@ class LoginView extends GetView<LoginController> {
                     ),
                   ),
                 ),
-                SizedBox(height: AppSpacing.xl),
-                const FieldLabel(AppStrings.emailLabel,
+                SizedBox(height: AppSpacing.lg),
+                const FieldLabel(
+                  AppStrings.emailLabel,
                   style: FieldLabelStyle.auth,
                 ),
                 SizedBox(height: AppSpacing.xs),
                 FormField<String>(
-                  validator: (val) => Validators.email(controller.emailController.text),
+                  validator: (val) =>
+                      Validators.email(controller.emailController.text),
                   builder: (state) {
                     return AppTextField(
                       controller: controller.emailController,
@@ -75,12 +81,14 @@ class LoginView extends GetView<LoginController> {
                   },
                 ),
                 SizedBox(height: AppSpacing.md),
-                const FieldLabel(AppStrings.passwordLabel,
+                const FieldLabel(
+                  AppStrings.passwordLabel,
                   style: FieldLabelStyle.auth,
                 ),
                 SizedBox(height: AppSpacing.xs),
                 FormField<String>(
-                  validator: (val) => Validators.password(controller.passwordController.text),
+                  validator: (val) =>
+                      Validators.password(controller.passwordController.text),
                   builder: (state) {
                     return AppPasswordField(
                       controller: controller.passwordController,
@@ -89,27 +97,40 @@ class LoginView extends GetView<LoginController> {
                     );
                   },
                 ),
-                SizedBox(height: AppSpacing.sm),
+                SizedBox(height: AppSpacing.xs),
                 Align(
                   alignment: Alignment.centerRight,
-                  child: TextLinkButton(text: AppStrings.forgotPassword, isSecondary: true, onPressed: () => Get.toNamed(Routes.forgotPassword),
+                  child: TextLinkButton(
+                    text: AppStrings.forgotPassword,
+                    isSecondary: true,
+                    onPressed: () => Get.toNamed(Routes.forgotPassword),
                   ),
                 ),
-                SizedBox(height: AppSpacing.xl),
+                SizedBox(height: AppSpacing.lg),
                 Obx(
-                  () => PrimaryButton(text: AppStrings.login, onPressed: controller.submit,
+                  () => PrimaryButton(
+                    text: AppStrings.login,
+                    onPressed: controller.submit,
                     expand: true,
                     isLoading: controller.isLoading.value,
                   ),
                 ),
-                SizedBox(height: AppSpacing.xl),
+                SizedBox(height: AppSpacing.lg),
                 const AuthDivider(),
-                SizedBox(height: AppSpacing.xl),
-                Center(child: GoogleAuthButton(isLoading: false, onPressed: () {})),
-                SizedBox(height: AppSpacing.xl),
-                AuthFooterPrompt(promptText: "Don't have an account?", actionText: "Sign up", onPressed: () => Get.toNamed(Routes.signup),
+                SizedBox(height: AppSpacing.lg),
+                Center(
+                  child: GoogleAuthButton(
+                    isLoading: false,
+                    onPressed: () {},
+                  ),
                 ),
-                SizedBox(height: AppSpacing.xl),
+                SizedBox(height: AppSpacing.lg),
+                AuthFooterPrompt(
+                  promptText: "Don't have an account?",
+                  actionText: "Sign up",
+                  onPressed: () => Get.toNamed(Routes.signup),
+                ),
+                SizedBox(height: AppSpacing.md),
               ],
             ),
           ),

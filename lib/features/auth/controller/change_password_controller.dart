@@ -11,8 +11,10 @@ class ChangePasswordController extends GetxController {
 
   @override
   void onClose() {
-    newPasswordController.dispose();
-    confirmPasswordController.dispose();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      newPasswordController.dispose();
+      confirmPasswordController.dispose();
+    });
     super.onClose();
   }
 

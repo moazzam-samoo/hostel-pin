@@ -9,7 +9,9 @@ class OtpController extends GetxController {
 
   @override
   void onClose() {
-    otpController.dispose();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      otpController.dispose();
+    });
     super.onClose();
   }
 

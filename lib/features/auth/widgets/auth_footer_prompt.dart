@@ -28,8 +28,10 @@ class AuthFooterPrompt extends StatelessWidget {
           ),
         ),
         SizedBox(width: AppSpacing.xs),
-        TextLinkButton(text: actionText, onPressed: onPressed,
-          isSecondary: false,
+        TextLinkButton(
+          text: actionText,
+          onPressed: onPressed,
+          isSecondary: true,
         ),
       ],
     );
