@@ -4,7 +4,9 @@ import 'search_controller.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_radius.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/utils/formatters.dart';
 import '../../../core/routes/app_routes.dart';
 import '../../../shared/widgets/navigation/app_top_bar.dart';
 import '../../../shared/widgets/inputs/app_search_bar.dart';
@@ -13,8 +15,6 @@ import '../../../shared/widgets/buttons/primary_button.dart';
 import '../../../shared/widgets/buttons/secondary_button.dart';
 import '../../../shared/widgets/layout/section_header.dart';
 import '../../../shared/widgets/cards/hostel_card.dart';
-import '../../../shared/widgets/layout/settings_row.dart';
-import '../../../shared/widgets/layout/auth_hero_sheet.dart';
 import '../../../shared/widgets/inputs/amenity_selector.dart';
 import '../../../shared/widgets/layout/form_section_header.dart';
 
@@ -30,11 +30,18 @@ class SearchView extends GetView<SearchController> {
 
     Get.bottomSheet(
       StatefulBuilder(builder: (context, setState) {
-        return AuthHeroSheet(
+        return Container(
+          padding: EdgeInsets.fromLTRB(
+            AppSpacing.gutter,
+            AppSpacing.lg,
+            AppSpacing.gutter,
+            AppSpacing.lg + MediaQuery.of(context).viewInsets.bottom,
+          ),
+          decoration: BoxDecoration(
+            color: AppColors.background,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.sheet)),
+          ),
           child: SingleChildScrollView(
-            padding: EdgeInsets.only(
-              bottom: MediaQuery.of(context).viewInsets.bottom,
-            ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -42,25 +49,39 @@ class SearchView extends GetView<SearchController> {
                 const SectionHeader(title: AppStrings.filterTitle),
                 SizedBox(height: AppSpacing.md),
 
-                FormSectionHeader(
-                  title: AppStrings.priceRangeLabel,
-                  description: 'Rs ${price.start.round()} — Rs ${price.end.round()}',
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      AppStrings.priceRangeLabel,
+                      style: AppTextStyles.formSectionTitle,
+                    ),
+                    Text(
+                      '${Formatters.currency(price.start)} — ${Formatters.currency(price.end)}',
+                      style: AppTextStyles.cardTitle.copyWith(
+                        color: AppColors.primary,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
                 ),
+                SizedBox(height: AppSpacing.xs),
                 RangeSlider(
                   values: price,
                   min: SearchController.minPrice,
                   max: SearchController.maxPrice,
-                  divisions: 30,
                   activeColor: AppColors.primary,
+                  inactiveColor: AppColors.primaryContainer,
                   labels: RangeLabels(
-                    'Rs ${price.start.round()}',
-                    'Rs ${price.end.round()}',
+                    Formatters.currency(price.start),
+                    Formatters.currency(price.end),
                   ),
                   onChanged: (v) => setState(() => price = v),
                 ),
                 SizedBox(height: AppSpacing.md),
 
                 const FormSectionHeader(title: AppStrings.amenitiesLabel),
+                SizedBox(height: AppSpacing.xs),
                 AmenitySelector(
                   selectedAmenities: amenities,
                   onToggle: (amenity) => setState(() {
@@ -73,27 +94,28 @@ class SearchView extends GetView<SearchController> {
                 ),
                 SizedBox(height: AppSpacing.md),
 
-                SettingsRow(
+                const FormSectionHeader(title: 'Sort By'),
+                SizedBox(height: AppSpacing.xs),
+                _SortOptionTile(
                   icon: Icons.attach_money,
                   title: AppStrings.sortPriceLowHigh,
-                  trailing: SettingsRowTrailing.toggle,
-                  toggleValue: sortByPrice,
-                  onToggleChanged: (v) {
+                  isSelected: sortByPrice,
+                  onTap: () {
                     setState(() {
-                      sortByPrice = v;
-                      if (v) sortByRating = false;
+                      sortByPrice = !sortByPrice;
+                      if (sortByPrice) sortByRating = false;
                     });
                   },
                 ),
-                SettingsRow(
-                  icon: Icons.star,
+                SizedBox(height: AppSpacing.sm),
+                _SortOptionTile(
+                  icon: Icons.star_border,
                   title: AppStrings.sortRating,
-                  trailing: SettingsRowTrailing.toggle,
-                  toggleValue: sortByRating,
-                  onToggleChanged: (v) {
+                  isSelected: sortByRating,
+                  onTap: () {
                     setState(() {
-                      sortByRating = v;
-                      if (v) sortByPrice = false;
+                      sortByRating = !sortByRating;
+                      if (sortByRating) sortByPrice = false;
                     });
                   },
                 ),
@@ -142,19 +164,20 @@ class SearchView extends GetView<SearchController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const AppTopBar(
-        variant: AppTopBarVariant.backOnly,
+        variant: AppTopBarVariant.brandWithBack,
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: AppSpacing.gutter),
+            padding: EdgeInsets.all(AppSpacing.gutter),
             child: Row(
               children: [
                 Expanded(
                   child: AppSearchBar(
-                    hintText: AppStrings.searchHint,
                     controller: controller.searchController,
+                    hintText: AppStrings.searchHint,
+                    onChanged: (v) => controller.searchQuery.value = v,
                   ),
                 ),
                 SizedBox(width: AppSpacing.sm),
@@ -165,16 +188,15 @@ class SearchView extends GetView<SearchController> {
               ],
             ),
           ),
-          SizedBox(height: AppSpacing.md),
           Expanded(
             child: Obx(() {
               if (controller.searchQuery.value.trim().isEmpty) {
                 return _buildRecentSearches();
-              } else if (controller.searchResults.isEmpty) {
-                return _buildEmptyState();
-              } else {
-                return _buildResultsList();
               }
+              if (controller.searchResults.isEmpty) {
+                return _buildEmptyState();
+              }
+              return _buildResultsList();
             }),
           ),
         ],
@@ -184,7 +206,7 @@ class SearchView extends GetView<SearchController> {
 
   Widget _buildRecentSearches() {
     return ListView(
-      padding: EdgeInsets.symmetric(horizontal: AppSpacing.gutter),
+      padding: EdgeInsets.all(AppSpacing.gutter),
       children: [
         const SectionHeader(title: AppStrings.recentSearches),
         SizedBox(height: AppSpacing.sm),
@@ -236,6 +258,7 @@ class SearchView extends GetView<SearchController> {
           price: hostel.pricePerMonth,
           rating: hostel.rating,
           imageUrl: hostel.photos.first,
+          amenities: hostel.amenities,
           layout: HostelCardLayout.compact,
           surface: HostelCardSurface.tonal,
           isSaved: controller.isSaved(hostel.id),
@@ -243,6 +266,70 @@ class SearchView extends GetView<SearchController> {
           onTap: () => Get.toNamed(Routes.studentHostelDetail, arguments: hostel),
         );
       },
+    );
+  }
+}
+
+class _SortOptionTile extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _SortOptionTile({
+    required this.icon,
+    required this.title,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(AppRadius.card),
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: AppSpacing.md,
+          vertical: AppSpacing.sm + 2,
+        ),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.primaryContainer : AppColors.background,
+          borderRadius: BorderRadius.circular(AppRadius.card),
+          border: Border.all(
+            color: isSelected ? AppColors.primary : AppColors.border,
+            width: isSelected ? 1.5 : 1.0,
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: isSelected ? AppColors.primary : AppColors.surfaceTonal,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                icon,
+                color: isSelected ? AppColors.background : AppColors.primary,
+                size: 18,
+              ),
+            ),
+            SizedBox(width: AppSpacing.md),
+            Expanded(
+              child: Text(
+                title,
+                style: AppTextStyles.body.copyWith(
+                  color: isSelected ? AppColors.primary : AppColors.textPrimary,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                ),
+              ),
+            ),
+            if (isSelected)
+              const Icon(Icons.check_circle, color: AppColors.primary, size: 20),
+          ],
+        ),
+      ),
     );
   }
 }

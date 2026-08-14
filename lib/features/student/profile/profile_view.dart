@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'profile_controller.dart';
 import '../../../core/constants/app_strings.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_radius.dart';
 import '../../../core/theme/app_spacing.dart';
+import '../../../core/theme/app_text_styles.dart';
 import '../../../shared/widgets/navigation/app_top_bar.dart';
+import '../../../shared/widgets/buttons/icon_circle_button.dart';
 import '../../../shared/widgets/layout/profile_header_block.dart';
-import '../../../shared/widgets/layout/form_section_header.dart';
 import '../../../shared/widgets/layout/settings_row.dart';
-import '../../../shared/widgets/buttons/primary_button.dart';
 import 'widgets/language_sheet.dart';
 
 class ProfileView extends GetView<ProfileController> {
@@ -16,96 +18,132 @@ class ProfileView extends GetView<ProfileController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const AppTopBar(
-        variant: AppTopBarVariant.titled,
-        title: AppStrings.profileScreenTitle,
+      appBar: AppTopBar(
+        variant: AppTopBarVariant.brand,
+        actions: [
+          IconCircleButton(
+            icon: Icons.more_vert,
+            onPressed: () {},
+          ),
+        ],
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(AppSpacing.gutter),
+        padding: EdgeInsets.symmetric(
+            horizontal: AppSpacing.gutter, vertical: AppSpacing.sm),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Obx(() => ProfileHeaderBlock(
-              name: controller.user?.displayName ?? '',
-              email: controller.user?.email ?? '',
-              imageUrl: controller.user?.photoUrl,
-            )),
+            Center(
+              child: Obx(() => ProfileHeaderBlock(
+                    name: controller.user?.displayName ?? 'Usaid Khan',
+                    email:
+                        controller.user?.email ?? 'usaidKhanChandio@gmail.com',
+                    imageUrl: controller.user?.photoUrl,
+                  )),
+            ),
             SizedBox(height: AppSpacing.md),
-            PrimaryButton(
-              text: AppStrings.editProfileButton,
-              onPressed: controller.onEditProfile,
+            Center(
+              child: InkWell(
+                onTap: controller.onEditProfile,
+                borderRadius: BorderRadius.circular(AppRadius.pill),
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 28, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary,
+                    borderRadius: BorderRadius.circular(AppRadius.pill),
+                  ),
+                  child: Text(
+                    AppStrings.editProfileButton,
+                    style: AppTextStyles.button.copyWith(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
             ),
             SizedBox(height: AppSpacing.xl),
 
-            // Order per I11: Account/Security → App Preferences → Logout
-            // (same order on both the student and owner profile screens).
-            const FormSectionHeader(title: AppStrings.securityPrivacySection),
-            SizedBox(height: AppSpacing.md),
+            // 1. App Preferences
+            Text(
+              AppStrings.appPreferencesSection,
+              style: AppTextStyles.cardTitle.copyWith(
+                fontSize: 16,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            SizedBox(height: AppSpacing.xs),
+            const SettingsRow(
+              icon: Icons.nightlight_round,
+              title: AppStrings.darkModeTitle,
+              subtitle:
+                  '${AppStrings.darkModeSubtitle}${AppStrings.comingSoonSuffix}',
+              trailing: SettingsRowTrailing.toggle,
+              toggleValue: false,
+              onToggleChanged: null,
+            ),
+            Obx(() => SettingsRow(
+                  icon: Icons.notifications,
+                  title: AppStrings.notificationsTitle,
+                  subtitle: AppStrings.notificationsSubtitle,
+                  trailing: SettingsRowTrailing.toggle,
+                  toggleValue: controller.notificationsEnabled.value,
+                  onToggleChanged: controller.toggleNotifications,
+                )),
             SettingsRow(
-              icon: Icons.manage_accounts,
+              icon: Icons.language,
+              title: AppStrings.languageSelectionTitle,
+              subtitle: AppStrings.languageSelectionValue,
+              trailing: SettingsRowTrailing.none,
+              onTap: () => showLanguageSheet(),
+            ),
+
+            SizedBox(height: AppSpacing.lg),
+
+            // 2. Security & Privacy
+            Text(
+              AppStrings.securityPrivacySection,
+              style: AppTextStyles.cardTitle.copyWith(
+                fontSize: 16,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            SizedBox(height: AppSpacing.xs),
+            SettingsRow(
+              icon: Icons.settings,
               title: AppStrings.accountSettingsTitle,
               subtitle: AppStrings.accountSettingsSubtitle,
               trailing: SettingsRowTrailing.chevron,
               onTap: controller.onAccountSettings,
             ),
             Obx(() => SettingsRow(
-              icon: Icons.bookmark,
-              title: AppStrings.savedHostelsTitle,
-              subtitle: AppStrings.savedHostelsSubtitle(controller.savedCount),
-              trailing: SettingsRowTrailing.chevron,
-              onTap: controller.onSavedHostels,
-            )),
+                  icon: Icons.favorite_border,
+                  title: AppStrings.savedHostelsTitle,
+                  subtitle:
+                      AppStrings.savedHostelsSubtitle(controller.savedCount),
+                  trailing: SettingsRowTrailing.chevron,
+                  onTap: controller.onSavedHostels,
+                )),
             SettingsRow(
-              icon: Icons.lock,
+              icon: Icons.lock_outline,
               title: AppStrings.changePasswordRowTitle,
               subtitle: AppStrings.changePasswordRowSubtitle,
               trailing: SettingsRowTrailing.chevron,
               onTap: controller.onChangePassword,
             ),
             SettingsRow(
-              icon: Icons.privacy_tip,
+              icon: Icons.shield_outlined,
               title: AppStrings.privacySettingsTitle,
               subtitle: AppStrings.controlProfile,
               trailing: SettingsRowTrailing.chevron,
               onTap: controller.onPrivacySettings,
             ),
-
-            SizedBox(height: AppSpacing.xl),
-            const FormSectionHeader(title: AppStrings.appPreferencesSection),
-            SizedBox(height: AppSpacing.md),
-            // No dark theme exists yet (I17) — shown disabled with a
-            // "Coming soon" suffix rather than a live toggle that does
-            // nothing when flipped.
-            const SettingsRow(
-              icon: Icons.dark_mode,
-              title: AppStrings.darkModeTitle,
-              subtitle: '${AppStrings.darkModeSubtitle}${AppStrings.comingSoonSuffix}',
-              trailing: SettingsRowTrailing.toggle,
-              toggleValue: false,
-              onToggleChanged: null,
-            ),
-            Obx(() => SettingsRow(
-              icon: Icons.notifications,
-              title: AppStrings.notificationsTitle,
-              subtitle: AppStrings.notificationsSubtitle,
-              trailing: SettingsRowTrailing.toggle,
-              toggleValue: controller.notificationsEnabled.value,
-              onToggleChanged: controller.toggleNotifications,
-            )),
-            SettingsRow(
-              icon: Icons.language,
-              title: AppStrings.languageSelectionTitle,
-              subtitle: AppStrings.languageSelectionValue,
-              trailing: SettingsRowTrailing.chevron,
-              onTap: () => showLanguageSheet(),
-            ),
-
-            SizedBox(height: AppSpacing.xl),
             SettingsRow(
               icon: Icons.logout,
               title: AppStrings.logoutTitle,
               subtitle: AppStrings.logoutSubtitle,
-              trailing: SettingsRowTrailing.none,
+              trailing: SettingsRowTrailing.chevron,
               isDestructive: true,
               onTap: controller.onLogout,
             ),

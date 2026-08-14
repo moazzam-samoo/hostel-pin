@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 
@@ -27,31 +28,56 @@ class UserAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool hasImage = imageUrl != null && imageUrl!.trim().isNotEmpty;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
         width: size,
         height: size,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           color: AppColors.primaryContainer,
           shape: BoxShape.circle,
-          image: imageUrl != null && imageUrl!.isNotEmpty
-              ? DecorationImage(
-                  image: NetworkImage(imageUrl!),
-                  fit: BoxFit.cover,
-                )
-              : null,
         ),
-        alignment: Alignment.center,
-        child: imageUrl == null || imageUrl!.isEmpty
-            ? Text(
-                initials,
-                style: AppTextStyles.sectionHeader.copyWith(
-                  color: AppColors.primary,
-                  fontSize: size * 0.4,
+        clipBehavior: Clip.antiAlias,
+        child: hasImage
+            ? CachedNetworkImage(
+                imageUrl: imageUrl!,
+                width: size,
+                height: size,
+                fit: BoxFit.cover,
+                placeholder: (context, url) => Container(
+                  color: AppColors.primaryContainer,
+                  child: const Center(
+                    child: SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                      ),
+                    ),
+                  ),
+                ),
+                errorWidget: (context, url, error) => Center(
+                  child: Text(
+                    initials,
+                    style: AppTextStyles.sectionHeader.copyWith(
+                      color: AppColors.primary,
+                      fontSize: size * 0.38,
+                    ),
+                  ),
                 ),
               )
-            : null,
+            : Center(
+                child: Text(
+                  initials,
+                  style: AppTextStyles.sectionHeader.copyWith(
+                    color: AppColors.primary,
+                    fontSize: size * 0.38,
+                  ),
+                ),
+              ),
       ),
     );
   }

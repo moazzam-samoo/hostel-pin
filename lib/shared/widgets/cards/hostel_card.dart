@@ -6,6 +6,7 @@ import '../../../core/constants/app_sizes.dart';
 import '../../../core/theme/app_shadows.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/utils/formatters.dart';
+import '../../../core/enums/amenity.dart';
 import '../media/network_image_box.dart';
 
 enum HostelCardSurface { tonal, lavender, outlined, elevated }
@@ -18,6 +19,8 @@ class HostelCard extends StatelessWidget {
   final num price;
   final double rating;
   final String imageUrl;
+  final String? ownerName;
+  final Set<Amenity> amenities;
   final bool isSaved;
   final VoidCallback? onTap;
   final VoidCallback? onHeartTap;
@@ -32,6 +35,8 @@ class HostelCard extends StatelessWidget {
     required this.price,
     required this.rating,
     required this.imageUrl,
+    this.ownerName,
+    this.amenities = const {},
     this.isSaved = false,
     this.onTap,
     this.onHeartTap,
@@ -86,8 +91,9 @@ class HostelCard extends StatelessWidget {
     switch (layout) {
       case HostelCardLayout.featured:
         return _buildFeatured();
-      case HostelCardLayout.compact:
       case HostelCardLayout.saved:
+        return _buildSaved();
+      case HostelCardLayout.compact:
         return _buildCompact();
     }
   }
@@ -97,18 +103,9 @@ class HostelCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Stack(
-          children: [
-            AspectRatio(
-              aspectRatio: 16 / 9,
-              child: _buildImage(),
-            ),
-            Positioned(
-              top: AppSpacing.sm,
-              right: AppSpacing.sm,
-              child: _buildHeart(),
-            ),
-          ],
+        AspectRatio(
+          aspectRatio: 16 / 10,
+          child: _buildImage(),
         ),
         Padding(
           padding: EdgeInsets.all(AppSpacing.md),
@@ -116,7 +113,60 @@ class HostelCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Flexible(
+                          child: Text(
+                            name,
+                            style: AppTextStyles.cardTitle,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        const Icon(
+                          Icons.arrow_forward,
+                          size: 16,
+                          color: AppColors.textPrimary,
+                        ),
+                      ],
+                    ),
+                  ),
+                  _buildHeart(),
+                ],
+              ),
+              SizedBox(height: AppSpacing.xs),
+              Text(
+                'Owner : ${ownerName ?? "Awais Khokhar"}',
+                style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSaved() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        AspectRatio(
+          aspectRatio: 16 / 9,
+          child: _buildImage(),
+        ),
+        Padding(
+          padding: EdgeInsets.all(AppSpacing.md),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
                 children: [
                   Expanded(
                     child: Text(
@@ -126,21 +176,40 @@ class HostelCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  _buildRating(),
+                  _buildHeart(),
                 ],
               ),
               SizedBox(height: AppSpacing.xs),
-              Text(
-                location,
-                style: AppTextStyles.locationTag,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              SizedBox(height: AppSpacing.md),
               Row(
                 children: [
                   Expanded(
-                    child: _buildPrice(),
+                    child: Text(
+                      'Owner : ${ownerName ?? "Awais Khokhar"}',
+                      style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  InkWell(
+                    onTap: onTap,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Details',
+                          style: AppTextStyles.caption.copyWith(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        const Icon(
+                          Icons.arrow_forward,
+                          size: 14,
+                          color: AppColors.primary,
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -155,7 +224,7 @@ class HostelCard extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.all(AppSpacing.sm),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           SizedBox(
             width: AppSizes.thumb,
@@ -182,21 +251,25 @@ class HostelCard extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    if (layout == HostelCardLayout.saved)
-                      _buildHeart()
-                    else
-                      _buildRating(),
+                    _buildRating(),
                   ],
                 ),
                 SizedBox(height: AppSpacing.xs),
-                Text(
-                  location,
-                  style: AppTextStyles.locationTag,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                _buildAmenitiesRow(),
+                SizedBox(height: AppSpacing.xs),
+                Row(
+                  children: [
+                    _buildPrice(),
+                    const Spacer(),
+                    Text(
+                      location.toUpperCase(),
+                      style: AppTextStyles.caption.copyWith(
+                        color: AppColors.textSecondary,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
                 ),
-                SizedBox(height: AppSpacing.sm),
-                _buildPrice(),
               ],
             ),
           ),
@@ -205,10 +278,48 @@ class HostelCard extends StatelessWidget {
     );
   }
 
+  Widget _buildAmenitiesRow() {
+    final list = <MapEntry<IconData, String>>[];
+    
+    bool hasGym = amenities.contains(Amenity.gym);
+    bool hasSecurity = amenities.contains(Amenity.security);
+
+    if (hasGym) {
+      list.add(const MapEntry(Icons.fitness_center, 'Gym'));
+    }
+    if (hasSecurity) {
+      list.add(const MapEntry(Icons.security, '24/7 Sec'));
+    }
+
+    if (list.length < 2) {
+      for (final a in amenities) {
+        if (a != Amenity.gym && a != Amenity.security) {
+          final label = a == Amenity.wifi ? 'Wifi' : (a == Amenity.meals ? 'Meals' : a.title.split(' ').first);
+          list.add(MapEntry(a.icon, label));
+          if (list.length >= 2) break;
+        }
+      }
+    }
+
+    // Default fallback if hostel has no amenities specified
+    if (list.isEmpty) {
+      list.add(const MapEntry(Icons.fitness_center, 'Gym'));
+      list.add(const MapEntry(Icons.security, '24/7 Sec'));
+    }
+
+    return Row(
+      children: [
+        for (int i = 0; i < list.length; i++) ...[
+          if (i > 0) SizedBox(width: AppSpacing.md),
+          Icon(list[i].key, size: 14, color: AppColors.textSecondary),
+          const SizedBox(width: 4),
+          Text(list[i].value, style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary)),
+        ],
+      ],
+    );
+  }
+
   Widget _buildImage() {
-    // Outer containers already clip (Container.clipBehavior on the card,
-    // or an explicit ClipRRect around the compact thumbnail), so this
-    // renders unrounded and lets the parent own the corners.
     return NetworkImageBox(
       imageUrl: imageUrl,
       fit: BoxFit.cover,
@@ -220,16 +331,12 @@ class HostelCard extends StatelessWidget {
     return InkWell(
       onTap: onHeartTap,
       borderRadius: BorderRadius.circular(AppRadius.round),
-      child: Container(
-        padding: const EdgeInsets.all(6),
-        decoration: const BoxDecoration(
-          color: AppColors.background,
-          shape: BoxShape.circle,
-        ),
+      child: Padding(
+        padding: const EdgeInsets.all(4),
         child: Icon(
           isSaved ? Icons.favorite : Icons.favorite_border,
           color: isSaved ? AppColors.heartActive : AppColors.textSecondary,
-          size: 18,
+          size: 20,
         ),
       ),
     );
@@ -255,11 +362,14 @@ class HostelCard extends StatelessWidget {
       children: [
         Text(
           Formatters.currency(price),
-          style: AppTextStyles.cardTitle.copyWith(color: AppColors.primary),
+          style: AppTextStyles.body.copyWith(
+            color: AppColors.secondary,
+            fontWeight: FontWeight.w600,
+          ),
         ),
         Text(
-          ' /month',
-          style: AppTextStyles.caption,
+          '/mnth',
+          style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary),
         ),
       ],
     );

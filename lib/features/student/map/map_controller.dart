@@ -12,6 +12,12 @@ class MapController extends GetxController {
   final hostels = <HostelModel>[].obs;
   final markers = <Marker>{}.obs;
   final selectedHostel = Rxn<HostelModel>();
+
+  /// Whether the GoogleMap widget should be built. Set to `false` to prevent
+  /// the fatal PlatformException when no API key is configured in
+  /// AndroidManifest.xml. Flip to `true` once you've added a real
+  /// `com.google.android.geo.API_KEY` meta-data entry.
+  final mapReady = false.obs;
   
   GoogleMapController? mapController;
   

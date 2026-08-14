@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_radius.dart';
-import '../feedback/app_loader.dart';
 
 class NetworkImageBox extends StatelessWidget {
   final String imageUrl;
@@ -22,12 +21,18 @@ class NetworkImageBox extends StatelessWidget {
 
   bool get _isNetwork => imageUrl.startsWith('http://') || imageUrl.startsWith('https://');
 
-  Widget _errorBox() => Container(
+  Widget _errorBox() => Image.asset(
+        'assets/images/placeholder_hostel.png',
         width: width,
         height: height,
-        color: AppColors.surfaceTonal,
-        child: const Center(
-          child: Icon(Icons.image_not_supported, color: AppColors.textTertiary),
+        fit: fit,
+        errorBuilder: (context, error, stackTrace) => Container(
+          width: width,
+          height: height,
+          color: AppColors.surfaceTonal,
+          child: const Center(
+            child: Icon(Icons.apartment, color: AppColors.textTertiary, size: 28),
+          ),
         ),
       );
 
@@ -35,8 +40,6 @@ class NetworkImageBox extends StatelessWidget {
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: borderRadius ?? BorderRadius.circular(AppRadius.card),
-      // Mock/local data (Phase 3) supplies asset paths; real data (Phase 7,
-      // Cloudinary) supplies http(s) URLs. Both are valid `imageUrl` inputs.
       child: _isNetwork
           ? CachedNetworkImage(
               imageUrl: imageUrl,
@@ -47,7 +50,16 @@ class NetworkImageBox extends StatelessWidget {
                 width: width,
                 height: height,
                 color: AppColors.surfaceTonal,
-                child: const AppLoader(color: AppColors.textSecondary),
+                child: const Center(
+                  child: SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                    ),
+                  ),
+                ),
               ),
               errorWidget: (context, url, error) => _errorBox(),
             )

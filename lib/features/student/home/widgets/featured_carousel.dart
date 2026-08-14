@@ -26,6 +26,8 @@ class FeaturedCarousel extends GetView<HomeController> {
             price: hostel.pricePerMonth,
             rating: hostel.rating,
             imageUrl: hostel.photos.first,
+            ownerName: hostel.ownerName,
+            amenities: hostel.amenities,
             layout: HostelCardLayout.featured,
             surface: HostelCardSurface.elevated,
             isSaved: controller.isSaved(hostel.id),
@@ -35,10 +37,10 @@ class FeaturedCarousel extends GetView<HomeController> {
         );
       },
       options: CarouselOptions(
-        height: 280, // Approximate height for featured card
-        viewportFraction: 0.85, // Closer to 0.72 might clip too much, let's try 0.85
+        height: 290,
+        viewportFraction: 0.76,
         enableInfiniteScroll: false,
-        padEnds: false, // align to the left
+        padEnds: false,
       ),
     );
   }

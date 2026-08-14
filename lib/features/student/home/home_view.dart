@@ -81,6 +81,7 @@ class HomeView extends GetView<HomeController> {
                 price: hostel.pricePerMonth,
                 rating: hostel.rating,
                 imageUrl: hostel.photos.first,
+                amenities: hostel.amenities,
                 layout: HostelCardLayout.compact,
                 surface: HostelCardSurface.tonal,
                 isSaved: controller.isSaved(hostel.id),

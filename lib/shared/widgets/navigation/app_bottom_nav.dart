@@ -29,52 +29,54 @@ class AppBottomNav extends StatelessWidget {
       ),
       child: SafeArea(
         top: false,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: items.asMap().entries.map((entry) {
-            final index = entry.key;
-            final item = entry.value;
-            final isSelected = index == currentIndex;
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: items.asMap().entries.map((entry) {
+              final index = entry.key;
+              final item = entry.value;
+              final isSelected = index == currentIndex;
 
-            return Expanded(
-              child: GestureDetector(
+              return GestureDetector(
                 behavior: HitTestBehavior.opaque,
                 onTap: () => onTabSelected(index),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      curve: Curves.easeInOut,
-                      padding: EdgeInsets.symmetric(
-                        horizontal: isSelected ? 20 : 12,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: isSelected ? AppColors.primaryContainer : Colors.transparent,
-                        borderRadius: BorderRadius.circular(AppRadius.pill),
-                      ),
-                      child: Icon(
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  curve: Curves.easeInOut,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: isSelected ? 16 : 8,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isSelected ? AppColors.primary : Colors.transparent,
+                    borderRadius: BorderRadius.circular(AppRadius.pill),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
                         item.icon,
-                        color: isSelected ? AppColors.primary : AppColors.textSecondary,
-                        size: 24,
+                        color: isSelected ? AppColors.background : AppColors.textSecondary,
+                        size: 22,
                       ),
-                    ),
-                    const SizedBox(height: 4),
-                    // Always render the text, but control color/weight to prevent layout jumps
-                    Text(
-                      item.label,
-                      style: AppTextStyles.labelMicro.copyWith(
-                        color: isSelected ? AppColors.primary : AppColors.textSecondary,
-                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                      ),
-                    ),
-                  ],
+                      if (isSelected) ...[
+                        const SizedBox(width: 6),
+                        Text(
+                          item.label,
+                          style: AppTextStyles.labelMicro.copyWith(
+                            color: AppColors.background,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
                 ),
-              ),
-            );
-          }).toList(),
+              );
+            }).toList(),
+          ),
         ),
       ),
     );

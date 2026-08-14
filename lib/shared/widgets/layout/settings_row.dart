@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_radius.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/app_spacing.dart';
+import '../../../core/constants/app_sizes.dart';
 
 enum SettingsRowTrailing { chevron, toggle, none }
 
@@ -29,12 +31,12 @@ class SettingsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = isDestructive ? AppColors.destructive : AppColors.textPrimary;
+    final textColor = isDestructive ? AppColors.destructive : AppColors.textPrimary;
 
     Widget? trailingWidget;
     switch (trailing) {
       case SettingsRowTrailing.chevron:
-        trailingWidget = const Icon(Icons.chevron_right, color: AppColors.textTertiary);
+        trailingWidget = const Icon(Icons.arrow_forward, color: AppColors.textTertiary, size: 18);
         break;
       case SettingsRowTrailing.toggle:
         trailingWidget = Switch(
@@ -50,11 +52,24 @@ class SettingsRow extends StatelessWidget {
 
     return InkWell(
       onTap: onTap,
+      borderRadius: BorderRadius.circular(AppRadius.card),
       child: Padding(
-        padding: EdgeInsets.symmetric(vertical: AppSpacing.md, horizontal: AppSpacing.gutter),
+        padding: EdgeInsets.symmetric(vertical: AppSpacing.sm),
         child: Row(
           children: [
-            Icon(icon, color: color, size: 24),
+            Container(
+              width: AppSizes.iconTile,
+              height: AppSizes.iconTile,
+              decoration: BoxDecoration(
+                color: isDestructive ? AppColors.destructive : AppColors.primaryVariant,
+                borderRadius: BorderRadius.circular(AppRadius.field),
+              ),
+              child: Icon(
+                icon,
+                color: AppColors.background,
+                size: 20,
+              ),
+            ),
             SizedBox(width: AppSpacing.md),
             Expanded(
               child: Column(
@@ -63,13 +78,16 @@ class SettingsRow extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: AppTextStyles.body.copyWith(color: color),
+                    style: AppTextStyles.body.copyWith(
+                      color: textColor,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                   if (subtitle != null) ...[
                     const SizedBox(height: 2),
                     Text(
                       subtitle!,
-                      style: AppTextStyles.caption,
+                      style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary),
                     ),
                   ],
                 ],

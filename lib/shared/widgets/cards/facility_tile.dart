@@ -27,50 +27,74 @@ class FacilityTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool isSelectMode = style == FacilityTileStyle.select;
-    final Color bgColor = isSelectMode && isSelected
-        ? AppColors.primaryContainer
+    final Color bgColor = isSelectMode
+        ? (isSelected ? AppColors.primaryContainer : AppColors.background)
+        : AppColors.surfaceTonal;
+    final Border? border = isSelectMode
+        ? Border.all(color: isSelected ? AppColors.primary : AppColors.border)
+        : null;
+
+    final Color badgeColor = isSelectMode
+        ? (isSelected ? AppColors.primary : AppColors.surfaceTonal)
         : AppColors.background;
-    final Color borderColor = isSelectMode && isSelected
-        ? AppColors.primary
-        : AppColors.border;
+
+    final Color iconColor = isSelectMode
+        ? (isSelected ? AppColors.background : AppColors.textPrimary)
+        : AppColors.primaryVariant;
 
     return InkWell(
       onTap: isSelectMode ? onTap : null,
       borderRadius: BorderRadius.circular(AppRadius.card),
       child: Container(
-        padding: EdgeInsets.all(AppSpacing.md),
+        padding: EdgeInsets.symmetric(
+          horizontal: AppSpacing.sm + 2,
+          vertical: AppSpacing.sm,
+        ),
         decoration: BoxDecoration(
           color: bgColor,
           borderRadius: BorderRadius.circular(AppRadius.card),
-          border: Border.all(color: borderColor),
+          border: border,
         ),
         child: Row(
           children: [
             Container(
-              padding: EdgeInsets.all(AppSpacing.sm),
+              padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
-                color: isSelectMode && isSelected ? AppColors.primary : AppColors.surfaceTonal,
+                color: badgeColor,
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 icon,
-                color: isSelectMode && isSelected ? AppColors.background : AppColors.textPrimary,
-                size: 20,
+                color: iconColor,
+                size: 18,
               ),
             ),
-            SizedBox(width: AppSpacing.md),
+            SizedBox(width: AppSpacing.sm),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
                     title,
-                    style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600),
+                    style: AppTextStyles.body.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimary,
+                      fontSize: 13,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
+                  const SizedBox(height: 1),
                   Text(
                     subtitle,
-                    style: AppTextStyles.caption,
+                    style: AppTextStyles.caption.copyWith(
+                      color: AppColors.textSecondary,
+                      fontSize: 11,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),

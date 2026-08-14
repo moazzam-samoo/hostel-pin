@@ -3,6 +3,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../shared/widgets/buttons/primary_button.dart';
 import '../../../../shared/widgets/buttons/secondary_button.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_strings.dart';
 
 class ContactActionRow extends StatelessWidget {
@@ -38,6 +39,7 @@ class ContactActionRow extends StatelessWidget {
           child: SecondaryButton(
             text: AppStrings.callButton,
             intent: ButtonIntent.secondary,
+            icon: const Icon(Icons.call, size: 18, color: AppColors.secondary),
             onPressed: _launchPhone,
           ),
         ),
@@ -45,6 +47,7 @@ class ContactActionRow extends StatelessWidget {
         Expanded(
           child: PrimaryButton(
             text: AppStrings.whatsappButton,
+            icon: const Icon(Icons.chat_bubble_outline, size: 18, color: AppColors.background),
             onPressed: _launchWhatsapp,
           ),
         ),
