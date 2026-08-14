@@ -65,43 +65,7 @@ class ProfileView extends GetView<ProfileController> {
             ),
             SizedBox(height: AppSpacing.xl),
 
-            // 1. App Preferences
-            Text(
-              AppStrings.appPreferencesSection,
-              style: AppTextStyles.cardTitle.copyWith(
-                fontSize: 16,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            SizedBox(height: AppSpacing.xs),
-            const SettingsRow(
-              icon: Icons.nightlight_round,
-              title: AppStrings.darkModeTitle,
-              subtitle:
-                  '${AppStrings.darkModeSubtitle}${AppStrings.comingSoonSuffix}',
-              trailing: SettingsRowTrailing.toggle,
-              toggleValue: false,
-              onToggleChanged: null,
-            ),
-            Obx(() => SettingsRow(
-                  icon: Icons.notifications,
-                  title: AppStrings.notificationsTitle,
-                  subtitle: AppStrings.notificationsSubtitle,
-                  trailing: SettingsRowTrailing.toggle,
-                  toggleValue: controller.notificationsEnabled.value,
-                  onToggleChanged: controller.toggleNotifications,
-                )),
-            SettingsRow(
-              icon: Icons.language,
-              title: AppStrings.languageSelectionTitle,
-              subtitle: AppStrings.languageSelectionValue,
-              trailing: SettingsRowTrailing.none,
-              onTap: () => showLanguageSheet(),
-            ),
-
-            SizedBox(height: AppSpacing.lg),
-
-            // 2. Security & Privacy
+            // 1. Security & Privacy
             Text(
               AppStrings.securityPrivacySection,
               style: AppTextStyles.cardTitle.copyWith(
@@ -138,6 +102,42 @@ class ProfileView extends GetView<ProfileController> {
               subtitle: AppStrings.controlProfile,
               trailing: SettingsRowTrailing.chevron,
               onTap: controller.onPrivacySettings,
+            ),
+
+            SizedBox(height: AppSpacing.lg),
+
+            // 2. App Preferences
+            Text(
+              AppStrings.appPreferencesSection,
+              style: AppTextStyles.cardTitle.copyWith(
+                fontSize: 16,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            SizedBox(height: AppSpacing.xs),
+            const SettingsRow(
+              icon: Icons.nightlight_round,
+              title: AppStrings.darkModeTitle,
+              subtitle:
+                  '${AppStrings.darkModeSubtitle}${AppStrings.comingSoonSuffix}',
+              trailing: SettingsRowTrailing.toggle,
+              toggleValue: false,
+              onToggleChanged: null,
+            ),
+            Obx(() => SettingsRow(
+                  icon: Icons.notifications,
+                  title: AppStrings.notificationsTitle,
+                  subtitle: AppStrings.notificationsSubtitle,
+                  trailing: SettingsRowTrailing.toggle,
+                  toggleValue: controller.notificationsEnabled.value,
+                  onToggleChanged: controller.toggleNotifications,
+                )),
+            SettingsRow(
+              icon: Icons.language,
+              title: AppStrings.languageSelectionTitle,
+              subtitle: AppStrings.languageSelectionValue,
+              trailing: SettingsRowTrailing.none,
+              onTap: () => showLanguageSheet(),
             ),
             SettingsRow(
               icon: Icons.logout,

@@ -33,5 +33,7 @@ class Routes {
   static const String ownerLocationPicker = '/owner/location-picker';
   static const String ownerVerification = '/owner/verification';
   static const String ownerPublishSuccess = '/owner/publish-success';
+  static const String ownerEditProfile = '/owner/edit-profile';
+  static const String ownerAccountSettings = '/owner/account-settings';
 
 }

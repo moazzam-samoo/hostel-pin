@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../../core/theme/app_colors.dart';
@@ -20,6 +21,12 @@ class NetworkImageBox extends StatelessWidget {
   });
 
   bool get _isNetwork => imageUrl.startsWith('http://') || imageUrl.startsWith('https://');
+
+  // Bundled assets always live under 'assets/' (see AppAssets); anything
+  // else that isn't a network URL is a local on-device file path — e.g.
+  // image_picker's XFile.path from Owner Add Listing's photo upload
+  // (Phase 4) before Phase 7 wires real Cloudinary uploads.
+  bool get _isAsset => imageUrl.startsWith('assets/');
 
   Widget _errorBox() => Image.asset(
         'assets/images/placeholder_hostel.png',
@@ -63,13 +70,21 @@ class NetworkImageBox extends StatelessWidget {
               ),
               errorWidget: (context, url, error) => _errorBox(),
             )
-          : Image.asset(
-              imageUrl,
-              width: width,
-              height: height,
-              fit: fit,
-              errorBuilder: (context, error, stackTrace) => _errorBox(),
-            ),
+          : _isAsset
+              ? Image.asset(
+                  imageUrl,
+                  width: width,
+                  height: height,
+                  fit: fit,
+                  errorBuilder: (context, error, stackTrace) => _errorBox(),
+                )
+              : Image.file(
+                  File(imageUrl),
+                  width: width,
+                  height: height,
+                  fit: fit,
+                  errorBuilder: (context, error, stackTrace) => _errorBox(),
+                ),
     );
   }
 }

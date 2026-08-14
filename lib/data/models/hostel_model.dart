@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import '../../core/enums/amenity.dart';
 import '../../core/enums/availability_status.dart';
+import '../../core/enums/listing_status.dart';
 
 class HostelModel {
   final String id;
@@ -22,6 +23,7 @@ class HostelModel {
   final int reviewCount;
   final int viewCount;
   final bool isFeatured;
+  final ListingStatus status;
 
   const HostelModel({
     required this.id,
@@ -43,6 +45,7 @@ class HostelModel {
     this.reviewCount = 0,
     this.viewCount = 0,
     this.isFeatured = false,
+    required this.status,
   });
 
   HostelModel copyWith({
@@ -65,6 +68,7 @@ class HostelModel {
     int? reviewCount,
     int? viewCount,
     bool? isFeatured,
+    ListingStatus? status,
   }) {
     return HostelModel(
       id: id ?? this.id,
@@ -86,6 +90,7 @@ class HostelModel {
       reviewCount: reviewCount ?? this.reviewCount,
       viewCount: viewCount ?? this.viewCount,
       isFeatured: isFeatured ?? this.isFeatured,
+      status: status ?? this.status,
     );
   }
 
@@ -112,7 +117,8 @@ class HostelModel {
       other.rating == rating &&
       other.reviewCount == reviewCount &&
       other.viewCount == viewCount &&
-      other.isFeatured == isFeatured;
+      other.isFeatured == isFeatured &&
+      other.status == status;
   }
 
   @override
@@ -122,7 +128,7 @@ class HostelModel {
       latitude, longitude, description, pricePerMonth,
       Object.hashAll(photos), Object.hashAll(amenities),
       availability, contactPhone, contactWhatsapp,
-      rating, reviewCount, viewCount, isFeatured,
+      rating, reviewCount, viewCount, isFeatured, status,
     ]);
   }
 }

@@ -11,7 +11,7 @@ import '../../../shared/widgets/layout/status_chip.dart';
 import '../../../shared/widgets/layout/price_label.dart';
 import '../../../shared/widgets/layout/section_header.dart';
 import 'widgets/contact_action_row.dart';
-import 'widgets/facility_grid.dart';
+import '../../../shared/widgets/cards/facility_grid.dart';
 import 'widgets/about_section.dart';
 import 'widgets/detail_location_section.dart';
 import 'widgets/photo_viewer_view.dart';

@@ -71,6 +71,88 @@ class AppStrings {
   static const String profile = 'Profile';
   static const String controlProfile = 'Control your profile';
   static const String roomsExample = 'e.g. 50 rooms';
+  static String dashboardGreeting(String name) => 'Hello, $name 👋';
+  static const String dashboardSubtitle = 'Manage your listings and student inquiries from one place.';
+  static const String totalListingLabel = 'Total Listing';
+  static const String totalViewsLabel = 'Total Views';
+  static const String activeLabel = 'Active';
+  static const String trafficLabel = 'Traffic';
+  static const String viewListingButton = 'View listing';
+  static const String pendingVerificationTitle = 'Pending Verification';
+  static String pendingVerificationMessage(String hostelName) => 'Hostel "$hostelName" is currently under review by our team. This usually takes 24 hours.';
+  static const String recentActivity = 'Recent Activity';
+  static const String genericPropertyName = 'Your property';
+
+  // Owner Listings
+  static const String myHostelsSubtitle = 'Manage your campus properties and availability.';
+  static const String editButton = 'Edit';
+  static const String deleteButton = 'Delete';
+  static const String deleteListingTitle = 'Delete Listing';
+  static const String deleteListingMessage = 'Are you sure you want to delete this listing? This cannot be undone.';
+  static const String expandReachTitle = 'Expand Your Reach';
+  static const String expandReachSubtitle = 'Have another property? Add it now to start receiving bookings.';
+  static const String addAnotherHostel = 'Add another hostel';
+  static const String noListingsTitle = 'No Listings Yet';
+  static const String noListingsMessage = 'You have not added any hostels yet.';
+
+  // Owner Add Listing
+  static const String listPropertyTitle = 'List Your Property';
+  static const String listPropertySubtitle = 'List your hostel to connect with students looking for a place to stay.';
+  static const String identityLocationSection = 'Identity & Location';
+  static const String hostelNameLabel = 'HOSTEL NAME';
+  static const String hostelNameHint = 'e.g: Chandia Hostel';
+  static const String fullAddressLabel = 'FULL ADDRESS';
+  static const String fullAddressHint = 'e.g: in Qasimabad';
+  static const String addPhotosSection = 'Add Photos of your Hostel';
+  static const String uploadPicturesLabel = 'Upload pictures';
+  static const String uploadPicturesHint = 'click to browse';
+  static const String minPhotosNote = '(Minimum 5 photos recommended)';
+  static const String roomsPricingSection = 'Rooms & Pricing';
+  static const String monthlyPriceLabel = 'Monthly Price';
+  static const String totalRoomsLabel = 'Total Rooms';
+  static const String includedFacilitiesLabel = 'Included Facilities..';
+  static const String ownerConnectivitySection = 'Owner Connectivity';
+  static const String phoneNoLabel = 'Phone no:';
+  static const String phoneHint = '+92-320605300';
+  static const String whatsappNumberLabel = 'Whatsapp number:';
+  static const String sameAsPhoneLabel = 'Same as phone number';
+  static const String saveAsDraft = 'Save as Draft';
+  static const String publishListing = 'Publish Listing';
+  static const String editListingTitle = 'Edit Listing';
+  static const String updateListingButton = 'Update Listing';
+  static const String listingPublishedTitle = 'Listing Published!';
+  static const String listingPublishedBody = 'Your hostel has been successfully published.';
+
+  // Owner Profile
+  static const String ownerProfileMyHostelsSubtitle = 'Manage your hostel';
+  static const String verificationCenterTitle = 'Verification Center';
+  static const String verificationCenterSubtitle = 'Manage identity';
+  static const String verificationStatusUnverified = 'Unverified';
+  static const String verificationStatusPending = 'Pending';
+  static const String verificationStatusVerified = 'Verified';
+  static const String currentStatusLabel = 'Current Status:';
+  static const String uploadDocumentLabel = 'Upload Document';
+  static const String verificationDocumentHint =
+      'Upload your CNIC or Business Registration to verify your identity.';
+
+  // Owner Add Listing — location picker & publish success
+  static const String pickLocationTitle = 'Pick Location';
+  static const String confirmLocationButton = 'Confirm Location';
+  static const String backToDashboardButton = 'Back to Dashboard';
+  static const String tapToPinLocation = 'Tap to pin location';
+  static String photosSelectedCount(int count) =>
+      '$count/10 photo${count == 1 ? '' : 's'} selected';
+  static String locationCoordinatesLabel(double lat, double lng) =>
+      'Lat ${lat.toStringAsFixed(4)}, Lng ${lng.toStringAsFixed(4)}';
+  static const String unsavedChangesTitle = 'Discard changes?';
+  static const String unsavedChangesMessage =
+      'You have unsaved changes. Are you sure you want to leave without saving?';
+  static const String discardButton = 'Discard';
+  static const String priceMonthSuffix = '/mnth';
+  static const String errorMinPhotos = 'Please add at least 5 photos.';
+  static const String errorMaxPhotos = 'You can add up to 10 photos only.';
+  static const String draftSavedMessage = 'Your listing has been saved as a draft.';
+  static const String listingDeletedMessage = 'Listing has been deleted.';
 
   // General & Amenities
   static const String meals = 'Meals';

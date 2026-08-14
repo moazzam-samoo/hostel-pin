@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import '../../core/enums/user_role.dart';
+import '../../core/enums/verification_status.dart';
 
 class UserPrefs {
   final bool darkMode;
@@ -45,6 +46,7 @@ class UserModel {
   final UserRole role;
   final List<String> savedHostelIds;
   final UserPrefs prefs;
+  final VerificationStatus verificationStatus;
 
   const UserModel({
     required this.uid,
@@ -54,6 +56,7 @@ class UserModel {
     required this.role,
     this.savedHostelIds = const [],
     this.prefs = const UserPrefs(),
+    this.verificationStatus = VerificationStatus.unverified,
   });
 
   UserModel copyWith({
@@ -64,6 +67,7 @@ class UserModel {
     UserRole? role,
     List<String>? savedHostelIds,
     UserPrefs? prefs,
+    VerificationStatus? verificationStatus,
   }) {
     return UserModel(
       uid: uid ?? this.uid,
@@ -73,6 +77,7 @@ class UserModel {
       role: role ?? this.role,
       savedHostelIds: savedHostelIds ?? this.savedHostelIds,
       prefs: prefs ?? this.prefs,
+      verificationStatus: verificationStatus ?? this.verificationStatus,
     );
   }
 
@@ -87,13 +92,14 @@ class UserModel {
       other.photoUrl == photoUrl &&
       other.role == role &&
       listEquals(other.savedHostelIds, savedHostelIds) &&
-      other.prefs == prefs;
+      other.prefs == prefs &&
+      other.verificationStatus == verificationStatus;
   }
 
   @override
   int get hashCode {
     return Object.hash(
-      uid, displayName, email, photoUrl, role, Object.hashAll(savedHostelIds), prefs
+      uid, displayName, email, photoUrl, role, Object.hashAll(savedHostelIds), prefs, verificationStatus
     );
   }
 }

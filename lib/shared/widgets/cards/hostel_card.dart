@@ -307,14 +307,20 @@ class HostelCard extends StatelessWidget {
       list.add(const MapEntry(Icons.security, '24/7 Sec'));
     }
 
-    return Row(
+    return Wrap(
+      spacing: AppSpacing.md,
+      runSpacing: AppSpacing.xs,
+      crossAxisAlignment: WrapCrossAlignment.center,
       children: [
-        for (int i = 0; i < list.length; i++) ...[
-          if (i > 0) SizedBox(width: AppSpacing.md),
-          Icon(list[i].key, size: 14, color: AppColors.textSecondary),
-          const SizedBox(width: 4),
-          Text(list[i].value, style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary)),
-        ],
+        for (int i = 0; i < list.length; i++)
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(list[i].key, size: 14, color: AppColors.textSecondary),
+              const SizedBox(width: 4),
+              Text(list[i].value, style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary)),
+            ],
+          ),
       ],
     );
   }

@@ -24,6 +24,16 @@ import '../../features/student/profile/edit_profile_view.dart';
 import '../../features/student/profile/edit_profile_controller.dart';
 import '../../features/student/profile/settings_view.dart';
 import '../../features/student/profile/privacy_settings_view.dart';
+import '../../features/owner/shell/owner_shell_view.dart';
+import '../../features/owner/shell/owner_shell_binding.dart';
+import '../../features/owner/add_listing/add_listing_view.dart';
+import '../../features/owner/add_listing/add_listing_controller.dart';
+import '../../features/owner/profile/verification_center_view.dart';
+import '../../features/owner/profile/account_settings_view.dart';
+import '../../features/owner/profile/owner_edit_profile_view.dart';
+import '../../features/owner/profile/owner_edit_profile_controller.dart';
+import '../../features/owner/add_listing/widgets/location_picker_view.dart';
+import '../../features/owner/add_listing/publish_success_view.dart';
 import '../../shared/widget_gallery/widget_gallery_view.dart';
 import 'app_routes.dart';
 class AppPages {
@@ -132,7 +142,8 @@ class AppPages {
     ),
     GetPage(
       name: Routes.ownerShell,
-      page: () => const Scaffold(body: Center(child: Text('Owner Shell'))),
+      page: () => const OwnerShellView(),
+      binding: OwnerShellBinding(),
     ),
     GetPage(
       name: Routes.ownerDashboard,
@@ -152,19 +163,33 @@ class AppPages {
     ),
     GetPage(
       name: Routes.ownerEdit,
-      page: () => const Scaffold(body: Center(child: Text('Owner Edit Listing'))),
+      page: () => const AddListingView(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut<AddListingController>(() => AddListingController());
+      }),
     ),
     GetPage(
       name: Routes.ownerLocationPicker,
-      page: () => const Scaffold(body: Center(child: Text('Location Picker'))),
+      page: () => const LocationPickerView(),
     ),
     GetPage(
       name: Routes.ownerVerification,
-      page: () => const Scaffold(body: Center(child: Text('Verification'))),
+      page: () => const VerificationCenterView(),
     ),
     GetPage(
       name: Routes.ownerPublishSuccess,
-      page: () => const Scaffold(body: Center(child: Text('Publish Success'))),
+      page: () => const PublishSuccessView(),
+    ),
+    GetPage(
+      name: Routes.ownerEditProfile,
+      page: () => const OwnerEditProfileView(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut<OwnerEditProfileController>(() => OwnerEditProfileController());
+      }),
+    ),
+    GetPage(
+      name: Routes.ownerAccountSettings,
+      page: () => const AccountSettingsView(),
     ),
   ];
 }

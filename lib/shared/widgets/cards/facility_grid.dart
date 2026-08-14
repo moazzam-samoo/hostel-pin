@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../../core/enums/amenity.dart';
-import '../../../../shared/widgets/cards/facility_tile.dart';
+import '../../../core/enums/amenity.dart';
+import 'facility_tile.dart';
 
 class FacilityGrid extends StatelessWidget {
   final Set<Amenity> amenities;
