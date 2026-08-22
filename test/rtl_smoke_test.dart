@@ -35,6 +35,7 @@ import 'package:get/get.dart';
 
 import 'package:hostel_finder_app/core/theme/app_theme.dart';
 import 'package:hostel_finder_app/data/services/mock_data_service.dart';
+import 'package:hostel_finder_app/data/services/session_service.dart';
 import 'package:hostel_finder_app/features/owner/add_listing/add_listing_controller.dart';
 import 'package:hostel_finder_app/features/owner/add_listing/add_listing_view.dart';
 import 'package:hostel_finder_app/features/owner/dashboard/dashboard_controller.dart';
@@ -45,6 +46,15 @@ import 'package:hostel_finder_app/shared/widgets/cards/hostel_card.dart';
 import 'package:hostel_finder_app/shared/widgets/navigation/app_bottom_nav.dart';
 import 'package:hostel_finder_app/shared/widgets/navigation/nav_item.dart';
 import 'package:hostel_finder_app/shared/widgets/layout/settings_row.dart';
+
+/// Test double for SessionService — see screen_size_test.dart's copy of the
+/// same fake for the full rationale (real AuthService/UserRepository touch
+/// live Firebase singletons at construction, unavailable in a plain widget
+/// test).
+class _FakeSessionService extends SessionService {
+  @override
+  void wireAuthState() {}
+}
 
 Future<void> _pumpRtl(WidgetTester tester, Widget child) async {
   tester.view.physicalSize = const Size(375, 812);
@@ -71,6 +81,7 @@ Future<void> _pumpRtl(WidgetTester tester, Widget child) async {
 void main() {
   setUp(() async {
     await Get.putAsync(() => MockDataService().init(), permanent: true);
+    Get.put<SessionService>(_FakeSessionService());
   });
 
   tearDown(() async {

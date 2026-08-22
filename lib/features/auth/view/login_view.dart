@@ -118,12 +118,17 @@ class LoginView extends GetView<LoginController> {
                 SizedBox(height: AppSpacing.lg),
                 const AuthDivider(),
                 SizedBox(height: AppSpacing.lg),
-                Center(
+                // Phase 6/F.2: beyond the documented one-line onPressed
+                // rewire, this button is now Obx-wrapped with a real
+                // isLoading binding (was hardcoded `false`) so the button's
+                // own spinner (see GoogleAuthButton) actually reflects an
+                // in-flight Google sign-in instead of staying tappable.
+                Obx(() => Center(
                   child: GoogleAuthButton(
-                    isLoading: false,
-                    onPressed: () {},
+                    isLoading: controller.isLoading.value,
+                    onPressed: controller.signInWithGoogle,
                   ),
-                ),
+                )),
                 SizedBox(height: AppSpacing.lg),
                 AuthFooterPrompt(
                   promptText: "Don't have an account?",

@@ -1,15 +1,19 @@
 import 'package:get/get.dart';
 import '../../../data/models/user_model.dart';
-import '../../../data/services/mock_data_service.dart';
+import '../../../data/services/session_service.dart';
+import '../../../data/repositories/auth_repository.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/routes/app_routes.dart';
 import '../../../shared/widgets/feedback/confirm_dialog.dart';
 import '../shell/student_shell_controller.dart';
+import '../../../data/services/mock_data_service.dart';
 
 class ProfileController extends GetxController {
+  final _sessionService = Get.find<SessionService>();
   final _dataService = Get.find<MockDataService>();
+  final _authRepo = Get.find<AuthRepository>();
 
-  UserModel? get user => _dataService.currentUser.value;
+  UserModel? get user => _sessionService.currentUser.value;
 
   int get savedCount => _dataService.savedHostelIds.length;
 
@@ -55,8 +59,9 @@ class ProfileController extends GetxController {
         message: AppStrings.logoutConfirmMessage,
         confirmText: AppStrings.logoutTitle,
         isDestructive: true,
-        onConfirm: () {
-          Get.back();
+        onConfirm: () async {
+          Get.back(); // close dialog
+          await _authRepo.signOut();
           Get.offAllNamed(Routes.login);
         },
         onCancel: () => Get.back(),

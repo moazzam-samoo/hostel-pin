@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/constants/app_strings.dart';
-import '../../../data/services/mock_data_service.dart';
+import '../../../data/services/session_service.dart';
+import '../../../data/repositories/user_repository.dart';
+import '../../../core/errors/failure.dart';
 import '../../../shared/widgets/feedback/app_snackbar.dart';
 
 class OwnerEditProfileController extends GetxController {
@@ -9,12 +11,13 @@ class OwnerEditProfileController extends GetxController {
   final nameController = TextEditingController();
   final isLoading = false.obs;
 
-  final MockDataService _dataService = Get.find<MockDataService>();
+  final SessionService _sessionService = Get.find<SessionService>();
+  final UserRepository _userRepo = Get.find<UserRepository>();
 
   @override
   void onInit() {
     super.onInit();
-    final user = _dataService.currentUser.value;
+    final user = _sessionService.currentUser.value;
     if (user != null) {
       nameController.text = user.displayName;
     }
@@ -27,23 +30,24 @@ class OwnerEditProfileController extends GetxController {
   }
 
   Future<void> save() async {
-    if (formKey.currentState?.validate() ?? false) {
-      isLoading.value = true;
+    if (!(formKey.currentState?.validate() ?? false)) return;
 
-      // Simulate network request
-      await Future.delayed(const Duration(seconds: 1));
+    final user = _sessionService.currentUser.value;
+    if (user == null) return;
 
-      final user = _dataService.currentUser.value;
-      if (user != null) {
-        final updated = user.copyWith(displayName: nameController.text.trim());
-        _dataService.currentUser.value = updated;
-        // In real app, persist to Firestore
-      }
-
-      isLoading.value = false;
+    isLoading.value = true;
+    try {
+      final updated = user.copyWith(displayName: nameController.text.trim());
+      await _userRepo.updateUserDoc(updated);
+      // SessionService's live users/{uid} stream picks up the change; no
+      // local mutation needed here.
       Get.back();
       AppSnackbar.showGlobal(
           message: AppStrings.editProfileSaved, type: SnackbarType.success);
+    } on Failure catch (f) {
+      AppSnackbar.showGlobal(message: f.message, type: SnackbarType.error);
+    } finally {
+      isLoading.value = false;
     }
   }
 }

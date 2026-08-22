@@ -1,15 +1,19 @@
 import 'package:get/get.dart';
-import '../../../data/services/mock_data_service.dart';
 import '../../../data/models/user_model.dart';
+import '../../../data/services/session_service.dart';
+import '../../../data/repositories/auth_repository.dart';
+import '../../../data/repositories/user_repository.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/routes/app_routes.dart';
 import '../../../shared/widgets/feedback/confirm_dialog.dart';
 import '../shell/owner_shell_controller.dart';
 
 class OwnerProfileController extends GetxController {
-  final MockDataService _dataService = Get.find<MockDataService>();
+  final SessionService _sessionService = Get.find<SessionService>();
+  final AuthRepository _authRepo = Get.find<AuthRepository>();
+  final UserRepository _userRepo = Get.find<UserRepository>();
 
-  Rx<UserModel?> get currentUser => _dataService.currentUser;
+  Rx<UserModel?> get currentUser => _sessionService.currentUser;
 
   // App Preferences — reads straight from the current user's prefs so it
   // stays in sync via the `currentUser` Rx dependency registered wherever
@@ -17,13 +21,17 @@ class OwnerProfileController extends GetxController {
   bool get notificationsEnabled =>
       currentUser.value?.prefs.notifications ?? true;
 
-  void toggleNotifications() {
-    // In a real app, update Firestore / SharedPreferences
+  void toggleNotifications() async {
     final user = currentUser.value;
     if (user != null) {
       final newPrefs =
           user.prefs.copyWith(notifications: !user.prefs.notifications);
-      _dataService.currentUser.value = user.copyWith(prefs: newPrefs);
+      final updatedUser = user.copyWith(prefs: newPrefs);
+      // Optimistic local update
+      currentUser.value = updatedUser;
+      
+      // Persist to Firestore
+      await _userRepo.updateUserDoc(updatedUser);
     }
   }
 
@@ -50,9 +58,9 @@ class OwnerProfileController extends GetxController {
         message: AppStrings.logoutConfirmMessage,
         confirmText: AppStrings.logoutTitle,
         isDestructive: true,
-        onConfirm: () {
-          Get.back();
-          _dataService.currentUser.value = null;
+        onConfirm: () async {
+          Get.back(); // close dialog
+          await _authRepo.signOut();
           Get.offAllNamed(Routes.login);
         },
         onCancel: () => Get.back(),

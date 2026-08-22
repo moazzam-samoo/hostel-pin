@@ -82,57 +82,55 @@ class StatRowTile extends StatelessWidget {
   }
 
   Widget _buildCard() {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Container(
-          width: 52,
-          height: 52,
-          decoration: BoxDecoration(
-            color: tileColor ?? AppColors.surfaceTonal,
-            borderRadius: BorderRadius.circular(AppRadius.iconBadge),
-          ),
-          child: Center(
-            child: Icon(icon, color: iconColor ?? AppColors.primary, size: 28),
-          ),
-        ),
-        SizedBox(width: AppSpacing.md),
-        Expanded(
-          child: Column(
+    return Container(
+      padding: EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: tileColor ?? AppColors.surfaceTonal,
+        borderRadius: BorderRadius.circular(AppRadius.card),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                title,
-                style: AppTextStyles.labelMicro.copyWith(
-                  color: iconColor ?? AppColors.primary,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 13.sp,
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: const BoxDecoration(
+                  color: AppColors.background,
+                  shape: BoxShape.circle,
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+                child: Icon(icon, color: iconColor ?? AppColors.primary, size: 24),
               ),
-              const SizedBox(height: 2),
-              Text(
-                value,
-                style: AppTextStyles.screenTitle.copyWith(
-                  fontSize: 22.sp,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
+              if (trailing != null) trailing!,
             ],
           ),
-        ),
-        // Flexible (not a bare widget) so this doesn't force a RenderFlex
-        // overflow when the tile is squeezed into a narrow Expanded slot
-        // (e.g. two stat cards side by side on Owner Dashboard) at small
-        // screen widths or 1.3x text scale — found via Phase 5's D.5
-        // responsiveness pass (TASK-Phase-5.md).
-        if (trailing != null) Flexible(child: trailing!),
-      ],
+          SizedBox(height: AppSpacing.md),
+          Text(
+            title,
+            style: AppTextStyles.labelMicro.copyWith(
+              color: AppColors.textSecondary,
+              fontWeight: FontWeight.w600,
+              fontSize: 13.sp,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: AppTextStyles.screenTitle.copyWith(
+              fontSize: 24.sp,
+              fontWeight: FontWeight.w700,
+              color: AppColors.textPrimary,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
     );
   }
 }

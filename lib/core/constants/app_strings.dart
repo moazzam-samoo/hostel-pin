@@ -57,6 +57,11 @@ class AppStrings {
   static const String newPasswordLabel = 'Type your new password';
   static const String confirmPasswordFieldLabel = 'Confirm password';
   static const String changePasswordButton = 'Change password';
+  static const String reauthTitle = 'Re-authenticate';
+  static const String reauthMessage =
+      'Please enter your current password to continue.';
+  static const String reauthConfirmButton = 'Confirm';
+  static const String cancelButton = 'Cancel';
 
   static const String passwordSuccessTitle = 'Change password successfully!';
   static const String passwordSuccessBody =
@@ -169,7 +174,7 @@ class AppStrings {
   static const String meals = 'Meals';
   static const String carBike = 'Car+Bike';
 
-  // Validation
+  // Validation & Errors
   static const String errorRequired = 'This field is required';
   static const String errorEmailRequired = 'Email is required';
   static const String errorEmailInvalid = 'Invalid email address';
@@ -188,6 +193,21 @@ class AppStrings {
       'Enter a valid number starting with +92';
   static const String errorPriceInvalid = 'Enter a valid price';
   static const String errorRoomsInvalid = 'Enter a valid number of rooms';
+  static const String errorGeneric = 'An unexpected error occurred. Please try again.';
+
+  // Firebase Errors
+  static const String errorUserNotFound = 'No user found for that email.';
+  static const String errorWrongPassword = 'Wrong password provided.';
+  static const String errorInvalidCredential = 'Invalid email or password.';
+  static const String errorEmailInUse = 'The account already exists for that email.';
+  static const String errorWeakPassword = 'The password provided is too weak.';
+  static const String errorOperationNotAllowed = 'This sign-in method is not enabled.';
+  static const String errorTooManyRequests = 'Too many requests. Please try again later.';
+  static const String errorUserDisabled = 'This user account has been disabled.';
+  static const String errorNetwork = 'Network error. Please check your connection.';
+  static const String errorRequiresRecentLogin = 'This operation requires you to re-authenticate.';
+  static const String errorAccountExistsWithDifferentCredential =
+      'An account already exists with the same email but a different sign-in method.';
 
   // Owner Dashboard
   static const String noRecentActivity = 'No recent activity';

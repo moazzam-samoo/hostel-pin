@@ -4,6 +4,7 @@ import '../models/hostel_model.dart';
 import '../models/user_model.dart';
 import '../mock/mock_hostels.dart';
 import '../mock/mock_user.dart';
+import 'session_service.dart';
 
 class MockDataService extends GetxService {
   final RxList<HostelModel> hostels = <HostelModel>[].obs;
@@ -12,8 +13,14 @@ class MockDataService extends GetxService {
   // A set of saved hostel IDs to sync between Home, Saved, and Map screens.
   final RxSet<String> savedHostelIds = <String>{}.obs;
 
-  List<HostelModel> get ownerListings =>
-      hostels.where((h) => h.ownerId == currentUser.value?.uid).toList();
+  // Filtered by the real, Firebase-authenticated owner's uid (SessionService)
+  // — not this service's own `currentUser`, which is a leftover mock-era
+  // field no longer kept in sync with the signed-in account. Hostel/listing
+  // data itself stays mock until Phase 7; only the identity used to filter
+  // "my listings" needs to be real.
+  List<HostelModel> get ownerListings => hostels
+      .where((h) => h.ownerId == Get.find<SessionService>().currentUser.value?.uid)
+      .toList();
 
   Future<MockDataService> init() async {
     // Load mock data

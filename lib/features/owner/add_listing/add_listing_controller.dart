@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart' show setEquals, listEquals;
 import 'package:get/get.dart';
 import '../../../data/models/hostel_model.dart';
 import '../../../data/services/mock_data_service.dart';
+import '../../../data/services/session_service.dart';
 import '../../../core/enums/amenity.dart';
 import '../../../core/enums/listing_status.dart';
 import '../../../core/enums/availability_status.dart';
@@ -21,6 +22,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 // widgets/location_picker_view.dart.
 class AddListingController extends GetxController {
   final MockDataService _dataService = Get.find<MockDataService>();
+  final SessionService _sessionService = Get.find<SessionService>();
 
   final formKey = GlobalKey<FormState>();
 
@@ -217,9 +219,9 @@ class AddListingController extends GetxController {
   }
 
   void _saveListing(ListingStatus status) {
-    final uid = _dataService.currentUser.value?.uid ?? 'mock_owner_id';
+    final uid = _sessionService.currentUser.value?.uid ?? 'mock_owner_id';
     final ownerName =
-        _dataService.currentUser.value?.displayName ?? 'Anonymous';
+        _sessionService.currentUser.value?.displayName ?? 'Anonymous';
 
     final hostel = HostelModel(
       id: _editingHostel?.id ??

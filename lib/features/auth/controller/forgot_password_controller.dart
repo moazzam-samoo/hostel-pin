@@ -2,8 +2,11 @@ import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import '../../../core/routes/app_routes.dart';
 import '../../../shared/widgets/feedback/app_snackbar.dart';
+import '../../../data/repositories/auth_repository.dart';
+import '../../../core/errors/failure.dart';
 
 class ForgotPasswordController extends GetxController {
+  final AuthRepository _authRepo = Get.find<AuthRepository>();
   final formKey = GlobalKey<FormState>();
   final emailController = TextEditingController();
   final isLoading = false.obs;
@@ -19,17 +22,14 @@ class ForgotPasswordController extends GetxController {
   Future<void> sendResetLink() async {
     if (!formKey.currentState!.validate()) return;
 
-    if (emailController.text == 'notfound@test.com') {
-      AppSnackbar.showGlobal(
-          message: 'No account found with this email.',
-          type: SnackbarType.error);
-      return;
-    }
-
     isLoading.value = true;
-    await Future.delayed(const Duration(milliseconds: 1200));
-    isLoading.value = false;
-    // Pass email as argument to checkEmail view
-    Get.toNamed(Routes.checkEmail, arguments: emailController.text);
+    try {
+      await _authRepo.sendPasswordResetEmail(emailController.text.trim());
+      Get.toNamed(Routes.checkEmail, arguments: emailController.text);
+    } on Failure catch (f) {
+      AppSnackbar.showGlobal(message: f.message, type: SnackbarType.error);
+    } finally {
+      isLoading.value = false;
+    }
   }
 }

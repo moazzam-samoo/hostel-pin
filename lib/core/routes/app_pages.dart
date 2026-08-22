@@ -36,6 +36,8 @@ import '../../features/owner/profile/owner_edit_profile_controller.dart';
 import '../../features/owner/add_listing/widgets/location_picker_view.dart';
 import '../../features/owner/add_listing/publish_success_view.dart';
 import '../../shared/widget_gallery/widget_gallery_view.dart';
+import '../middleware/auth_middleware.dart';
+import '../middleware/role_middleware.dart';
 import 'app_routes.dart';
 
 class AppPages {
@@ -96,6 +98,7 @@ class AppPages {
       name: Routes.studentShell,
       page: () => const StudentShellView(),
       binding: StudentShellBinding(),
+      middlewares: [AuthMiddleware(), RoleMiddleware()],
     ),
     GetPage(
       name: Routes.studentHome,
@@ -105,11 +108,13 @@ class AppPages {
       name: Routes.studentSearch,
       page: () => const SearchView(),
       binding: SearchBinding(),
+      middlewares: [AuthMiddleware()],
     ),
     GetPage(
       name: Routes.studentHostelDetail,
       page: () => const HostelDetailView(),
       binding: HostelDetailBinding(),
+      middlewares: [AuthMiddleware()],
     ),
     GetPage(
       name: Routes.studentMap,
@@ -133,19 +138,23 @@ class AppPages {
       binding: BindingsBuilder(() {
         Get.lazyPut<EditProfileController>(() => EditProfileController());
       }),
+      middlewares: [AuthMiddleware()],
     ),
     GetPage(
       name: Routes.studentSettings,
       page: () => const SettingsView(),
+      middlewares: [AuthMiddleware()],
     ),
     GetPage(
       name: Routes.studentPrivacy,
       page: () => const PrivacySettingsView(),
+      middlewares: [AuthMiddleware()],
     ),
     GetPage(
       name: Routes.ownerShell,
       page: () => const OwnerShellView(),
       binding: OwnerShellBinding(),
+      middlewares: [AuthMiddleware(), RoleMiddleware()],
     ),
     GetPage(
       name: Routes.ownerDashboard,
@@ -169,10 +178,12 @@ class AppPages {
       binding: BindingsBuilder(() {
         Get.lazyPut<AddListingController>(() => AddListingController());
       }),
+      middlewares: [AuthMiddleware()],
     ),
     GetPage(
       name: Routes.ownerLocationPicker,
       page: () => const LocationPickerView(),
+      middlewares: [AuthMiddleware()],
     ),
     GetPage(
       name: Routes.ownerVerification,
@@ -181,10 +192,12 @@ class AppPages {
         Get.lazyPut<VerificationCenterController>(
             () => VerificationCenterController());
       }),
+      middlewares: [AuthMiddleware()],
     ),
     GetPage(
       name: Routes.ownerPublishSuccess,
       page: () => const PublishSuccessView(),
+      middlewares: [AuthMiddleware()],
     ),
     GetPage(
       name: Routes.ownerEditProfile,
@@ -193,10 +206,12 @@ class AppPages {
         Get.lazyPut<OwnerEditProfileController>(
             () => OwnerEditProfileController());
       }),
+      middlewares: [AuthMiddleware()],
     ),
     GetPage(
       name: Routes.ownerAccountSettings,
       page: () => const AccountSettingsView(),
+      middlewares: [AuthMiddleware()],
     ),
   ];
 }

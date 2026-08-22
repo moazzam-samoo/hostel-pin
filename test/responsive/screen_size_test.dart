@@ -12,6 +12,7 @@ import 'package:get/get.dart';
 
 import 'package:hostel_finder_app/core/theme/app_theme.dart';
 import 'package:hostel_finder_app/data/services/mock_data_service.dart';
+import 'package:hostel_finder_app/data/services/session_service.dart';
 import 'package:hostel_finder_app/features/owner/add_listing/add_listing_controller.dart';
 import 'package:hostel_finder_app/features/owner/add_listing/add_listing_view.dart';
 import 'package:hostel_finder_app/features/owner/dashboard/dashboard_controller.dart';
@@ -34,6 +35,16 @@ const _sizes = <String, Size>{
   'iPad Pro portrait (800x1280)': Size(800, 1280),
   'baseline landscape (812x375)': Size(812, 375),
 };
+
+/// Test double for SessionService — skips wireAuthState()'s real Firebase
+/// calls (no Get.find<AuthService>()/UserRepository), leaving `currentUser`
+/// as a plain, never-populated Rxn. Fine here: none of the screens under
+/// test in this file assert on a specific signed-in identity, only that
+/// they render without overflow/exceptions.
+class _FakeSessionService extends SessionService {
+  @override
+  void wireAuthState() {}
+}
 
 Future<void> _pumpAtSize(
   WidgetTester tester,
@@ -68,6 +79,7 @@ Future<void> _pumpAtSize(
 void main() {
   setUp(() async {
     await Get.putAsync(() => MockDataService().init(), permanent: true);
+    Get.put<SessionService>(_FakeSessionService());
   });
 
   tearDown(() async {
