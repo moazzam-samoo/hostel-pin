@@ -15,7 +15,7 @@ class SignupController extends GetxController {
   final phoneController = TextEditingController(text: '+92');
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
-  
+
   final acceptedTerms = false.obs;
   final isLoading = false.obs;
 
@@ -34,13 +34,17 @@ class SignupController extends GetxController {
   Future<void> submit() async {
     if (!formKey.currentState!.validate()) return;
     if (!acceptedTerms.value) {
-      AppSnackbar.showGlobal(message: 'Please accept the Terms of Service to continue', type: SnackbarType.error);
+      AppSnackbar.showGlobal(
+          message: 'Please accept the Terms of Service to continue',
+          type: SnackbarType.error);
       return;
     }
 
     // Trigger failure path for testing error UI
     if (emailController.text == 'error@test.com') {
-      AppSnackbar.showGlobal(message: 'Email already in use (Mock Error)', type: SnackbarType.error);
+      AppSnackbar.showGlobal(
+          message: 'Email already in use (Mock Error)',
+          type: SnackbarType.error);
       return;
     }
 
@@ -52,6 +56,7 @@ class SignupController extends GetxController {
     // back to student only if reached directly (e.g. deep link) with no role set.
     final role = authController.selectedRole.value ?? UserRole.student;
     Get.find<MockDataService>().setCurrentUserForRole(role);
-    Get.offAllNamed(role == UserRole.student ? Routes.studentShell : Routes.ownerShell);
+    Get.offAllNamed(
+        role == UserRole.student ? Routes.studentShell : Routes.ownerShell);
   }
 }

@@ -40,7 +40,8 @@ class EmptyState extends StatelessWidget {
             SizedBox(height: AppSpacing.sm),
             Text(
               message,
-              style: AppTextStyles.body.copyWith(color: AppColors.textSecondary),
+              style:
+                  AppTextStyles.body.copyWith(color: AppColors.textSecondary),
               textAlign: TextAlign.center,
             ),
           ],

@@ -13,8 +13,9 @@ Future<BitmapDescriptor> buildHostelMarkerBitmap({
   final ui.PictureRecorder pictureRecorder = ui.PictureRecorder();
   final Canvas canvas = Canvas(pictureRecorder);
 
-  final Color stateColor = isSelected ? AppColors.markerSelected : AppColors.primary;
-  
+  final Color stateColor =
+      isSelected ? AppColors.markerSelected : AppColors.primary;
+
   // Measure text
   final TextPainter textPainter = TextPainter(textDirection: TextDirection.ltr);
   textPainter.text = TextSpan(
@@ -29,14 +30,14 @@ Future<BitmapDescriptor> buildHostelMarkerBitmap({
 
   final double paddingX = 12.0 * pixelRatio;
   final double paddingY = 8.0 * pixelRatio;
-  
+
   final double chipWidth = textPainter.width + (paddingX * 2);
   final double chipHeight = textPainter.height + (paddingY * 2);
   final double chipRadius = 16.0 * pixelRatio;
 
   final double stemHeight = 12.0 * pixelRatio;
   final double stemWidth = 2.0 * pixelRatio;
-  
+
   final double pinRadius = 8.0 * pixelRatio;
   final double dotRadius = 3.0 * pixelRatio;
   final double pinTailLength = 6.0 * pixelRatio;
@@ -65,21 +66,21 @@ Future<BitmapDescriptor> buildHostelMarkerBitmap({
 
   // Draw teardrop pin
   final double pinCenterY = chipHeight + stemHeight + pinRadius;
-  
+
   final Path pinPath = Path();
   pinPath.addArc(
     Rect.fromCircle(center: Offset(centerX, pinCenterY), radius: pinRadius),
     0,
     3.14159 * 2,
   );
-  
+
   // Triangle tail pointing down
   final Path tailPath = Path();
   tailPath.moveTo(centerX - pinRadius * 0.8, pinCenterY + pinRadius * 0.5);
   tailPath.lineTo(centerX + pinRadius * 0.8, pinCenterY + pinRadius * 0.5);
   tailPath.lineTo(centerX, pinCenterY + pinRadius + pinTailLength);
   tailPath.close();
-  
+
   canvas.drawPath(pinPath, paint);
   canvas.drawPath(tailPath, paint);
 
@@ -88,11 +89,12 @@ Future<BitmapDescriptor> buildHostelMarkerBitmap({
   canvas.drawCircle(Offset(centerX, pinCenterY), dotRadius, dotPaint);
 
   final ui.Image image = await pictureRecorder.endRecording().toImage(
-    totalWidth.toInt(),
-    totalHeight.toInt(),
-  );
-  
-  final ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+        totalWidth.toInt(),
+        totalHeight.toInt(),
+      );
+
+  final ByteData? byteData =
+      await image.toByteData(format: ui.ImageByteFormat.png);
   final Uint8List bytes = byteData!.buffer.asUint8List();
 
   // The canvas above was drawn at `pixelRatio`x scale for crispness — tell

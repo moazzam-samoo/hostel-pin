@@ -53,9 +53,10 @@ class HostelDetailView extends GetView<HostelDetailController> {
                       ),
                       SizedBox(width: AppSpacing.sm),
                       StatusChip(
-                        type: hostel.availability == AvailabilityStatus.available
-                            ? StatusChipType.available
-                            : StatusChipType.unavailable,
+                        type:
+                            hostel.availability == AvailabilityStatus.available
+                                ? StatusChipType.available
+                                : StatusChipType.unavailable,
                       ),
                     ],
                   ),

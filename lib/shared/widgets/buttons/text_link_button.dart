@@ -28,7 +28,8 @@ class TextLinkButton extends StatelessWidget {
           style: AppTextStyles.body.copyWith(
             color: isSecondary ? AppColors.secondary : AppColors.primary,
             decoration: isUnderlined ? TextDecoration.underline : null,
-            decorationColor: isSecondary ? AppColors.secondary : AppColors.primary,
+            decorationColor:
+                isSecondary ? AppColors.secondary : AppColors.primary,
           ),
         ),
       ),

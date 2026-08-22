@@ -90,7 +90,13 @@ class AddListingController extends GetxController {
       }
       update();
     });
-    for (final c in [nameController, addressController, priceController, roomsController, whatsappController]) {
+    for (final c in [
+      nameController,
+      addressController,
+      priceController,
+      roomsController,
+      whatsappController
+    ]) {
       c.addListener(update);
     }
     // photos/selectedAmenities are Rx collections — re-run isValid whenever
@@ -152,7 +158,8 @@ class AddListingController extends GetxController {
   }
 
   void toggleAvailability(bool isAvailable) {
-    availability.value = isAvailable ? AvailabilityStatus.available : AvailabilityStatus.full;
+    availability.value =
+        isAvailable ? AvailabilityStatus.available : AvailabilityStatus.full;
   }
 
   void toggleAmenity(Amenity amenity) {
@@ -181,7 +188,8 @@ class AddListingController extends GetxController {
         if (photos.length < 10) {
           photos.add(image.path);
         } else {
-          AppSnackbar.showGlobal(message: AppStrings.errorMaxPhotos, type: SnackbarType.error);
+          AppSnackbar.showGlobal(
+              message: AppStrings.errorMaxPhotos, type: SnackbarType.error);
           break;
         }
       }
@@ -195,11 +203,13 @@ class AddListingController extends GetxController {
   void publishListing() {
     if (formKey.currentState?.validate() ?? false) {
       if (photos.length < 5) {
-        AppSnackbar.showGlobal(message: AppStrings.errorMinPhotos, type: SnackbarType.error);
+        AppSnackbar.showGlobal(
+            message: AppStrings.errorMinPhotos, type: SnackbarType.error);
         return;
       }
       if (photos.length > 10) {
-        AppSnackbar.showGlobal(message: AppStrings.errorMaxPhotos, type: SnackbarType.error);
+        AppSnackbar.showGlobal(
+            message: AppStrings.errorMaxPhotos, type: SnackbarType.error);
         return;
       }
       _saveListing(ListingStatus.published);
@@ -208,10 +218,12 @@ class AddListingController extends GetxController {
 
   void _saveListing(ListingStatus status) {
     final uid = _dataService.currentUser.value?.uid ?? 'mock_owner_id';
-    final ownerName = _dataService.currentUser.value?.displayName ?? 'Anonymous';
-    
+    final ownerName =
+        _dataService.currentUser.value?.displayName ?? 'Anonymous';
+
     final hostel = HostelModel(
-      id: _editingHostel?.id ?? DateTime.now().millisecondsSinceEpoch.toString(),
+      id: _editingHostel?.id ??
+          DateTime.now().millisecondsSinceEpoch.toString(),
       ownerId: uid,
       ownerName: ownerName,
       name: nameController.text.trim(),

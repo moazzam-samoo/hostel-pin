@@ -25,24 +25,25 @@ class OwnerShellView extends GetView<OwnerShellController> {
       },
       child: Scaffold(
         body: Obx(() => IndexedStack(
-          index: controller.currentIndex.value,
-          children: const [
-            DashboardView(),
-            ListingsView(),
-            AddListingView(),
-            OwnerProfileView(),
-          ],
-        )),
+              index: controller.currentIndex.value,
+              children: const [
+                DashboardView(),
+                ListingsView(),
+                AddListingView(),
+                OwnerProfileView(),
+              ],
+            )),
         bottomNavigationBar: Obx(() => AppBottomNav(
-          currentIndex: controller.currentIndex.value,
-          onTabSelected: controller.onTabSelected,
-          items: const [
-            NavItem(label: 'Dashboard', icon: Icons.dashboard, route: ''),
-            NavItem(label: 'Listing', icon: Icons.list_alt, route: ''),
-            NavItem(label: 'Add', icon: Icons.add_circle_outline, route: ''),
-            NavItem(label: 'Profile', icon: Icons.person, route: ''),
-          ],
-        )),
+              currentIndex: controller.currentIndex.value,
+              onTabSelected: controller.onTabSelected,
+              items: const [
+                NavItem(label: 'Dashboard', icon: Icons.dashboard, route: ''),
+                NavItem(label: 'Listing', icon: Icons.list_alt, route: ''),
+                NavItem(
+                    label: 'Add', icon: Icons.add_circle_outline, route: ''),
+                NavItem(label: 'Profile', icon: Icons.person, route: ''),
+              ],
+            )),
       ),
     );
   }

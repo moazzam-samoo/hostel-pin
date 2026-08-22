@@ -18,9 +18,11 @@ class ForgotPasswordController extends GetxController {
 
   Future<void> sendResetLink() async {
     if (!formKey.currentState!.validate()) return;
-    
+
     if (emailController.text == 'notfound@test.com') {
-      AppSnackbar.showGlobal(message: 'No account found with this email.', type: SnackbarType.error);
+      AppSnackbar.showGlobal(
+          message: 'No account found with this email.',
+          type: SnackbarType.error);
       return;
     }
 

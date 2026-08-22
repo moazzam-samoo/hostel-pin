@@ -127,11 +127,17 @@ class _MapPanelState extends State<MapPanel> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.gps_fixed, size: 16, color: AppColors.textPrimary),
+                        const Icon(Icons.gps_fixed,
+                            size: 16, color: AppColors.textPrimary),
                         SizedBox(width: AppSpacing.xs),
-                        Text(
-                          widget.label,
-                          style: AppTextStyles.caption.copyWith(color: AppColors.textPrimary),
+                        Flexible(
+                          child: Text(
+                            widget.label,
+                            style: AppTextStyles.caption
+                                .copyWith(color: AppColors.textPrimary),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                       ],
                     ),

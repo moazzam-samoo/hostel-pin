@@ -1,0 +1,6 @@
+# Declares the `golden` tag golden_toolkit's testGoldens() applies to every
+# golden test (test/golden/shared_widgets_golden_test.dart), silencing the
+# "tag was used that wasn't specified in dart_test.yaml" warning `flutter
+# test` otherwise prints. No tests are excluded by default.
+tags:
+  golden:

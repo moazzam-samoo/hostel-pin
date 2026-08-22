@@ -24,7 +24,8 @@ class ActivityRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: AppSpacing.sm, horizontal: AppSpacing.gutter),
+      padding: EdgeInsets.symmetric(
+          vertical: AppSpacing.sm, horizontal: AppSpacing.gutter),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -49,13 +50,15 @@ class ActivityRow extends StatelessWidget {
                   SizedBox(height: AppSpacing.xs),
                   Text(
                     message!,
-                    style: AppTextStyles.body.copyWith(color: AppColors.textSecondary),
+                    style: AppTextStyles.body
+                        .copyWith(color: AppColors.textSecondary),
                   ),
                 ],
                 SizedBox(height: AppSpacing.xs),
                 Text(
                   timeAgo,
-                  style: AppTextStyles.caption.copyWith(color: AppColors.textTertiary),
+                  style: AppTextStyles.caption
+                      .copyWith(color: AppColors.textTertiary),
                 ),
               ],
             ),

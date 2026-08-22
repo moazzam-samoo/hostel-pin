@@ -4,6 +4,7 @@ class AppRadius {
   static double get field => 10.r;
   static double get button => 12.r;
   static double get card => 12.r;
+  static double get iconBadge => 14.r;
   static double get authCard => 16.r;
   static double get pill => 22.r;
   static double get sheet => 28.r;

@@ -48,7 +48,8 @@ class AppStrings {
   static const String resendCode = 'Resend';
   static const String verifyEmailTitle = 'Verify Your Email';
   static const String otpFieldHint = 'Enter 4-digit OTP';
-  static const String otpSentToPrefix = 'We texted you a code to verify your email address: ';
+  static const String otpSentToPrefix =
+      'We texted you a code to verify your email address: ';
   static const String otpSentToSuffix = '';
   static const String verifyButton = 'Verify';
 
@@ -72,32 +73,38 @@ class AppStrings {
   static const String controlProfile = 'Control your profile';
   static const String roomsExample = 'e.g. 50 rooms';
   static String dashboardGreeting(String name) => 'Hello, $name 👋';
-  static const String dashboardSubtitle = 'Manage your listings and student inquiries from one place.';
+  static const String dashboardSubtitle =
+      'Manage your listings and student inquiries from one place.';
   static const String totalListingLabel = 'Total Listing';
   static const String totalViewsLabel = 'Total Views';
   static const String activeLabel = 'Active';
   static const String trafficLabel = 'Traffic';
   static const String viewListingButton = 'View listing';
   static const String pendingVerificationTitle = 'Pending Verification';
-  static String pendingVerificationMessage(String hostelName) => 'Hostel "$hostelName" is currently under review by our team. This usually takes 24 hours.';
+  static String pendingVerificationMessage(String hostelName) =>
+      'Hostel "$hostelName" is currently under review by our team. This usually takes 24 hours.';
   static const String recentActivity = 'Recent Activity';
   static const String genericPropertyName = 'Your property';
 
   // Owner Listings
-  static const String myHostelsSubtitle = 'Manage your campus properties and availability.';
+  static const String myHostelsSubtitle =
+      'Manage your campus properties and availability.';
   static const String editButton = 'Edit';
   static const String deleteButton = 'Delete';
   static const String deleteListingTitle = 'Delete Listing';
-  static const String deleteListingMessage = 'Are you sure you want to delete this listing? This cannot be undone.';
+  static const String deleteListingMessage =
+      'Are you sure you want to delete this listing? This cannot be undone.';
   static const String expandReachTitle = 'Expand Your Reach';
-  static const String expandReachSubtitle = 'Have another property? Add it now to start receiving bookings.';
+  static const String expandReachSubtitle =
+      'Have another property? Add it now to start receiving bookings.';
   static const String addAnotherHostel = 'Add another hostel';
   static const String noListingsTitle = 'No Listings Yet';
   static const String noListingsMessage = 'You have not added any hostels yet.';
 
   // Owner Add Listing
   static const String listPropertyTitle = 'List Your Property';
-  static const String listPropertySubtitle = 'List your hostel to connect with students looking for a place to stay.';
+  static const String listPropertySubtitle =
+      'List your hostel to connect with students looking for a place to stay.';
   static const String identityLocationSection = 'Identity & Location';
   static const String hostelNameLabel = 'HOSTEL NAME';
   static const String hostelNameHint = 'e.g: Chandia Hostel';
@@ -123,7 +130,8 @@ class AppStrings {
   static const String editListingTitle = 'Edit Listing';
   static const String updateListingButton = 'Update Listing';
   static const String listingPublishedTitle = 'Listing Published!';
-  static const String listingPublishedBody = 'Your hostel has been successfully published.';
+  static const String listingPublishedBody =
+      'Your hostel has been successfully published.';
 
   // Owner Profile
   static const String ownerProfileMyHostelsSubtitle = 'Manage your hostel';
@@ -153,7 +161,8 @@ class AppStrings {
   static const String priceMonthSuffix = '/mnth';
   static const String errorMinPhotos = 'Please add at least 5 photos.';
   static const String errorMaxPhotos = 'You can add up to 10 photos only.';
-  static const String draftSavedMessage = 'Your listing has been saved as a draft.';
+  static const String draftSavedMessage =
+      'Your listing has been saved as a draft.';
   static const String listingDeletedMessage = 'Listing has been deleted.';
 
   // General & Amenities
@@ -206,10 +215,14 @@ class AppStrings {
   static const String viewDetailsLink = 'View details';
   static const String getDirectionsButton = 'Get Directions';
   static const String noMapsAppFound = 'No maps app found on this device.';
+  static const String allowLocationAccess = 'Allow Location Access';
+  static const String notNow = 'Not Now';
+  static const String continueText = 'Continue';
 
   // Saved
   static const String savedEmptyTitle = 'No saved hostels yet';
-  static const String savedEmptyMessage = 'Save hostels while you explore to see them all here in your personal curated list.';
+  static const String savedEmptyMessage =
+      'Save hostels while you explore to see them all here in your personal curated list.';
   static const String startBrowsing = 'Start Browsing';
   static const String youMightAlsoLike = 'You might also like';
   static const String detailsLink = 'Details';
@@ -238,15 +251,18 @@ class AppStrings {
   static const String editProfileNameLabel = 'Full Name';
   static const String editProfileSaved = 'Profile updated';
   static const String logoutConfirmTitle = 'Log Out';
-  static const String logoutConfirmMessage = 'Are you sure you want to log out?';
-  static const String settingsPlaceholder = 'More account settings are coming soon.';
+  static const String logoutConfirmMessage =
+      'Are you sure you want to log out?';
+  static const String settingsPlaceholder =
+      'More account settings are coming soon.';
   static const String privacyPlaceholder = 'Privacy controls are coming soon.';
   static const String languageSheetTitle = 'Select Language';
 
   // Search / Filter
   static const String searchResultsTitle = 'Search Results';
   static const String noResultsTitle = 'No Results Found';
-  static const String noResultsMessage = 'We could not find any hostels matching your criteria.';
+  static const String noResultsMessage =
+      'We could not find any hostels matching your criteria.';
   static const String recentSearches = 'Recent Searches';
   static const String filterTitle = 'Filters';
   static const String priceRangeLabel = 'Price Range';

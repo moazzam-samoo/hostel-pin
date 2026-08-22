@@ -33,11 +33,13 @@ class UploadPlaceholder extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.cloud_upload_outlined, color: AppColors.primary, size: 32),
+            const Icon(Icons.cloud_upload_outlined,
+                color: AppColors.primary, size: 32),
             SizedBox(height: AppSpacing.sm),
             Text(
               label,
-              style: AppTextStyles.body.copyWith(color: AppColors.textSecondary),
+              style:
+                  AppTextStyles.body.copyWith(color: AppColors.textSecondary),
             ),
           ],
         ),

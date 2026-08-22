@@ -1,7 +1,9 @@
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class AppSpacing {
+  static double get xxs => 2.w; // micro spacing
   static double get xs => 4.w;
+  static double get sm2 => 6.w; // tight spacing
   static double get sm => 8.w;
   static double get md => 12.w;
   static double get gutter => 16.w;

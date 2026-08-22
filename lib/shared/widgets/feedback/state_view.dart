@@ -24,7 +24,8 @@ class StateView extends StatelessWidget {
   Widget build(BuildContext context) {
     switch (state) {
       case StateViewStatus.loading:
-        return loadingBuilder ?? const Center(child: CircularProgressIndicator());
+        return loadingBuilder ??
+            const Center(child: CircularProgressIndicator());
       case StateViewStatus.empty:
         return emptyBuilder ?? const SizedBox.shrink();
       case StateViewStatus.error:

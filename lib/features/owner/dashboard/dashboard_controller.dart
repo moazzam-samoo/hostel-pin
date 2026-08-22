@@ -11,9 +11,10 @@ class DashboardController extends GetxController {
 
   UserModel? get currentUser => _dataService.currentUser.value;
   List<HostelModel> get ownerListings => _dataService.ownerListings;
-  
-  int get totalViews => ownerListings.fold(0, (sum, hostel) => sum + hostel.viewCount);
-  
+
+  int get totalViews =>
+      ownerListings.fold(0, (sum, hostel) => sum + hostel.viewCount);
+
   List<ActivityModel> get recentActivities => mockActivities;
 
   void navigateToTab(int index) {

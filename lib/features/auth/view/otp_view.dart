@@ -39,7 +39,8 @@ class OtpView extends GetView<OtpController> {
                     textAfter: AppStrings.otpSentToSuffix,
                   ),
                   SizedBox(height: AppSpacing.xl),
-                  const FieldLabel(AppStrings.enterOtp,
+                  const FieldLabel(
+                    AppStrings.enterOtp,
                     style: FieldLabelStyle.auth,
                   ),
                   SizedBox(height: AppSpacing.xs),
@@ -49,7 +50,9 @@ class OtpView extends GetView<OtpController> {
                   ),
                   SizedBox(height: AppSpacing.md),
                   Obx(
-                    () => PrimaryButton(text: AppStrings.verifyButton, onPressed: controller.verifyOtp,
+                    () => PrimaryButton(
+                      text: AppStrings.verifyButton,
+                      onPressed: controller.verifyOtp,
                       expand: true,
                       isLoading: controller.isLoading.value,
                     ),

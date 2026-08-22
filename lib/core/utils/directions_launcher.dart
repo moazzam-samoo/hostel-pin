@@ -12,13 +12,13 @@ Future<void> openDirectionsTo({
   try {
     final destination = Location.coords(latitude, longitude, title: title);
     final request = MapLauncher.directions(destination);
-    
+
     final availableMaps = await request.getSupportedMaps([
       MapApp.google,
       MapApp.apple,
       MapApp.waze,
     ]);
-    
+
     if (availableMaps.isEmpty) {
       AppSnackbar.showGlobal(
         message: AppStrings.noMapsAppFound,

@@ -24,7 +24,7 @@ class HomeController extends GetxController {
     status.value = StateViewStatus.loading;
     // Simulate network delay
     await Future.delayed(const Duration(seconds: 1));
-    
+
     if (_dataService.hostels.isEmpty) {
       status.value = StateViewStatus.empty;
     } else {

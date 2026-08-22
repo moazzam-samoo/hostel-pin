@@ -40,7 +40,7 @@ class AuthHeroSheet extends StatelessWidget {
                     )
                   : const SizedBox.shrink(),
             ),
-            
+
             // The curved bottom sheet area
             Expanded(
               child: Container(
@@ -60,4 +60,3 @@ class AuthHeroSheet extends StatelessWidget {
     );
   }
 }
-

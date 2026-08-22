@@ -32,11 +32,13 @@ class AppDropdownField<T> extends StatelessWidget {
             initialValue: value,
             items: items,
             onChanged: onChanged,
-            icon: const Icon(Icons.keyboard_arrow_down, color: AppColors.textSecondary),
+            icon: const Icon(Icons.keyboard_arrow_down,
+                color: AppColors.textSecondary),
             style: AppTextStyles.body,
             decoration: InputDecoration(
               hintText: hintText,
-              hintStyle: AppTextStyles.body.copyWith(color: AppColors.textSecondary),
+              hintStyle:
+                  AppTextStyles.body.copyWith(color: AppColors.textSecondary),
               filled: true,
               fillColor: AppColors.background,
               contentPadding: const EdgeInsets.symmetric(horizontal: 16),

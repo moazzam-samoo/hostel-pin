@@ -4,7 +4,7 @@ import '../../../data/services/mock_data_service.dart';
 
 class SavedController extends GetxController {
   final _dataService = Get.find<MockDataService>();
-  
+
   final savedHostels = <HostelModel>[].obs;
 
   @override
@@ -17,9 +17,8 @@ class SavedController extends GetxController {
   }
 
   void _loadSavedHostels() {
-    savedHostels.value = _dataService.hostels
-        .where((h) => _dataService.isSaved(h.id))
-        .toList();
+    savedHostels.value =
+        _dataService.hostels.where((h) => _dataService.isSaved(h.id)).toList();
   }
 
   // "You might also like" renders regardless of whether the saved list

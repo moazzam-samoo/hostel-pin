@@ -19,9 +19,13 @@ class SectionHeader extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          title,
-          style: AppTextStyles.sectionHeader,
+        Flexible(
+          child: Text(
+            title,
+            style: AppTextStyles.sectionHeader,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
         if (trailingText != null)
           GestureDetector(

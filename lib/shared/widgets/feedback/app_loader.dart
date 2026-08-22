@@ -27,7 +27,8 @@ class AppLoader extends StatelessWidget {
             SizedBox(height: AppSpacing.md),
             Text(
               message!,
-              style: AppTextStyles.body.copyWith(color: AppColors.textSecondary),
+              style:
+                  AppTextStyles.body.copyWith(color: AppColors.textSecondary),
               textAlign: TextAlign.center,
             ),
           ],

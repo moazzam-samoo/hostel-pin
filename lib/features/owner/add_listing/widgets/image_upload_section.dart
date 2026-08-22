@@ -29,7 +29,8 @@ class ImageUploadSection extends GetView<AddListingController> {
           Text(
             AppStrings.photosSelectedCount(photos.length),
             style: AppTextStyles.caption.copyWith(
-              color: photos.length < 5 ? AppColors.error : AppColors.textSecondary,
+              color:
+                  photos.length < 5 ? AppColors.error : AppColors.textSecondary,
             ),
           ),
           if (photos.isNotEmpty) ...[
@@ -52,22 +53,22 @@ class ImageUploadSection extends GetView<AddListingController> {
       height: 80,
       child: Stack(
         children: [
-          url.startsWith('http') 
-            ? NetworkImageBox(
-                imageUrl: url,
-                width: 80,
-                height: 80,
-                borderRadius: BorderRadius.circular(AppRadius.field),
-              )
-            : ClipRRect(
-                borderRadius: BorderRadius.circular(AppRadius.field),
-                child: Image.file(
-                  File(url),
+          url.startsWith('http')
+              ? NetworkImageBox(
+                  imageUrl: url,
                   width: 80,
                   height: 80,
-                  fit: BoxFit.cover,
+                  borderRadius: BorderRadius.circular(AppRadius.field),
+                )
+              : ClipRRect(
+                  borderRadius: BorderRadius.circular(AppRadius.field),
+                  child: Image.file(
+                    File(url),
+                    width: 80,
+                    height: 80,
+                    fit: BoxFit.cover,
+                  ),
                 ),
-              ),
           Positioned(
             top: 4,
             right: 4,
@@ -76,7 +77,7 @@ class ImageUploadSection extends GetView<AddListingController> {
                 controller.photos.remove(url);
               },
               child: Container(
-                padding: const EdgeInsets.all(2),
+                padding: EdgeInsets.all(AppSpacing.xxs),
                 decoration: const BoxDecoration(
                   color: Colors.black54,
                   shape: BoxShape.circle,
@@ -89,5 +90,4 @@ class ImageUploadSection extends GetView<AddListingController> {
       ),
     );
   }
-
 }

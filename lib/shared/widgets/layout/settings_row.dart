@@ -31,12 +31,14 @@ class SettingsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textColor = isDestructive ? AppColors.destructive : AppColors.textPrimary;
+    final textColor =
+        isDestructive ? AppColors.destructive : AppColors.textPrimary;
 
     Widget? trailingWidget;
     switch (trailing) {
       case SettingsRowTrailing.chevron:
-        trailingWidget = const Icon(Icons.arrow_forward, color: AppColors.textTertiary, size: 18);
+        trailingWidget = const Icon(Icons.arrow_forward,
+            color: AppColors.textTertiary, size: 18);
         break;
       case SettingsRowTrailing.toggle:
         trailingWidget = Switch(
@@ -61,7 +63,9 @@ class SettingsRow extends StatelessWidget {
               width: AppSizes.iconTile,
               height: AppSizes.iconTile,
               decoration: BoxDecoration(
-                color: isDestructive ? AppColors.destructive : AppColors.primaryVariant,
+                color: isDestructive
+                    ? AppColors.destructive
+                    : AppColors.primaryVariant,
                 borderRadius: BorderRadius.circular(AppRadius.field),
               ),
               child: Icon(
@@ -87,7 +91,8 @@ class SettingsRow extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       subtitle!,
-                      style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary),
+                      style: AppTextStyles.caption
+                          .copyWith(color: AppColors.textSecondary),
                     ),
                   ],
                 ],

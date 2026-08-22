@@ -26,10 +26,12 @@ class EditProfileView extends GetView<EditProfileController> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const FieldLabel(AppStrings.editProfileNameLabel, style: FieldLabelStyle.form),
+              const FieldLabel(AppStrings.editProfileNameLabel,
+                  style: FieldLabelStyle.form),
               SizedBox(height: AppSpacing.xs),
               FormField<String>(
-                validator: (val) => Validators.required(controller.nameController.text),
+                validator: (val) =>
+                    Validators.required(controller.nameController.text),
                 builder: (state) => AppTextField(
                   controller: controller.nameController,
                   hintText: AppStrings.editProfileNameLabel,

@@ -37,7 +37,8 @@ class _ImageCarouselState extends State<ImageCarousel> {
         height: widget.height,
         decoration: BoxDecoration(
           color: AppColors.surfaceTonal,
-          borderRadius: widget.borderRadius ?? BorderRadius.circular(AppRadius.card),
+          borderRadius:
+              widget.borderRadius ?? BorderRadius.circular(AppRadius.card),
         ),
         child: const Center(
           child: Icon(Icons.image_not_supported, color: AppColors.textTertiary),
@@ -62,7 +63,8 @@ class _ImageCarouselState extends State<ImageCarousel> {
                 imageUrl: widget.imageUrls[index],
                 width: double.infinity,
                 height: double.infinity,
-                borderRadius: widget.borderRadius ?? BorderRadius.circular(AppRadius.card),
+                borderRadius: widget.borderRadius ??
+                    BorderRadius.circular(AppRadius.card),
               );
             },
           ),
@@ -80,7 +82,9 @@ class _ImageCarouselState extends State<ImageCarousel> {
                 height: 8.0,
                 margin: const EdgeInsets.symmetric(horizontal: 4.0),
                 decoration: BoxDecoration(
-                  color: isSelected ? AppColors.background : AppColors.background.withValues(alpha: 0.5),
+                  color: isSelected
+                      ? AppColors.background
+                      : AppColors.background.withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(AppRadius.round),
                 ),
               );

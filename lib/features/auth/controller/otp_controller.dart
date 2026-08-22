@@ -17,7 +17,8 @@ class OtpController extends GetxController {
 
   Future<void> verifyOtp() async {
     if (otpController.text != '1234') {
-      AppSnackbar.showGlobal(message: 'Invalid OTP. Try again.', type: SnackbarType.error);
+      AppSnackbar.showGlobal(
+          message: 'Invalid OTP. Try again.', type: SnackbarType.error);
       return;
     }
     isLoading.value = true;

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart' hide SearchController;
 import 'package:get/get.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'search_controller.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/theme/app_spacing.dart';
@@ -39,7 +40,8 @@ class SearchView extends GetView<SearchController> {
           ),
           decoration: BoxDecoration(
             color: AppColors.background,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.sheet)),
+            borderRadius:
+                BorderRadius.vertical(top: Radius.circular(AppRadius.sheet)),
           ),
           child: SingleChildScrollView(
             child: Column(
@@ -48,7 +50,6 @@ class SearchView extends GetView<SearchController> {
               children: [
                 const SectionHeader(title: AppStrings.filterTitle),
                 SizedBox(height: AppSpacing.md),
-
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -56,11 +57,16 @@ class SearchView extends GetView<SearchController> {
                       AppStrings.priceRangeLabel,
                       style: AppTextStyles.formSectionTitle,
                     ),
-                    Text(
-                      '${Formatters.currency(price.start)} — ${Formatters.currency(price.end)}',
-                      style: AppTextStyles.cardTitle.copyWith(
-                        color: AppColors.primary,
-                        fontSize: 14,
+                    Flexible(
+                      child: Text(
+                        '${Formatters.currency(price.start)} — ${Formatters.currency(price.end)}',
+                        style: AppTextStyles.cardTitle.copyWith(
+                          color: AppColors.primary,
+                          fontSize: 14.sp,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.right,
                       ),
                     ),
                   ],
@@ -79,7 +85,6 @@ class SearchView extends GetView<SearchController> {
                   onChanged: (v) => setState(() => price = v),
                 ),
                 SizedBox(height: AppSpacing.md),
-
                 const FormSectionHeader(title: AppStrings.amenitiesLabel),
                 SizedBox(height: AppSpacing.xs),
                 AmenitySelector(
@@ -93,7 +98,6 @@ class SearchView extends GetView<SearchController> {
                   }),
                 ),
                 SizedBox(height: AppSpacing.md),
-
                 const FormSectionHeader(title: 'Sort By'),
                 SizedBox(height: AppSpacing.xs),
                 _SortOptionTile(
@@ -211,13 +215,14 @@ class SearchView extends GetView<SearchController> {
         const SectionHeader(title: AppStrings.recentSearches),
         SizedBox(height: AppSpacing.sm),
         ...controller.recentSearches.map((search) => ListTile(
-          leading: const Icon(Icons.history, color: AppColors.textSecondary),
-          title: Text(search, style: AppTextStyles.body),
-          contentPadding: EdgeInsets.zero,
-          onTap: () {
-            controller.searchController.text = search;
-          },
-        )),
+              leading:
+                  const Icon(Icons.history, color: AppColors.textSecondary),
+              title: Text(search, style: AppTextStyles.body),
+              contentPadding: EdgeInsets.zero,
+              onTap: () {
+                controller.searchController.text = search;
+              },
+            )),
       ],
     );
   }
@@ -263,7 +268,8 @@ class SearchView extends GetView<SearchController> {
           surface: HostelCardSurface.tonal,
           isSaved: controller.isSaved(hostel.id),
           onHeartTap: () => controller.toggleSaved(hostel.id),
-          onTap: () => Get.toNamed(Routes.studentHostelDetail, arguments: hostel),
+          onTap: () =>
+              Get.toNamed(Routes.studentHostelDetail, arguments: hostel),
         );
       },
     );
@@ -304,7 +310,7 @@ class _SortOptionTile extends StatelessWidget {
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(6),
+              padding: EdgeInsets.all(AppSpacing.sm2),
               decoration: BoxDecoration(
                 color: isSelected ? AppColors.primary : AppColors.surfaceTonal,
                 shape: BoxShape.circle,
@@ -326,7 +332,8 @@ class _SortOptionTile extends StatelessWidget {
               ),
             ),
             if (isSelected)
-              const Icon(Icons.check_circle, color: AppColors.primary, size: 20),
+              const Icon(Icons.check_circle,
+                  color: AppColors.primary, size: 20),
           ],
         ),
       ),

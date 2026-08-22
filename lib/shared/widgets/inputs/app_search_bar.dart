@@ -32,8 +32,10 @@ class AppSearchBar extends StatelessWidget {
         style: AppTextStyles.body,
         decoration: InputDecoration(
           hintText: hintText,
-          hintStyle: AppTextStyles.body.copyWith(color: AppColors.textSecondary),
-          prefixIcon: const Icon(Icons.search, color: AppColors.textSecondary, size: 20),
+          hintStyle:
+              AppTextStyles.body.copyWith(color: AppColors.textSecondary),
+          prefixIcon: const Icon(Icons.search,
+              color: AppColors.textSecondary, size: 20),
           fillColor: AppColors.primaryContainer,
           filled: true,
           contentPadding: const EdgeInsets.symmetric(horizontal: 16),

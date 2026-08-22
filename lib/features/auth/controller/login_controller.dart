@@ -29,7 +29,9 @@ class LoginController extends GetxController {
 
     // Trigger failure path for testing error UI
     if (emailController.text == 'error@test.com') {
-      AppSnackbar.showGlobal(message: 'Invalid credentials (Mock Error)', type: SnackbarType.error);
+      AppSnackbar.showGlobal(
+          message: 'Invalid credentials (Mock Error)',
+          type: SnackbarType.error);
       return;
     }
 
@@ -41,6 +43,7 @@ class LoginController extends GetxController {
     // back to student only if reached directly (e.g. deep link) with no role set.
     final role = authController.selectedRole.value ?? UserRole.student;
     Get.find<MockDataService>().setCurrentUserForRole(role);
-    Get.offAllNamed(role == UserRole.student ? Routes.studentShell : Routes.ownerShell);
+    Get.offAllNamed(
+        role == UserRole.student ? Routes.studentShell : Routes.ownerShell);
   }
 }

@@ -3,14 +3,15 @@ class Routes {
   static const String widgetGallery = '/widget-gallery';
   static const String welcome = '/welcome';
   static const String roleSelection = '/role-selection';
-  
+
   static const String login = '/login';
   static const String signup = '/signup';
   static const String forgotPassword = '/forgot-password';
   static const String checkEmail = '/check-email';
   static const String changePassword = '/change-password';
   static const String passwordSuccess = '/password-success';
-  static const String otp = '/otp'; // TODO: phone-verification (unreferenced in v1)
+  static const String otp =
+      '/otp'; // TODO: phone-verification (unreferenced in v1)
 
   static const String studentShell = '/student';
   static const String studentHome = '/student/home';
@@ -35,5 +36,4 @@ class Routes {
   static const String ownerPublishSuccess = '/owner/publish-success';
   static const String ownerEditProfile = '/owner/edit-profile';
   static const String ownerAccountSettings = '/owner/account-settings';
-
 }

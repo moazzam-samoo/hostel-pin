@@ -20,7 +20,8 @@ class NetworkImageBox extends StatelessWidget {
     this.borderRadius,
   });
 
-  bool get _isNetwork => imageUrl.startsWith('http://') || imageUrl.startsWith('https://');
+  bool get _isNetwork =>
+      imageUrl.startsWith('http://') || imageUrl.startsWith('https://');
 
   // Bundled assets always live under 'assets/' (see AppAssets); anything
   // else that isn't a network URL is a local on-device file path — e.g.
@@ -38,7 +39,8 @@ class NetworkImageBox extends StatelessWidget {
           height: height,
           color: AppColors.surfaceTonal,
           child: const Center(
-            child: Icon(Icons.apartment, color: AppColors.textTertiary, size: 28),
+            child:
+                Icon(Icons.apartment, color: AppColors.textTertiary, size: 28),
           ),
         ),
       );
@@ -63,7 +65,8 @@ class NetworkImageBox extends StatelessWidget {
                     height: 20,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                      valueColor:
+                          AlwaysStoppedAnimation<Color>(AppColors.primary),
                     ),
                   ),
                 ),

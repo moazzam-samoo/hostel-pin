@@ -8,17 +8,14 @@ import '../../../core/theme/app_text_styles.dart';
 import '../../../shared/widgets/navigation/app_top_bar.dart';
 import '../../../shared/widgets/media/upload_placeholder.dart';
 import '../../../shared/widgets/layout/status_chip.dart';
-import '../../../data/services/mock_data_service.dart';
 import '../../../core/enums/verification_status.dart';
+import 'verification_center_controller.dart';
 
-class VerificationCenterView extends StatelessWidget {
+class VerificationCenterView extends GetView<VerificationCenterController> {
   const VerificationCenterView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final user = Get.find<MockDataService>().currentUser.value;
-    final status = user?.verificationStatus ?? VerificationStatus.unverified;
-    
     return Scaffold(
       appBar: const AppTopBar(
         variant: AppTopBarVariant.titled,
@@ -31,7 +28,8 @@ class VerificationCenterView extends StatelessWidget {
           children: [
             Text(
               AppStrings.verificationCenterSubtitle,
-              style: AppTextStyles.body.copyWith(color: AppColors.textSecondary),
+              style:
+                  AppTextStyles.body.copyWith(color: AppColors.textSecondary),
             ),
             SizedBox(height: AppSpacing.xl),
             Row(
@@ -41,7 +39,7 @@ class VerificationCenterView extends StatelessWidget {
                   style: AppTextStyles.cardTitle,
                 ),
                 SizedBox(width: AppSpacing.sm),
-                _buildStatusChip(status),
+                Obx(() => _buildStatusChip(controller.status)),
               ],
             ),
             SizedBox(height: AppSpacing.xl),
@@ -54,14 +52,15 @@ class VerificationCenterView extends StatelessWidget {
             SizedBox(height: AppSpacing.sm),
             Text(
               AppStrings.verificationDocumentHint,
-              style: AppTextStyles.caption.copyWith(color: AppColors.textTertiary),
+              style:
+                  AppTextStyles.caption.copyWith(color: AppColors.textTertiary),
             ),
           ],
         ),
       ),
     );
   }
-  
+
   Widget _buildStatusChip(VerificationStatus status) {
     switch (status) {
       case VerificationStatus.unverified:
@@ -73,7 +72,8 @@ class VerificationCenterView extends StatelessWidget {
           ),
           child: Text(
             AppStrings.verificationStatusUnverified,
-            style: AppTextStyles.caption.copyWith(color: AppColors.textTertiary),
+            style:
+                AppTextStyles.caption.copyWith(color: AppColors.textTertiary),
           ),
         );
       case VerificationStatus.pending:

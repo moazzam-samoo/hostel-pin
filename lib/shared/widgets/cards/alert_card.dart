@@ -44,12 +44,14 @@ class AlertCard extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: AppTextStyles.cardTitle.copyWith(color: AppColors.error),
+                  style:
+                      AppTextStyles.cardTitle.copyWith(color: AppColors.error),
                 ),
                 SizedBox(height: AppSpacing.xs),
                 Text(
                   message,
-                  style: AppTextStyles.body.copyWith(color: AppColors.textSecondary),
+                  style: AppTextStyles.body
+                      .copyWith(color: AppColors.textSecondary),
                 ),
               ],
             ),

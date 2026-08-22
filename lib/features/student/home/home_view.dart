@@ -28,9 +28,9 @@ class HomeView extends GetView<HomeController> {
         ],
       ),
       body: Obx(() => StateView(
-        state: controller.status.value,
-        contentBuilder: _buildContent(context),
-      )),
+            state: controller.status.value,
+            contentBuilder: _buildContent(context),
+          )),
     );
   }
 
@@ -71,23 +71,25 @@ class HomeView extends GetView<HomeController> {
             physics: const NeverScrollableScrollPhysics(),
             padding: EdgeInsets.all(AppSpacing.gutter),
             itemCount: controller.regularHostels.length,
-            separatorBuilder: (context, index) => SizedBox(height: AppSpacing.md),
+            separatorBuilder: (context, index) =>
+                SizedBox(height: AppSpacing.md),
             itemBuilder: (context, index) {
               final hostel = controller.regularHostels[index];
               return Obx(() => HostelCard(
-                id: hostel.id,
-                name: hostel.name,
-                location: hostel.city,
-                price: hostel.pricePerMonth,
-                rating: hostel.rating,
-                imageUrl: hostel.photos.first,
-                amenities: hostel.amenities,
-                layout: HostelCardLayout.compact,
-                surface: HostelCardSurface.tonal,
-                isSaved: controller.isSaved(hostel.id),
-                onHeartTap: () => controller.toggleSaved(hostel.id),
-                onTap: () => Get.toNamed(Routes.studentHostelDetail, arguments: hostel),
-              ));
+                    id: hostel.id,
+                    name: hostel.name,
+                    location: hostel.city,
+                    price: hostel.pricePerMonth,
+                    rating: hostel.rating,
+                    imageUrl: hostel.photos.first,
+                    amenities: hostel.amenities,
+                    layout: HostelCardLayout.compact,
+                    surface: HostelCardSurface.tonal,
+                    isSaved: controller.isSaved(hostel.id),
+                    onHeartTap: () => controller.toggleSaved(hostel.id),
+                    onTap: () => Get.toNamed(Routes.studentHostelDetail,
+                        arguments: hostel),
+                  ));
             },
           ),
         ],

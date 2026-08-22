@@ -29,6 +29,7 @@ import '../../features/owner/shell/owner_shell_binding.dart';
 import '../../features/owner/add_listing/add_listing_view.dart';
 import '../../features/owner/add_listing/add_listing_controller.dart';
 import '../../features/owner/profile/verification_center_view.dart';
+import '../../features/owner/profile/verification_center_controller.dart';
 import '../../features/owner/profile/account_settings_view.dart';
 import '../../features/owner/profile/owner_edit_profile_view.dart';
 import '../../features/owner/profile/owner_edit_profile_controller.dart';
@@ -36,6 +37,7 @@ import '../../features/owner/add_listing/widgets/location_picker_view.dart';
 import '../../features/owner/add_listing/publish_success_view.dart';
 import '../../shared/widget_gallery/widget_gallery_view.dart';
 import 'app_routes.dart';
+
 class AppPages {
   static final List<GetPage> pages = [
     GetPage(
@@ -175,6 +177,10 @@ class AppPages {
     GetPage(
       name: Routes.ownerVerification,
       page: () => const VerificationCenterView(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut<VerificationCenterController>(
+            () => VerificationCenterController());
+      }),
     ),
     GetPage(
       name: Routes.ownerPublishSuccess,
@@ -184,7 +190,8 @@ class AppPages {
       name: Routes.ownerEditProfile,
       page: () => const OwnerEditProfileView(),
       binding: BindingsBuilder(() {
-        Get.lazyPut<OwnerEditProfileController>(() => OwnerEditProfileController());
+        Get.lazyPut<OwnerEditProfileController>(
+            () => OwnerEditProfileController());
       }),
     ),
     GetPage(

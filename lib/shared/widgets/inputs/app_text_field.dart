@@ -46,12 +46,14 @@ class AppTextField extends StatelessWidget {
             ),
             decoration: InputDecoration(
               hintText: hintText,
-              hintStyle: AppTextStyles.body.copyWith(color: AppColors.textSecondary),
+              hintStyle:
+                  AppTextStyles.body.copyWith(color: AppColors.textSecondary),
               prefixIcon: leadingIcon != null
                   ? Icon(leadingIcon, color: AppColors.textSecondary, size: 20)
                   : null,
               suffixIcon: trailing,
-              errorText: null, // Displayed manually below for better height control
+              errorText:
+                  null, // Displayed manually below for better height control
             ),
           ),
         ),

@@ -40,7 +40,8 @@ class SavedView extends GetView<SavedController> {
                     PrimaryButton(
                       text: AppStrings.startBrowsing,
                       expand: true,
-                      onPressed: () => Get.find<StudentShellController>().onTabSelected(0),
+                      onPressed: () =>
+                          Get.find<StudentShellController>().onTabSelected(0),
                     ),
                     SizedBox(height: AppSpacing.xl),
                   ],
@@ -51,7 +52,8 @@ class SavedView extends GetView<SavedController> {
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: controller.savedHostels.length,
-                separatorBuilder: (context, index) => SizedBox(height: AppSpacing.md),
+                separatorBuilder: (context, index) =>
+                    SizedBox(height: AppSpacing.md),
                 itemBuilder: (context, index) {
                   final hostel = controller.savedHostels[index];
                   return HostelCard(
@@ -67,7 +69,8 @@ class SavedView extends GetView<SavedController> {
                     surface: HostelCardSurface.lavender,
                     isSaved: true,
                     onHeartTap: () => controller.removeSaved(hostel.id),
-                    onTap: () => Get.toNamed(Routes.studentHostelDetail, arguments: hostel),
+                    onTap: () => Get.toNamed(Routes.studentHostelDetail,
+                        arguments: hostel),
                   );
                 },
               );
@@ -76,28 +79,30 @@ class SavedView extends GetView<SavedController> {
             const SectionHeader(title: AppStrings.youMightAlsoLike),
             SizedBox(height: AppSpacing.md),
             Obx(() => ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: controller.suggestedHostels.length,
-              separatorBuilder: (context, index) => SizedBox(height: AppSpacing.md),
-              itemBuilder: (context, index) {
-                final hostel = controller.suggestedHostels[index];
-                return HostelCard(
-                  id: hostel.id,
-                  name: hostel.name,
-                  location: hostel.city,
-                  price: hostel.pricePerMonth,
-                  rating: hostel.rating,
-                  imageUrl: hostel.photos.first,
-                  amenities: hostel.amenities,
-                  layout: HostelCardLayout.compact,
-                  surface: HostelCardSurface.tonal,
-                  isSaved: controller.isSaved(hostel.id),
-                  onHeartTap: () => controller.toggleSaved(hostel.id),
-                  onTap: () => Get.toNamed(Routes.studentHostelDetail, arguments: hostel),
-                );
-              },
-            )),
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: controller.suggestedHostels.length,
+                  separatorBuilder: (context, index) =>
+                      SizedBox(height: AppSpacing.md),
+                  itemBuilder: (context, index) {
+                    final hostel = controller.suggestedHostels[index];
+                    return HostelCard(
+                      id: hostel.id,
+                      name: hostel.name,
+                      location: hostel.city,
+                      price: hostel.pricePerMonth,
+                      rating: hostel.rating,
+                      imageUrl: hostel.photos.first,
+                      amenities: hostel.amenities,
+                      layout: HostelCardLayout.compact,
+                      surface: HostelCardSurface.tonal,
+                      isSaved: controller.isSaved(hostel.id),
+                      onHeartTap: () => controller.toggleSaved(hostel.id),
+                      onTap: () => Get.toNamed(Routes.studentHostelDetail,
+                          arguments: hostel),
+                    );
+                  },
+                )),
           ],
         ),
       ),

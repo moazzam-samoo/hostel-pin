@@ -35,7 +35,9 @@ class AddListingView extends GetView<AddListingController> {
         child: Scaffold(
           appBar: AppTopBar(
             variant: AppTopBarVariant.titled,
-            title: controller.isEditMode ? AppStrings.editListingTitle : AppStrings.listPropertyTitle,
+            title: controller.isEditMode
+                ? AppStrings.editListingTitle
+                : AppStrings.listPropertyTitle,
           ),
           body: KeyboardDismissWrapper(
             child: Form(
@@ -50,12 +52,14 @@ class AddListingView extends GetView<AddListingController> {
                         children: [
                           Text(
                             AppStrings.listPropertySubtitle,
-                            style: AppTextStyles.body.copyWith(color: AppColors.textSecondary),
+                            style: AppTextStyles.body
+                                .copyWith(color: AppColors.textSecondary),
                           ),
                           SizedBox(height: AppSpacing.lg),
 
                           // 1. Identity & Location
-                          const FormSectionHeader(title: AppStrings.identityLocationSection),
+                          const FormSectionHeader(
+                              title: AppStrings.identityLocationSection),
                           SizedBox(height: AppSpacing.md),
                           _buildValidatedField(
                             label: AppStrings.hostelNameLabel,
@@ -75,28 +79,36 @@ class AddListingView extends GetView<AddListingController> {
                                 mode: MapPanelMode.picker,
                                 height: 140,
                                 onTap: controller.pickLocation,
-                                latitude: controller.hasPickedLocation.value ? controller.latitude.value : null,
-                                longitude: controller.hasPickedLocation.value ? controller.longitude.value : null,
+                                latitude: controller.hasPickedLocation.value
+                                    ? controller.latitude.value
+                                    : null,
+                                longitude: controller.hasPickedLocation.value
+                                    ? controller.longitude.value
+                                    : null,
                                 label: controller.hasPickedLocation.value
                                     ? AppStrings.locationCoordinatesLabel(
-                                        controller.latitude.value, controller.longitude.value)
+                                        controller.latitude.value,
+                                        controller.longitude.value)
                                     : AppStrings.tapToPinLocation,
                               )),
                           SizedBox(height: AppSpacing.xl),
 
                           // 2. Photos
-                          const FormSectionHeader(title: AppStrings.addPhotosSection),
+                          const FormSectionHeader(
+                              title: AppStrings.addPhotosSection),
                           SizedBox(height: AppSpacing.xs),
                           Text(
                             AppStrings.minPhotosNote,
-                            style: AppTextStyles.caption.copyWith(color: AppColors.textTertiary),
+                            style: AppTextStyles.caption
+                                .copyWith(color: AppColors.textTertiary),
                           ),
                           SizedBox(height: AppSpacing.md),
                           const ImageUploadSection(),
                           SizedBox(height: AppSpacing.xl),
 
                           // 3. Rooms & Pricing
-                          const FormSectionHeader(title: AppStrings.roomsPricingSection),
+                          const FormSectionHeader(
+                              title: AppStrings.roomsPricingSection),
                           SizedBox(height: AppSpacing.md),
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -125,19 +137,25 @@ class AddListingView extends GetView<AddListingController> {
                           ),
                           SizedBox(height: AppSpacing.md),
                           Obx(() {
-                            final isAvailable = controller.availability.value == AvailabilityStatus.available;
+                            final isAvailable = controller.availability.value ==
+                                AvailabilityStatus.available;
                             return Row(
                               children: [
                                 Expanded(
                                   child: Text(
                                     AppStrings.availabilityLabel,
-                                    style: AppTextStyles.body.copyWith(color: AppColors.textPrimary),
+                                    style: AppTextStyles.body
+                                        .copyWith(color: AppColors.textPrimary),
                                   ),
                                 ),
                                 Text(
-                                  isAvailable ? AppStrings.availableStatus : AppStrings.fullStatus,
+                                  isAvailable
+                                      ? AppStrings.availableStatus
+                                      : AppStrings.fullStatus,
                                   style: AppTextStyles.caption.copyWith(
-                                    color: isAvailable ? AppColors.success : AppColors.error,
+                                    color: isAvailable
+                                        ? AppColors.success
+                                        : AppColors.error,
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
@@ -151,14 +169,19 @@ class AddListingView extends GetView<AddListingController> {
                           SizedBox(height: AppSpacing.md),
                           const FieldLabel(AppStrings.includedFacilitiesLabel),
                           SizedBox(height: AppSpacing.sm),
-                          Obx(() => AmenitySelector(
-                                selectedAmenities: controller.selectedAmenities.toSet(),
-                                onToggle: controller.toggleAmenity,
-                              )),
+                          Obx(() {
+                            final currentAmenities =
+                                controller.selectedAmenities.toSet();
+                            return AmenitySelector(
+                              selectedAmenities: currentAmenities,
+                              onToggle: controller.toggleAmenity,
+                            );
+                          }),
                           SizedBox(height: AppSpacing.xl),
 
                           // 4. Connectivity
-                          const FormSectionHeader(title: AppStrings.ownerConnectivitySection),
+                          const FormSectionHeader(
+                              title: AppStrings.ownerConnectivitySection),
                           SizedBox(height: AppSpacing.md),
                           _buildValidatedField(
                             label: AppStrings.phoneNoLabel,
@@ -182,9 +205,13 @@ class AddListingView extends GetView<AddListingController> {
                                           : AppColors.textTertiary,
                                     ),
                                     SizedBox(width: AppSpacing.sm),
-                                    Text(
-                                      AppStrings.sameAsPhoneLabel,
-                                      style: AppTextStyles.body,
+                                    Flexible(
+                                      child: Text(
+                                        AppStrings.sameAsPhoneLabel,
+                                        style: AppTextStyles.body,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -291,7 +318,9 @@ class AddListingView extends GetView<AddListingController> {
             Expanded(
               child: GetBuilder<AddListingController>(
                 builder: (c) => PrimaryButton(
-                  text: c.isEditMode ? AppStrings.updateListingButton : AppStrings.publishListing,
+                  text: c.isEditMode
+                      ? AppStrings.updateListingButton
+                      : AppStrings.publishListing,
                   isDisabled: !c.isValid,
                   onPressed: controller.publishListing,
                 ),

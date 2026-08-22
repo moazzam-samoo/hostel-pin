@@ -4,9 +4,9 @@ import 'app.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Initialize dependencies, services, etc. here later
-  
+
   runApp(
     ScreenUtilInit(
       designSize: const Size(375, 812),

@@ -42,7 +42,7 @@ class SecondaryButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = _contentColor;
-    
+
     return SizedBox(
       width: expand ? double.infinity : width,
       height: AppSizes.buttonHeight,
@@ -74,9 +74,18 @@ class SecondaryButton extends StatelessWidget {
                     icon!,
                     const SizedBox(width: 8),
                   ],
-                  Text(
-                    text,
-                    style: AppTextStyles.button.copyWith(color: color),
+                  // Flexible + ellipsis guards against RenderFlex overflow
+                  // when this button is squeezed into a narrow Expanded
+                  // slot (e.g. a two-button Row on Add Listing) at small
+                  // screen widths — found via Phase 5's D.5 responsiveness
+                  // pass (TASK-Phase-5.md).
+                  Flexible(
+                    child: Text(
+                      text,
+                      style: AppTextStyles.button.copyWith(color: color),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ],
               ),

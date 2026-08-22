@@ -23,10 +23,14 @@ class ConfettiDots extends StatelessWidget {
   final List<ConfettiDot> dots;
 
   static const List<ConfettiDot> defaultDots = [
-    ConfettiDot(alignment: Alignment(1.15, -0.85), size: 14, color: AppColors.dotPink),
-    ConfettiDot(alignment: Alignment(-1.25, -0.15), size: 10, color: AppColors.dotCyan),
-    ConfettiDot(alignment: Alignment(-0.95, 1.05), size: 12, color: AppColors.dotAmber),
-    ConfettiDot(alignment: Alignment(1.05, 0.95), size: 8, color: AppColors.dotBlue),
+    ConfettiDot(
+        alignment: Alignment(1.15, -0.85), size: 14, color: AppColors.dotPink),
+    ConfettiDot(
+        alignment: Alignment(-1.25, -0.15), size: 10, color: AppColors.dotCyan),
+    ConfettiDot(
+        alignment: Alignment(-0.95, 1.05), size: 12, color: AppColors.dotAmber),
+    ConfettiDot(
+        alignment: Alignment(1.05, 0.95), size: 8, color: AppColors.dotBlue),
   ];
 
   const ConfettiDots({

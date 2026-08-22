@@ -32,7 +32,8 @@ class DetailLocationSection extends StatelessWidget {
         SizedBox(height: AppSpacing.sm),
         PrimaryButton(
           text: AppStrings.getDirectionsButton,
-          icon: const Icon(Icons.directions, size: 20, color: AppColors.background),
+          icon: const Icon(Icons.directions,
+              size: 20, color: AppColors.background),
           expand: true,
           onPressed: () => openDirectionsTo(
             latitude: latitude,

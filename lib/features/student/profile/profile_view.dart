@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'profile_controller.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/theme/app_colors.dart';
@@ -56,7 +57,7 @@ class ProfileView extends GetView<ProfileController> {
                   child: Text(
                     AppStrings.editProfileButton,
                     style: AppTextStyles.button.copyWith(
-                      fontSize: 14,
+                      fontSize: 14.sp,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -69,7 +70,7 @@ class ProfileView extends GetView<ProfileController> {
             Text(
               AppStrings.securityPrivacySection,
               style: AppTextStyles.cardTitle.copyWith(
-                fontSize: 16,
+                fontSize: 16.sp,
                 color: AppColors.textPrimary,
               ),
             ),
@@ -110,7 +111,7 @@ class ProfileView extends GetView<ProfileController> {
             Text(
               AppStrings.appPreferencesSection,
               style: AppTextStyles.cardTitle.copyWith(
-                fontSize: 16,
+                fontSize: 16.sp,
                 color: AppColors.textPrimary,
               ),
             ),

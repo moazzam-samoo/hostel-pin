@@ -11,7 +11,7 @@ class LocationPickerView extends StatefulWidget {
   final LatLng initialLocation;
 
   const LocationPickerView({
-    super.key, 
+    super.key,
     this.initialLocation = const LatLng(25.3960, 68.3722), // Hyderabad default
   });
 
@@ -32,7 +32,8 @@ class _LocationPickerViewState extends State<LocationPickerView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppStrings.pickLocationTitle, style: AppTextStyles.screenTitle),
+        title: Text(AppStrings.pickLocationTitle,
+            style: AppTextStyles.screenTitle),
         backgroundColor: AppColors.background,
         elevation: 0,
         iconTheme: const IconThemeData(color: AppColors.textPrimary),

@@ -22,7 +22,8 @@ class FieldLabel extends StatelessWidget {
         ? AppTextStyles.labelMicro
         : AppTextStyles.labelSentence;
 
-    final displayText = style == FieldLabelStyle.form ? text.toUpperCase() : text;
+    final displayText =
+        style == FieldLabelStyle.form ? text.toUpperCase() : text;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0, left: 4.0),

@@ -14,7 +14,8 @@ class EditProfileController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    nameController = TextEditingController(text: _dataService.currentUser.value?.displayName ?? '');
+    nameController = TextEditingController(
+        text: _dataService.currentUser.value?.displayName ?? '');
   }
 
   @override
@@ -32,10 +33,12 @@ class EditProfileController extends GetxController {
 
     final current = _dataService.currentUser.value;
     if (current != null) {
-      _dataService.currentUser.value = current.copyWith(displayName: nameController.text.trim());
+      _dataService.currentUser.value =
+          current.copyWith(displayName: nameController.text.trim());
     }
 
-    AppSnackbar.showGlobal(message: AppStrings.editProfileSaved, type: SnackbarType.success);
+    AppSnackbar.showGlobal(
+        message: AppStrings.editProfileSaved, type: SnackbarType.success);
     Get.back();
   }
 }

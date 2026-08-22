@@ -19,7 +19,8 @@ class FileAttachmentTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+      padding: EdgeInsets.symmetric(
+          horizontal: AppSpacing.md, vertical: AppSpacing.sm),
       decoration: BoxDecoration(
         color: AppColors.surfaceTonal,
         borderRadius: BorderRadius.circular(AppRadius.card),
@@ -49,7 +50,8 @@ class FileAttachmentTile extends StatelessWidget {
           ),
           if (onRemove != null)
             IconButton(
-              icon: const Icon(Icons.close, color: AppColors.textSecondary, size: 20),
+              icon: const Icon(Icons.close,
+                  color: AppColors.textSecondary, size: 20),
               onPressed: onRemove,
               splashRadius: 20,
             ),

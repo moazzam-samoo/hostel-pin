@@ -7,6 +7,7 @@ import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/constants/app_assets.dart';
 import '../../core/enums/amenity.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 // Buttons
 import '../widgets/buttons/primary_button.dart';
@@ -24,6 +25,7 @@ import '../widgets/cards/alert_card.dart';
 import '../widgets/cards/stat_row_tile.dart';
 import '../widgets/cards/activity_row.dart';
 import '../widgets/cards/promo_card.dart';
+import '../widgets/cards/facility_grid.dart';
 
 // Inputs
 import '../widgets/inputs/app_text_field.dart';
@@ -142,10 +144,14 @@ class _WidgetGalleryViewState extends State<WidgetGalleryView> {
   List<Widget> _buildButtons() {
     return [
       PrimaryButton(text: 'Primary Button', onPressed: () {}),
-      PrimaryButton(text: 'Primary With Icon', icon: const Icon(Icons.add), onPressed: () {}),
+      PrimaryButton(
+          text: 'Primary With Icon',
+          icon: const Icon(Icons.add),
+          onPressed: () {}),
       PrimaryButton(text: 'Primary Loading', isLoading: true, onPressed: () {}),
       SecondaryButton(text: 'Secondary Button', onPressed: () {}),
-      SecondaryButton(text: 'Secondary Loading', isLoading: true, onPressed: () {}),
+      SecondaryButton(
+          text: 'Secondary Loading', isLoading: true, onPressed: () {}),
       TextLinkButton(text: 'Text Link Button', onPressed: () {}),
       GoogleAuthButton(onPressed: () {}),
       Row(
@@ -188,6 +194,9 @@ class _WidgetGalleryViewState extends State<WidgetGalleryView> {
         subtitle: '',
         style: FacilityTileStyle.read,
       ),
+      const FacilityGrid(
+        amenities: {Amenity.wifi, Amenity.gym, Amenity.laundry},
+      ),
       AuthFormCard(
         child: Column(
           children: [
@@ -203,7 +212,8 @@ class _WidgetGalleryViewState extends State<WidgetGalleryView> {
         title: 'Incomplete Profile',
         message: 'Your profile is incomplete. Please add a photo.',
       ),
-      const StatRowTile(title: 'Total Views', value: '1,240', icon: Icons.visibility),
+      const StatRowTile(
+          title: 'Total Views', value: '1,240', icon: Icons.visibility),
       StatRowTile(
         layout: StatRowTileLayout.card,
         title: 'Total Listing',
@@ -211,7 +221,11 @@ class _WidgetGalleryViewState extends State<WidgetGalleryView> {
         icon: Icons.apartment_rounded,
         tileColor: AppColors.secondaryContainer,
         iconColor: AppColors.secondary,
-        trailing: Text('Active', style: AppTextStyles.labelMicro.copyWith(color: AppColors.success, fontWeight: FontWeight.w600, fontSize: 13)),
+        trailing: Text('Active',
+            style: AppTextStyles.labelMicro.copyWith(
+                color: AppColors.success,
+                fontWeight: FontWeight.w600,
+                fontSize: 13.sp)),
       ),
       const ActivityRow(
         title: 'New Booking',
@@ -231,7 +245,8 @@ class _WidgetGalleryViewState extends State<WidgetGalleryView> {
   List<Widget> _buildInputs() {
     return [
       const FieldLabel('Full Name', isRequired: true),
-      const AppTextField(hintText: 'Enter your name', leadingIcon: Icons.person),
+      const AppTextField(
+          hintText: 'Enter your name', leadingIcon: Icons.person),
       AppGap.md(),
       const FieldLabel('Password'),
       const AppPasswordField(hintText: 'Enter your password'),
@@ -251,7 +266,8 @@ class _WidgetGalleryViewState extends State<WidgetGalleryView> {
       AppGap.md(),
       OtpFieldRow(onResend: () {}),
       AppGap.md(),
-      const FormSectionHeader(title: 'Select Amenities', description: 'Choose what you offer'),
+      const FormSectionHeader(
+          title: 'Select Amenities', description: 'Choose what you offer'),
       AppGap.md(),
       AmenitySelector(
         selectedAmenities: _selectedAmenities,
@@ -291,13 +307,15 @@ class _WidgetGalleryViewState extends State<WidgetGalleryView> {
               children: [
                 Text('Welcome Back', style: AppTextStyles.authTitle),
                 AppGap.sm(),
-                Text('Hello there, sign in to continue', style: AppTextStyles.screenSubtitle),
+                Text('Hello there, sign in to continue',
+                    style: AppTextStyles.screenSubtitle),
               ],
             ),
           ),
         ),
       ),
-      const ScreenTitleBlock(title: 'Welcome Back!', subtitle: 'Here is your dashboard'),
+      const ScreenTitleBlock(
+          title: 'Welcome Back!', subtitle: 'Here is your dashboard'),
       const HighlightedBodyText(
         textBefore: 'We sent an email to ',
         highlightedText: 'test@example.com',
@@ -328,7 +346,8 @@ class _WidgetGalleryViewState extends State<WidgetGalleryView> {
           ),
         ],
       ),
-      ProfileHeaderBlock(name: 'Moazzam Samoo', email: 'moazzam@example.com', onEdit: () {}),
+      ProfileHeaderBlock(
+          name: 'Moazzam Samoo', email: 'moazzam@example.com', onEdit: () {}),
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
@@ -400,11 +419,13 @@ class _WidgetGalleryViewState extends State<WidgetGalleryView> {
       ),
       PrimaryButton(
         text: 'Show Success Snackbar',
-        onPressed: () => AppSnackbar.show(context, message: 'Saved successfully', type: SnackbarType.success),
+        onPressed: () => AppSnackbar.show(context,
+            message: 'Saved successfully', type: SnackbarType.success),
       ),
       PrimaryButton(
         text: 'Show Error Snackbar',
-        onPressed: () => AppSnackbar.show(context, message: 'Failed to save', type: SnackbarType.error),
+        onPressed: () => AppSnackbar.show(context,
+            message: 'Failed to save', type: SnackbarType.error),
       ),
       PrimaryButton(
         text: 'Show Confirm Dialog',
@@ -436,7 +457,10 @@ class _WidgetGalleryViewState extends State<WidgetGalleryView> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           UserAvatar(name: 'Ali Khan', size: 60),
-          UserAvatar(name: 'Moazzam Samoo', imageUrl: 'https://via.placeholder.com/100', size: 60),
+          UserAvatar(
+              name: 'Moazzam Samoo',
+              imageUrl: 'https://via.placeholder.com/100',
+              size: 60),
         ],
       ),
       const ImageCarousel(
@@ -456,7 +480,8 @@ class _WidgetGalleryViewState extends State<WidgetGalleryView> {
         onSeeAll: () {},
       ),
       UploadPlaceholder(onTap: () {}),
-      FileAttachmentTile(fileName: 'hostel_license.pdf', fileSize: '2.4 MB', onRemove: () {}),
+      FileAttachmentTile(
+          fileName: 'hostel_license.pdf', fileSize: '2.4 MB', onRemove: () {}),
       Center(
         child: ConfettiDots(
           canvasSize: AppSizes.authLogo + 40,

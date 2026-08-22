@@ -14,13 +14,15 @@ class OwnerProfileController extends GetxController {
   // App Preferences — reads straight from the current user's prefs so it
   // stays in sync via the `currentUser` Rx dependency registered wherever
   // this getter is read inside an Obx (no separate .obs needed here).
-  bool get notificationsEnabled => currentUser.value?.prefs.notifications ?? true;
+  bool get notificationsEnabled =>
+      currentUser.value?.prefs.notifications ?? true;
 
   void toggleNotifications() {
     // In a real app, update Firestore / SharedPreferences
     final user = currentUser.value;
     if (user != null) {
-      final newPrefs = user.prefs.copyWith(notifications: !user.prefs.notifications);
+      final newPrefs =
+          user.prefs.copyWith(notifications: !user.prefs.notifications);
       _dataService.currentUser.value = user.copyWith(prefs: newPrefs);
     }
   }

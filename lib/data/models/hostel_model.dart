@@ -97,38 +97,53 @@ class HostelModel {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-  
+
     return other is HostelModel &&
-      other.id == id &&
-      other.ownerId == ownerId &&
-      other.ownerName == ownerName &&
-      other.name == name &&
-      other.fullAddress == fullAddress &&
-      other.city == city &&
-      other.latitude == latitude &&
-      other.longitude == longitude &&
-      other.description == description &&
-      other.pricePerMonth == pricePerMonth &&
-      listEquals(other.photos, photos) &&
-      setEquals(other.amenities, amenities) &&
-      other.availability == availability &&
-      other.contactPhone == contactPhone &&
-      other.contactWhatsapp == contactWhatsapp &&
-      other.rating == rating &&
-      other.reviewCount == reviewCount &&
-      other.viewCount == viewCount &&
-      other.isFeatured == isFeatured &&
-      other.status == status;
+        other.id == id &&
+        other.ownerId == ownerId &&
+        other.ownerName == ownerName &&
+        other.name == name &&
+        other.fullAddress == fullAddress &&
+        other.city == city &&
+        other.latitude == latitude &&
+        other.longitude == longitude &&
+        other.description == description &&
+        other.pricePerMonth == pricePerMonth &&
+        listEquals(other.photos, photos) &&
+        setEquals(other.amenities, amenities) &&
+        other.availability == availability &&
+        other.contactPhone == contactPhone &&
+        other.contactWhatsapp == contactWhatsapp &&
+        other.rating == rating &&
+        other.reviewCount == reviewCount &&
+        other.viewCount == viewCount &&
+        other.isFeatured == isFeatured &&
+        other.status == status;
   }
 
   @override
   int get hashCode {
     return Object.hashAll([
-      id, ownerId, ownerName, name, fullAddress, city,
-      latitude, longitude, description, pricePerMonth,
-      Object.hashAll(photos), Object.hashAll(amenities),
-      availability, contactPhone, contactWhatsapp,
-      rating, reviewCount, viewCount, isFeatured, status,
+      id,
+      ownerId,
+      ownerName,
+      name,
+      fullAddress,
+      city,
+      latitude,
+      longitude,
+      description,
+      pricePerMonth,
+      Object.hashAll(photos),
+      Object.hashAll(amenities),
+      availability,
+      contactPhone,
+      contactWhatsapp,
+      rating,
+      reviewCount,
+      viewCount,
+      isFeatured,
+      status,
     ]);
   }
 }

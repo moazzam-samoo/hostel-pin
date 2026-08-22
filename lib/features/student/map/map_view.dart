@@ -28,7 +28,6 @@ class MapView extends GetView<MapController> {
                 zoomControlsEnabled: false,
                 onTap: (_) => controller.selectedHostel.value = null,
               )),
-          
           SafeArea(
             child: Padding(
               padding: EdgeInsets.all(AppSpacing.gutter),
@@ -39,7 +38,6 @@ class MapView extends GetView<MapController> {
               ),
             ),
           ),
-
           Obx(() {
             final selected = controller.selectedHostel.value;
             if (selected == null) return const SizedBox.shrink();
@@ -53,7 +51,8 @@ class MapView extends GetView<MapController> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   GestureDetector(
-                    onTap: () => Get.toNamed(Routes.studentHostelDetail, arguments: selected),
+                    onTap: () => Get.toNamed(Routes.studentHostelDetail,
+                        arguments: selected),
                     child: HostelCard(
                       id: selected.id,
                       name: selected.name,
@@ -66,13 +65,15 @@ class MapView extends GetView<MapController> {
                       surface: HostelCardSurface.elevated,
                       isSaved: controller.isSaved(selected.id),
                       onHeartTap: () => controller.toggleSaved(selected.id),
-                      onTap: () => Get.toNamed(Routes.studentHostelDetail, arguments: selected),
+                      onTap: () => Get.toNamed(Routes.studentHostelDetail,
+                          arguments: selected),
                     ),
                   ),
                   SizedBox(height: AppSpacing.sm),
                   PrimaryButton(
                     text: AppStrings.getDirectionsButton,
-                    icon: const Icon(Icons.directions, size: 20, color: AppColors.background),
+                    icon: const Icon(Icons.directions,
+                        size: 20, color: AppColors.background),
                     expand: true,
                     onPressed: () => openDirectionsTo(
                       latitude: selected.latitude,
@@ -87,7 +88,8 @@ class MapView extends GetView<MapController> {
         ],
       ),
       floatingActionButton: Obx(() {
-        final padding = controller.selectedHostel.value != null ? 140.0 : AppSpacing.gutter;
+        final padding =
+            controller.selectedHostel.value != null ? 140.0 : AppSpacing.gutter;
         return Padding(
           padding: EdgeInsets.only(bottom: padding),
           child: FloatingActionButton(

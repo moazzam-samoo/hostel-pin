@@ -10,6 +10,7 @@ import '../../../core/enums/amenity.dart';
 import '../media/network_image_box.dart';
 
 enum HostelCardSurface { tonal, lavender, outlined, elevated }
+
 enum HostelCardLayout { compact, featured, saved }
 
 class HostelCard extends StatelessWidget {
@@ -141,7 +142,8 @@ class HostelCard extends StatelessWidget {
               SizedBox(height: AppSpacing.xs),
               Text(
                 'Owner : ${ownerName ?? "Awais Khokhar"}',
-                style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary),
+                style: AppTextStyles.caption
+                    .copyWith(color: AppColors.textSecondary),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -185,7 +187,8 @@ class HostelCard extends StatelessWidget {
                   Expanded(
                     child: Text(
                       'Owner : ${ownerName ?? "Awais Khokhar"}',
-                      style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary),
+                      style: AppTextStyles.caption
+                          .copyWith(color: AppColors.textSecondary),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -260,12 +263,21 @@ class HostelCard extends StatelessWidget {
                 Row(
                   children: [
                     _buildPrice(),
-                    const Spacer(),
-                    Text(
-                      location.toUpperCase(),
-                      style: AppTextStyles.caption.copyWith(
-                        color: AppColors.textSecondary,
-                        fontWeight: FontWeight.w500,
+                    const SizedBox(width: 4),
+                    // Expanded + ellipsis (not Spacer + a bare Text) so a
+                    // longer city/location string can't push this row past
+                    // its available width — found via Phase 5's D.5 pass
+                    // (TASK-Phase-5.md).
+                    Expanded(
+                      child: Text(
+                        location.toUpperCase(),
+                        style: AppTextStyles.caption.copyWith(
+                          color: AppColors.textSecondary,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        textAlign: TextAlign.right,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ],
@@ -280,7 +292,7 @@ class HostelCard extends StatelessWidget {
 
   Widget _buildAmenitiesRow() {
     final list = <MapEntry<IconData, String>>[];
-    
+
     bool hasGym = amenities.contains(Amenity.gym);
     bool hasSecurity = amenities.contains(Amenity.security);
 
@@ -294,7 +306,9 @@ class HostelCard extends StatelessWidget {
     if (list.length < 2) {
       for (final a in amenities) {
         if (a != Amenity.gym && a != Amenity.security) {
-          final label = a == Amenity.wifi ? 'Wifi' : (a == Amenity.meals ? 'Meals' : a.title.split(' ').first);
+          final label = a == Amenity.wifi
+              ? 'Wifi'
+              : (a == Amenity.meals ? 'Meals' : a.title.split(' ').first);
           list.add(MapEntry(a.icon, label));
           if (list.length >= 2) break;
         }
@@ -318,7 +332,9 @@ class HostelCard extends StatelessWidget {
             children: [
               Icon(list[i].key, size: 14, color: AppColors.textSecondary),
               const SizedBox(width: 4),
-              Text(list[i].value, style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary)),
+              Text(list[i].value,
+                  style: AppTextStyles.caption
+                      .copyWith(color: AppColors.textSecondary)),
             ],
           ),
       ],

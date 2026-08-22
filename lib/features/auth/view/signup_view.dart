@@ -42,14 +42,16 @@ class SignupView extends GetView<SignupController> {
                   style: AppTextStyles.authTitle,
                 ),
                 SizedBox(height: AppSpacing.lg),
-                
+
                 // Full Name
-                const FieldLabel(AppStrings.fullNameLabel,
+                const FieldLabel(
+                  AppStrings.fullNameLabel,
                   style: FieldLabelStyle.auth,
                 ),
                 SizedBox(height: AppSpacing.xs),
                 FormField<String>(
-                  validator: (val) => Validators.required(controller.nameController.text),
+                  validator: (val) =>
+                      Validators.required(controller.nameController.text),
                   builder: (state) => AppTextField(
                     controller: controller.nameController,
                     hintText: AppStrings.fullNameLabel,
@@ -62,14 +64,16 @@ class SignupView extends GetView<SignupController> {
                   ),
                 ),
                 SizedBox(height: AppSpacing.md),
-                
+
                 // Email
-                const FieldLabel(AppStrings.emailLabel,
+                const FieldLabel(
+                  AppStrings.emailLabel,
                   style: FieldLabelStyle.auth,
                 ),
                 SizedBox(height: AppSpacing.xs),
                 FormField<String>(
-                  validator: (val) => Validators.email(controller.emailController.text),
+                  validator: (val) =>
+                      Validators.email(controller.emailController.text),
                   builder: (state) => AppTextField(
                     controller: controller.emailController,
                     hintText: AppStrings.enterEmail,
@@ -83,14 +87,16 @@ class SignupView extends GetView<SignupController> {
                   ),
                 ),
                 SizedBox(height: AppSpacing.md),
-                
+
                 // Phone
-                const FieldLabel(AppStrings.phoneLabel,
+                const FieldLabel(
+                  AppStrings.phoneLabel,
                   style: FieldLabelStyle.auth,
                 ),
                 SizedBox(height: AppSpacing.xs),
                 FormField<String>(
-                  validator: (val) => Validators.phone(controller.phoneController.text),
+                  validator: (val) =>
+                      Validators.phone(controller.phoneController.text),
                   builder: (state) => AppTextField(
                     controller: controller.phoneController,
                     hintText: AppStrings.phoneLabel,
@@ -104,14 +110,16 @@ class SignupView extends GetView<SignupController> {
                   ),
                 ),
                 SizedBox(height: AppSpacing.md),
-                
+
                 // Password
-                const FieldLabel(AppStrings.passwordLabel,
+                const FieldLabel(
+                  AppStrings.passwordLabel,
                   style: FieldLabelStyle.auth,
                 ),
                 SizedBox(height: AppSpacing.xs),
                 FormField<String>(
-                  validator: (val) => Validators.password(controller.passwordController.text),
+                  validator: (val) =>
+                      Validators.password(controller.passwordController.text),
                   builder: (state) => AppPasswordField(
                     controller: controller.passwordController,
                     hintText: AppStrings.passwordLabel,
@@ -119,9 +127,10 @@ class SignupView extends GetView<SignupController> {
                   ),
                 ),
                 SizedBox(height: AppSpacing.md),
-                
+
                 // Confirm Password
-                const FieldLabel(AppStrings.confirmPasswordLabel,
+                const FieldLabel(
+                  AppStrings.confirmPasswordLabel,
                   style: FieldLabelStyle.auth,
                 ),
                 SizedBox(height: AppSpacing.xs),
@@ -137,16 +146,19 @@ class SignupView extends GetView<SignupController> {
                   ),
                 ),
                 SizedBox(height: AppSpacing.lg),
-                
+
                 // Terms
                 Obx(() => TermsCheckbox(
-                  value: controller.acceptedTerms.value,
-                  onChanged: (val) => controller.acceptedTerms.value = val ?? false,
-                )),
+                      value: controller.acceptedTerms.value,
+                      onChanged: (val) =>
+                          controller.acceptedTerms.value = val ?? false,
+                    )),
                 SizedBox(height: AppSpacing.xl),
-                
+
                 Obx(
-                  () => PrimaryButton(text: AppStrings.createAccount, onPressed: controller.submit,
+                  () => PrimaryButton(
+                    text: AppStrings.createAccount,
+                    onPressed: controller.submit,
                     expand: true,
                     isLoading: controller.isLoading.value,
                   ),
@@ -154,9 +166,14 @@ class SignupView extends GetView<SignupController> {
                 SizedBox(height: AppSpacing.xl),
                 const AuthDivider(),
                 SizedBox(height: AppSpacing.xl),
-                Center(child: GoogleAuthButton(isLoading: false, onPressed: () {})),
+                Center(
+                    child:
+                        GoogleAuthButton(isLoading: false, onPressed: () {})),
                 SizedBox(height: AppSpacing.xl),
-                AuthFooterPrompt(promptText: "Already have an account?", actionText: "Login", onPressed: () => Get.back(),
+                AuthFooterPrompt(
+                  promptText: "Already have an account?",
+                  actionText: "Login",
+                  onPressed: () => Get.back(),
                 ),
                 SizedBox(height: AppSpacing.xl),
               ],

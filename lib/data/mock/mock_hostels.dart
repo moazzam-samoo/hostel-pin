@@ -13,14 +13,23 @@ final List<HostelModel> mockHostels = [
     city: 'Hyderabad',
     latitude: 25.3960,
     longitude: 68.3722,
-    description: 'Nestled in the heart of Lisbon\'s oldest district, The Alfama Loft offers a unique blend of historical charm and contemporary nomadic comfort. Our space is designed specifically for digital nomads and fluid travelers who seek community without compromising on luxury. Enjoy panoramic views of the Tagus River from our rooftop lounge.',
+    description:
+        'Nestled in the heart of Lisbon\'s oldest district, The Alfama Loft offers a unique blend of historical charm and contemporary nomadic comfort. Our space is designed specifically for digital nomads and fluid travelers who seek community without compromising on luxury. Enjoy panoramic views of the Tagus River from our rooftop lounge.',
     pricePerMonth: 12000,
     photos: [
       'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=600&q=80',
       'https://images.unsplash.com/photo-1590490360182-c33d57733427?w=600&q=80',
       'https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=600&q=80',
     ],
-    amenities: {Amenity.wifi, Amenity.gym, Amenity.security, Amenity.meals, Amenity.laundry, Amenity.parking, Amenity.beds},
+    amenities: {
+      Amenity.wifi,
+      Amenity.gym,
+      Amenity.security,
+      Amenity.meals,
+      Amenity.laundry,
+      Amenity.parking,
+      Amenity.beds
+    },
     availability: AvailabilityStatus.available,
     contactPhone: '+923001234567',
     contactWhatsapp: '+923001234567',
@@ -39,7 +48,8 @@ final List<HostelModel> mockHostels = [
     city: 'Hyderabad',
     latitude: 25.4000,
     longitude: 68.3700,
-    description: 'Premium girls hostel offering attached baths, AC rooms, and strict security. Perfect for medical students.',
+    description:
+        'Premium girls hostel offering attached baths, AC rooms, and strict security. Perfect for medical students.',
     pricePerMonth: 12000,
     photos: [
       'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600&q=80',
@@ -65,7 +75,8 @@ final List<HostelModel> mockHostels = [
     city: 'Hyderabad',
     latitude: 25.3900,
     longitude: 68.3800,
-    description: 'Centrally located hostel with easy access to transport. Offers single and double sharing rooms.',
+    description:
+        'Centrally located hostel with easy access to transport. Offers single and double sharing rooms.',
     pricePerMonth: 12000,
     photos: [
       'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=600&q=80',
@@ -91,7 +102,8 @@ final List<HostelModel> mockHostels = [
     city: 'Hyderabad',
     latitude: 25.4200,
     longitude: 68.2700,
-    description: 'Peaceful environment next to the park. Large study hall and outdoor seating area available.',
+    description:
+        'Peaceful environment next to the park. Large study hall and outdoor seating area available.',
     pricePerMonth: 12000,
     photos: [
       'https://images.unsplash.com/photo-1590490360182-c33d57733427?w=600&q=80',
@@ -117,7 +129,8 @@ final List<HostelModel> mockHostels = [
     city: 'Hyderabad',
     latitude: 25.4100,
     longitude: 68.2650,
-    description: 'Highly secure lodge for students. Clean environment with dedicated study rooms and gym.',
+    description:
+        'Highly secure lodge for students. Clean environment with dedicated study rooms and gym.',
     pricePerMonth: 12000,
     photos: [
       'https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=600&q=80',
@@ -143,7 +156,8 @@ final List<HostelModel> mockHostels = [
     city: 'Jamshoro',
     latitude: 25.3850,
     longitude: 68.3650,
-    description: 'Premium student accommodation with lush green lawn, backup generator, and 24/7 security.',
+    description:
+        'Premium student accommodation with lush green lawn, backup generator, and 24/7 security.',
     pricePerMonth: 12000,
     photos: [
       'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=600&q=80',
@@ -169,14 +183,23 @@ final List<HostelModel> mockHostels = [
     city: 'Hyderabad',
     latitude: 25.3750,
     longitude: 68.3550,
-    description: 'Nestled in the heart of the district, offering historical charm and modern student comfort. Enjoy our fast WiFi, self-service laundry, and 3 tasty meals.',
+    description:
+        'Nestled in the heart of the district, offering historical charm and modern student comfort. Enjoy our fast WiFi, self-service laundry, and 3 tasty meals.',
     pricePerMonth: 12000,
     photos: [
       'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=600&q=80',
       'https://images.unsplash.com/photo-1590490360182-c33d57733427?w=600&q=80',
       'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=600&q=80',
     ],
-    amenities: {Amenity.gym, Amenity.security, Amenity.wifi, Amenity.meals, Amenity.laundry, Amenity.parking, Amenity.beds},
+    amenities: {
+      Amenity.gym,
+      Amenity.security,
+      Amenity.wifi,
+      Amenity.meals,
+      Amenity.laundry,
+      Amenity.parking,
+      Amenity.beds
+    },
     availability: AvailabilityStatus.available,
     contactPhone: '+923339876543',
     contactWhatsapp: '+923339876543',
@@ -195,7 +218,8 @@ final List<HostelModel> mockHostels = [
     city: 'Hyderabad',
     latitude: 25.4250,
     longitude: 68.2750,
-    description: 'Just 2 minutes walk from the university main gate. Best location for students.',
+    description:
+        'Just 2 minutes walk from the university main gate. Best location for students.',
     pricePerMonth: 12000,
     photos: [
       'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600&q=80',

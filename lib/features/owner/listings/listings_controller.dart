@@ -9,7 +9,7 @@ import '../../../shared/widgets/feedback/app_snackbar.dart';
 
 class ListingsController extends GetxController {
   final MockDataService _dataService = Get.find<MockDataService>();
-  
+
   List<HostelModel> get ownerListings => _dataService.ownerListings;
 
   void deleteListing(HostelModel hostel) {
@@ -24,7 +24,9 @@ class ListingsController extends GetxController {
           _dataService.hostels.removeWhere((h) => h.id == hostel.id);
           // Note: Opting for standard AppSnackbar instead of Undo pattern
           // as per Phase 3's accepted gap.
-          AppSnackbar.showGlobal(message: AppStrings.listingDeletedMessage, type: SnackbarType.success);
+          AppSnackbar.showGlobal(
+              message: AppStrings.listingDeletedMessage,
+              type: SnackbarType.success);
         },
         onCancel: () => Get.back(),
       ),

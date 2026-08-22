@@ -48,17 +48,17 @@ class ActivityModel {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-  
+
     return other is ActivityModel &&
-      other.id == id &&
-      other.ownerId == ownerId &&
-      other.type == type &&
-      other.title == title &&
-      other.message == message &&
-      other.hostelId == hostelId &&
-      other.hostelName == hostelName &&
-      other.thumbnailUrl == thumbnailUrl &&
-      other.createdAt == createdAt;
+        other.id == id &&
+        other.ownerId == ownerId &&
+        other.type == type &&
+        other.title == title &&
+        other.message == message &&
+        other.hostelId == hostelId &&
+        other.hostelName == hostelName &&
+        other.thumbnailUrl == thumbnailUrl &&
+        other.createdAt == createdAt;
   }
 
   @override

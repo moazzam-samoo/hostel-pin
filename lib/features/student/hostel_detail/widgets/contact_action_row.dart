@@ -47,7 +47,8 @@ class ContactActionRow extends StatelessWidget {
         Expanded(
           child: PrimaryButton(
             text: AppStrings.whatsappButton,
-            icon: const Icon(Icons.chat_bubble_outline, size: 18, color: AppColors.background),
+            icon: const Icon(Icons.chat_bubble_outline,
+                size: 18, color: AppColors.background),
             onPressed: _launchWhatsapp,
           ),
         ),

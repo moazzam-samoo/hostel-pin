@@ -23,14 +23,15 @@ class ListingsView extends GetView<ListingsController> {
       appBar: const AppTopBar(variant: AppTopBarVariant.brand),
       body: Obx(() {
         final listings = controller.ownerListings;
-        
+
         return SingleChildScrollView(
           padding: EdgeInsets.only(bottom: AppSpacing.xl),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: AppSpacing.gutter, vertical: AppSpacing.md),
+                padding: EdgeInsets.symmetric(
+                    horizontal: AppSpacing.gutter, vertical: AppSpacing.md),
                 child: const ScreenTitleBlock(
                   title: AppStrings.myHostels,
                   subtitle: AppStrings.myHostelsSubtitle,
@@ -40,7 +41,6 @@ class ListingsView extends GetView<ListingsController> {
                 _buildEmptyState()
               else
                 ...listings.map((hostel) => _buildListingItem(hostel)),
-              
               SizedBox(height: AppSpacing.xl),
               _buildPromoFooter(),
             ],
@@ -63,7 +63,10 @@ class ListingsView extends GetView<ListingsController> {
 
   Widget _buildListingItem(HostelModel hostel) {
     return Padding(
-      padding: EdgeInsets.only(left: AppSpacing.gutter, right: AppSpacing.gutter, bottom: AppSpacing.xl),
+      padding: EdgeInsets.only(
+          left: AppSpacing.gutter,
+          right: AppSpacing.gutter,
+          bottom: AppSpacing.xl),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -77,7 +80,8 @@ class ListingsView extends GetView<ListingsController> {
                 child: SecondaryButton(
                   text: AppStrings.editButton,
                   intent: ButtonIntent.primary,
-                  icon: const Icon(Icons.edit_outlined, color: AppColors.primary, size: 20),
+                  icon: const Icon(Icons.edit_outlined,
+                      color: AppColors.primary, size: 20),
                   onPressed: () => controller.editListing(hostel),
                 ),
               ),
@@ -102,19 +106,23 @@ class ListingsView extends GetView<ListingsController> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Container(
-            padding: EdgeInsets.all(AppSpacing.md),
-            decoration: const BoxDecoration(
-              color: AppColors.surfaceTonal,
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.home, color: AppColors.primary, size: 28),
-          ),
-          SizedBox(height: AppSpacing.md),
-          Text(
-            AppStrings.expandReachTitle,
-            style: AppTextStyles.sectionHeader.copyWith(color: AppColors.primary),
-            textAlign: TextAlign.center,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.home, color: AppColors.primary, size: 28),
+              SizedBox(width: AppSpacing.sm),
+              // Flexible (letting the heading wrap instead of forcing one
+              // line) avoids a RenderFlex overflow at narrow widths/large
+              // text scale — found via Phase 5's D.5 pass (TASK-Phase-5.md).
+              Flexible(
+                child: Text(
+                  AppStrings.expandReachTitle,
+                  style: AppTextStyles.sectionHeader
+                      .copyWith(color: AppColors.primary),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ],
           ),
           SizedBox(height: AppSpacing.sm),
           Text(
@@ -126,17 +134,27 @@ class ListingsView extends GetView<ListingsController> {
           TextButton(
             onPressed: controller.navigateToAddListing,
             style: TextButton.styleFrom(
-              padding: EdgeInsets.symmetric(vertical: AppSpacing.sm, horizontal: AppSpacing.md),
+              padding: EdgeInsets.symmetric(
+                  vertical: AppSpacing.sm, horizontal: AppSpacing.md),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  AppStrings.addAnotherHostel,
-                  style: AppTextStyles.button.copyWith(color: AppColors.primary),
+                // Flexible + ellipsis guards against RenderFlex overflow at
+                // large text scale (1.3x) — found via Phase 5's D.5 pass
+                // (TASK-Phase-5.md).
+                Flexible(
+                  child: Text(
+                    AppStrings.addAnotherHostel,
+                    style:
+                        AppTextStyles.button.copyWith(color: AppColors.primary),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
                 SizedBox(width: AppSpacing.xs),
-                const Icon(Icons.arrow_forward, color: AppColors.primary, size: 18),
+                const Icon(Icons.arrow_forward,
+                    color: AppColors.primary, size: 18),
               ],
             ),
           ),

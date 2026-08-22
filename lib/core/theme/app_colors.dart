@@ -37,7 +37,7 @@ class AppColors {
   static const Color errorContainer = Color(0xFFEDC5C5);
   static const Color heartActive = Color(0xFFFF2F2F);
   static const Color destructive = Color(0xFF93000A);
-  
+
   // Confetti Dots
   static const Color dotPink = Color(0xFFFF2F55);
   static const Color dotCyan = Color(0xFF3ECFB2);

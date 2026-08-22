@@ -42,7 +42,8 @@ class OwnerEditProfileController extends GetxController {
 
       isLoading.value = false;
       Get.back();
-      AppSnackbar.showGlobal(message: AppStrings.editProfileSaved, type: SnackbarType.success);
+      AppSnackbar.showGlobal(
+          message: AppStrings.editProfileSaved, type: SnackbarType.success);
     }
   }
 }

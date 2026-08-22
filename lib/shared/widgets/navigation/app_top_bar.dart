@@ -4,6 +4,7 @@ import '../../../core/theme/app_text_styles.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/constants/app_assets.dart';
 import '../buttons/icon_square_button.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 enum AppTopBarVariant { brand, brandWithBack, titled, backOnly, none }
 
@@ -85,12 +86,17 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
         Image.asset(
           AppAssets.appLogo,
           height: 24,
-          errorBuilder: (c, e, s) => const Icon(Icons.apartment, color: AppColors.primary),
+          errorBuilder: (c, e, s) =>
+              const Icon(Icons.apartment, color: AppColors.primary),
         ),
         const SizedBox(width: 8),
-        Text(
-          AppStrings.appName,
-          style: AppTextStyles.screenTitle.copyWith(fontSize: 18),
+        Flexible(
+          child: Text(
+            AppStrings.appName,
+            style: AppTextStyles.screenTitle.copyWith(fontSize: 18.sp),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
       ],
     );
@@ -99,7 +105,9 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
   Widget _buildTextTitle() {
     return Text(
       title ?? '',
-      style: AppTextStyles.screenTitle.copyWith(fontSize: 18),
+      style: AppTextStyles.screenTitle.copyWith(fontSize: 18.sp),
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
     );
   }
 }

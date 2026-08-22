@@ -20,9 +20,11 @@ class ChangePasswordController extends GetxController {
 
   Future<void> changePassword() async {
     if (!formKey.currentState!.validate()) return;
-    
+
     if (newPasswordController.text.startsWith('Error')) {
-      AppSnackbar.showGlobal(message: 'Could not update password. Try again.', type: SnackbarType.error);
+      AppSnackbar.showGlobal(
+          message: 'Could not update password. Try again.',
+          type: SnackbarType.error);
       return;
     }
 

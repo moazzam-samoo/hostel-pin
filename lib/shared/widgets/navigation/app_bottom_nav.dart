@@ -52,7 +52,8 @@ class AppBottomNav extends StatelessWidget {
                       vertical: 8,
                     ),
                     decoration: BoxDecoration(
-                      color: isSelected ? AppColors.primary : Colors.transparent,
+                      color:
+                          isSelected ? AppColors.primary : Colors.transparent,
                       borderRadius: BorderRadius.circular(AppRadius.pill),
                     ),
                     child: Row(
@@ -60,16 +61,22 @@ class AppBottomNav extends StatelessWidget {
                       children: [
                         Icon(
                           item.icon,
-                          color: isSelected ? AppColors.background : AppColors.textSecondary,
+                          color: isSelected
+                              ? AppColors.background
+                              : AppColors.textSecondary,
                           size: 22,
                         ),
                         if (isSelected) ...[
                           const SizedBox(width: 6),
-                          Text(
-                            item.label,
-                            style: AppTextStyles.labelMicro.copyWith(
-                              color: AppColors.background,
-                              fontWeight: FontWeight.w600,
+                          Flexible(
+                            child: Text(
+                              item.label,
+                              style: AppTextStyles.labelMicro.copyWith(
+                                color: AppColors.background,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ],

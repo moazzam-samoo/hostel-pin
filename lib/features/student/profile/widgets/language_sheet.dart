@@ -28,7 +28,8 @@ class _LanguageSheetContent extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(AppStrings.languageSheetTitle, style: AppTextStyles.sectionHeader),
+            Text(AppStrings.languageSheetTitle,
+                style: AppTextStyles.sectionHeader),
             SizedBox(height: AppSpacing.md),
             // Only one language exists today — a real picker lands once
             // localization is added. Shown as selected, not interactive.

@@ -32,12 +32,14 @@ class ChangePasswordView extends GetView<ChangePasswordController> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const FieldLabel(AppStrings.newPasswordLabel,
+                    const FieldLabel(
+                      AppStrings.newPasswordLabel,
                       style: FieldLabelStyle.auth,
                     ),
                     SizedBox(height: AppSpacing.xs),
                     FormField<String>(
-                      validator: (val) => Validators.password(controller.newPasswordController.text),
+                      validator: (val) => Validators.password(
+                          controller.newPasswordController.text),
                       builder: (state) => AppPasswordField(
                         controller: controller.newPasswordController,
                         hintText: AppStrings.newPasswordLabel,
@@ -45,7 +47,8 @@ class ChangePasswordView extends GetView<ChangePasswordController> {
                       ),
                     ),
                     SizedBox(height: AppSpacing.md),
-                    const FieldLabel(AppStrings.confirmPasswordFieldLabel,
+                    const FieldLabel(
+                      AppStrings.confirmPasswordFieldLabel,
                       style: FieldLabelStyle.auth,
                     ),
                     SizedBox(height: AppSpacing.xs),
@@ -62,7 +65,9 @@ class ChangePasswordView extends GetView<ChangePasswordController> {
                     ),
                     SizedBox(height: AppSpacing.xl),
                     Obx(
-                      () => PrimaryButton(text: AppStrings.changePasswordButton, onPressed: controller.changePassword,
+                      () => PrimaryButton(
+                        text: AppStrings.changePasswordButton,
+                        onPressed: controller.changePassword,
                         expand: true,
                         isLoading: controller.isLoading.value,
                       ),

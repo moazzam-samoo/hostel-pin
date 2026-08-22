@@ -3,6 +3,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_radius.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_text_styles.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 enum FacilityTileStyle { read, select }
 
@@ -81,7 +82,7 @@ class FacilityTile extends StatelessWidget {
                     style: AppTextStyles.body.copyWith(
                       fontWeight: FontWeight.w600,
                       color: AppColors.textPrimary,
-                      fontSize: 13,
+                      fontSize: 13.sp,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -91,7 +92,7 @@ class FacilityTile extends StatelessWidget {
                     subtitle,
                     style: AppTextStyles.caption.copyWith(
                       color: AppColors.textSecondary,
-                      fontSize: 11,
+                      fontSize: 11.sp,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,

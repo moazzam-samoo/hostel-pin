@@ -32,12 +32,14 @@ class ForgotPasswordView extends GetView<ForgotPasswordController> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const FieldLabel(AppStrings.emailLabel,
+                    const FieldLabel(
+                      AppStrings.emailLabel,
                       style: FieldLabelStyle.auth,
                     ),
                     SizedBox(height: AppSpacing.xs),
                     FormField<String>(
-                      validator: (val) => Validators.email(controller.emailController.text),
+                      validator: (val) =>
+                          Validators.email(controller.emailController.text),
                       builder: (state) => AppTextField(
                         controller: controller.emailController,
                         hintText: AppStrings.enterEmail,
@@ -52,7 +54,9 @@ class ForgotPasswordView extends GetView<ForgotPasswordController> {
                     ),
                     SizedBox(height: AppSpacing.xl),
                     Obx(
-                      () => PrimaryButton(text: AppStrings.sendResetLink, onPressed: controller.sendResetLink,
+                      () => PrimaryButton(
+                        text: AppStrings.sendResetLink,
+                        onPressed: controller.sendResetLink,
                         expand: true,
                         isLoading: controller.isLoading.value,
                       ),

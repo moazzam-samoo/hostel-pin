@@ -5,10 +5,16 @@ import '../../../core/utils/formatters.dart';
 
 class PriceLabel extends StatelessWidget {
   final num price;
+  final TextStyle? priceStyle;
+  final TextStyle? suffixStyle;
+  final String suffix;
 
   const PriceLabel({
     super.key,
     required this.price,
+    this.priceStyle,
+    this.suffixStyle,
+    this.suffix = ' /month',
   });
 
   @override
@@ -20,11 +26,12 @@ class PriceLabel extends StatelessWidget {
       children: [
         Text(
           Formatters.currency(price),
-          style: AppTextStyles.sectionHeader.copyWith(color: AppColors.primary),
+          style: priceStyle ??
+              AppTextStyles.sectionHeader.copyWith(color: AppColors.primary),
         ),
         Text(
-          ' /month',
-          style: AppTextStyles.caption,
+          suffix,
+          style: suffixStyle ?? AppTextStyles.caption,
         ),
       ],
     );

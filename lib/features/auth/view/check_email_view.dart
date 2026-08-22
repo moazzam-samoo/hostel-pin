@@ -39,7 +39,8 @@ class CheckEmailView extends StatelessWidget {
                       color: AppColors.primaryContainer,
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.mark_email_read, color: AppColors.primary, size: 32),
+                    child: const Icon(Icons.mark_email_read,
+                        color: AppColors.primary, size: 32),
                   ),
                   SizedBox(height: AppSpacing.md),
                   HighlightedBodyText(
@@ -48,11 +49,15 @@ class CheckEmailView extends StatelessWidget {
                     textAfter: AppStrings.resetLinkSentSuffix,
                   ),
                   SizedBox(height: AppSpacing.xl),
-                  SecondaryButton(text: AppStrings.resendCode, onPressed: () {},
+                  SecondaryButton(
+                    text: AppStrings.resendCode,
+                    onPressed: () {},
                     expand: true,
                   ),
                   SizedBox(height: AppSpacing.md),
-                  TextLinkButton(text: AppStrings.backToLogin, onPressed: () => Get.offAllNamed(Routes.login),
+                  TextLinkButton(
+                    text: AppStrings.backToLogin,
+                    onPressed: () => Get.offAllNamed(Routes.login),
                     isSecondary: true,
                   ),
                 ],

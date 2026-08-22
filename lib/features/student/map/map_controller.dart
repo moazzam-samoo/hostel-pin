@@ -6,16 +6,17 @@ import '../../../data/models/hostel_model.dart';
 import '../../../data/services/mock_data_service.dart';
 import '../../../shared/widgets/feedback/app_snackbar.dart';
 import '../../../core/utils/hostel_marker_builder.dart';
+import '../../../core/constants/app_strings.dart';
 
 class MapController extends GetxController {
   final _dataService = Get.find<MockDataService>();
-  
+
   final hostels = <HostelModel>[].obs;
   final markers = <Marker>{}.obs;
   final selectedHostel = Rxn<HostelModel>();
 
   GoogleMapController? mapController;
-  
+
   // Hyderabad, Sindh, Pakistan — matches every mock hostel's coordinates
   // (all cluster around 25.39, 68.37). Overwritten by the user's live
   // location once permission is granted, via onMapCreated -> getCurrentLocation().
@@ -42,7 +43,7 @@ class MapController extends GetxController {
     for (var hostel in hostels) {
       final isSelected = selectedHostel.value?.id == hostel.id;
       final cacheKey = '${hostel.id}_$isSelected';
-      
+
       BitmapDescriptor bitmap;
       if (_markerBitmapCache.containsKey(cacheKey)) {
         bitmap = _markerBitmapCache[cacheKey]!;
@@ -53,7 +54,7 @@ class MapController extends GetxController {
         );
         _markerBitmapCache[cacheKey] = bitmap;
       }
-      
+
       newMarkers.add(
         Marker(
           markerId: MarkerId(hostel.id),
@@ -83,7 +84,9 @@ class MapController extends GetxController {
 
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      AppSnackbar.showGlobal(message: 'Please enable location services.', type: SnackbarType.error);
+      AppSnackbar.showGlobal(
+          message: 'Please enable location services.',
+          type: SnackbarType.error);
       return;
     }
 
@@ -96,13 +99,17 @@ class MapController extends GetxController {
 
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        AppSnackbar.showGlobal(message: 'Location permissions are denied.', type: SnackbarType.error);
+        AppSnackbar.showGlobal(
+            message: 'Location permissions are denied.',
+            type: SnackbarType.error);
         return;
       }
     }
 
     if (permission == LocationPermission.deniedForever) {
-      AppSnackbar.showGlobal(message: 'Location permissions are permanently denied.', type: SnackbarType.error);
+      AppSnackbar.showGlobal(
+          message: 'Location permissions are permanently denied.',
+          type: SnackbarType.error);
       return;
     }
 
@@ -117,20 +124,25 @@ class MapController extends GetxController {
         ),
       );
     } catch (e) {
-      AppSnackbar.showGlobal(message: 'Could not get current location.', type: SnackbarType.error);
+      AppSnackbar.showGlobal(
+          message: 'Could not get current location.', type: SnackbarType.error);
     }
   }
 
   Future<bool?> _showLocationRationale() {
     return Get.dialog<bool>(
       AlertDialog(
-        title: const Text('Allow Location Access'),
+        title: const Text(AppStrings.allowLocationAccess),
         content: const Text(
           'Hostel Finder uses your location to show nearby hostels on the map and center it on you.',
         ),
         actions: [
-          TextButton(onPressed: () => Get.back(result: false), child: const Text('Not Now')),
-          TextButton(onPressed: () => Get.back(result: true), child: const Text('Continue')),
+          TextButton(
+              onPressed: () => Get.back(result: false),
+              child: const Text(AppStrings.notNow)),
+          TextButton(
+              onPressed: () => Get.back(result: true),
+              child: const Text(AppStrings.continueText)),
         ],
       ),
     );

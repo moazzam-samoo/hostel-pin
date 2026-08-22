@@ -39,7 +39,8 @@ class PromoCard extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: AppTextStyles.cardTitle.copyWith(color: AppColors.primary),
+                  style: AppTextStyles.cardTitle
+                      .copyWith(color: AppColors.primary),
                 ),
                 SizedBox(height: AppSpacing.xs),
                 Text(

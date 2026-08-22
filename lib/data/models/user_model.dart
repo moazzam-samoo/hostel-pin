@@ -84,22 +84,21 @@ class UserModel {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-  
+
     return other is UserModel &&
-      other.uid == uid &&
-      other.displayName == displayName &&
-      other.email == email &&
-      other.photoUrl == photoUrl &&
-      other.role == role &&
-      listEquals(other.savedHostelIds, savedHostelIds) &&
-      other.prefs == prefs &&
-      other.verificationStatus == verificationStatus;
+        other.uid == uid &&
+        other.displayName == displayName &&
+        other.email == email &&
+        other.photoUrl == photoUrl &&
+        other.role == role &&
+        listEquals(other.savedHostelIds, savedHostelIds) &&
+        other.prefs == prefs &&
+        other.verificationStatus == verificationStatus;
   }
 
   @override
   int get hashCode {
-    return Object.hash(
-      uid, displayName, email, photoUrl, role, Object.hashAll(savedHostelIds), prefs, verificationStatus
-    );
+    return Object.hash(uid, displayName, email, photoUrl, role,
+        Object.hashAll(savedHostelIds), prefs, verificationStatus);
   }
 }

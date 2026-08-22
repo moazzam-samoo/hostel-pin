@@ -5,6 +5,6 @@ class AuthController extends GetxController {
   // Shared state across auth screens
   final selectedRole = Rx<UserRole?>(null);
 
-  // You can place global mock session methods here if needed, 
+  // You can place global mock session methods here if needed,
   // but form submission logic belongs in the screen controllers.
 }

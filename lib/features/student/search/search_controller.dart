@@ -6,12 +6,12 @@ import '../../../data/services/mock_data_service.dart';
 
 class SearchController extends GetxController {
   final _dataService = Get.find<MockDataService>();
-  
+
   final searchController = TextEditingController();
   final searchQuery = ''.obs;
-  
+
   final recentSearches = ['Ameerpet', 'Boys hostel', 'Under 10k'].obs;
-  
+
   // Basic filtering state
   final isSortPriceLowToHigh = false.obs;
   final isSortRatingHighToLow = false.obs;
@@ -40,9 +40,12 @@ class SearchController extends GetxController {
 
     final query = searchQuery.value.toLowerCase();
     var results = _dataService.hostels.where((h) {
-      final matchesQuery = h.name.toLowerCase().contains(query) || h.city.toLowerCase().contains(query);
-      final matchesPrice = h.pricePerMonth >= priceRange.value.start && h.pricePerMonth <= priceRange.value.end;
-      final matchesAmenities = selectedAmenities.isEmpty || selectedAmenities.every(h.amenities.contains);
+      final matchesQuery = h.name.toLowerCase().contains(query) ||
+          h.city.toLowerCase().contains(query);
+      final matchesPrice = h.pricePerMonth >= priceRange.value.start &&
+          h.pricePerMonth <= priceRange.value.end;
+      final matchesAmenities = selectedAmenities.isEmpty ||
+          selectedAmenities.every(h.amenities.contains);
       return matchesQuery && matchesPrice && matchesAmenities;
     }).toList();
 

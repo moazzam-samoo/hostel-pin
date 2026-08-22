@@ -29,24 +29,28 @@ class StudentShellView extends GetView<StudentShellController> {
       },
       child: Scaffold(
         body: Obx(() => IndexedStack(
-          index: controller.currentIndex.value,
-          children: const [
-            HomeView(),
-            MapView(),
-            SavedView(),
-            ProfileView(),
-          ],
-        )),
+              index: controller.currentIndex.value,
+              children: const [
+                HomeView(),
+                MapView(),
+                SavedView(),
+                ProfileView(),
+              ],
+            )),
         bottomNavigationBar: Obx(() => AppBottomNav(
-          currentIndex: controller.currentIndex.value,
-          onTabSelected: controller.onTabSelected,
-          items: const [
-            NavItem(label: 'Home', icon: Icons.home_filled, route: ''), // Routes are not really used by this nav implementation for switching tabs
-            NavItem(label: 'Map', icon: Icons.map, route: ''),
-            NavItem(label: 'Saved', icon: Icons.favorite, route: ''),
-            NavItem(label: 'Profile', icon: Icons.person, route: ''),
-          ],
-        )),
+              currentIndex: controller.currentIndex.value,
+              onTabSelected: controller.onTabSelected,
+              items: const [
+                NavItem(
+                    label: 'Home',
+                    icon: Icons.home_filled,
+                    route:
+                        ''), // Routes are not really used by this nav implementation for switching tabs
+                NavItem(label: 'Map', icon: Icons.map, route: ''),
+                NavItem(label: 'Saved', icon: Icons.favorite, route: ''),
+                NavItem(label: 'Profile', icon: Icons.person, route: ''),
+              ],
+            )),
       ),
     );
   }

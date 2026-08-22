@@ -5,6 +5,7 @@ import '../../../core/constants/app_strings.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_text_styles.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../core/enums/verification_status.dart';
 import '../../../core/enums/listing_status.dart';
@@ -24,7 +25,8 @@ class DashboardView extends GetView<DashboardController> {
     return Scaffold(
       appBar: const AppTopBar(variant: AppTopBarVariant.brand),
       body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(horizontal: AppSpacing.gutter, vertical: AppSpacing.md),
+        padding: EdgeInsets.symmetric(
+            horizontal: AppSpacing.gutter, vertical: AppSpacing.md),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -66,41 +68,46 @@ class DashboardView extends GetView<DashboardController> {
   }
 
   Widget _buildStatRow() {
-    return Column(
+    return Row(
       children: [
-        Obx(() => StatRowTile(
-              layout: StatRowTileLayout.card,
-              title: AppStrings.totalListingLabel,
-              value: controller.ownerListings.length.toString().padLeft(2, '0'),
-              icon: Icons.apartment_rounded,
-              tileColor: AppColors.secondaryContainer,
-              iconColor: AppColors.secondary,
-              trailing: Text(
-                AppStrings.activeLabel,
-                style: AppTextStyles.labelMicro.copyWith(
-                  color: AppColors.success,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 13,
+        Expanded(
+          child: Obx(() => StatRowTile(
+                layout: StatRowTileLayout.card,
+                title: AppStrings.totalListingLabel,
+                value:
+                    controller.ownerListings.length.toString().padLeft(2, '0'),
+                icon: Icons.apartment_rounded,
+                tileColor: AppColors.secondaryContainer,
+                iconColor: AppColors.secondary,
+                trailing: Text(
+                  AppStrings.activeLabel,
+                  style: AppTextStyles.labelMicro.copyWith(
+                    color: AppColors.success,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 13.sp,
+                  ),
                 ),
-              ),
-            )),
-        SizedBox(height: AppSpacing.md),
-        Obx(() => StatRowTile(
-              layout: StatRowTileLayout.card,
-              title: AppStrings.totalViewsLabel,
-              value: Formatters.compact(controller.totalViews),
-              icon: Icons.visibility_outlined,
-              tileColor: AppColors.primaryContainer,
-              iconColor: AppColors.primaryVariant,
-              trailing: Text(
-                AppStrings.trafficLabel,
-                style: AppTextStyles.labelMicro.copyWith(
-                  color: AppColors.error,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 13,
+              )),
+        ),
+        SizedBox(width: AppSpacing.md),
+        Expanded(
+          child: Obx(() => StatRowTile(
+                layout: StatRowTileLayout.card,
+                title: AppStrings.totalViewsLabel,
+                value: Formatters.compact(controller.totalViews),
+                icon: Icons.visibility_outlined,
+                tileColor: AppColors.primaryContainer,
+                iconColor: AppColors.primaryVariant,
+                trailing: Text(
+                  AppStrings.trafficLabel,
+                  style: AppTextStyles.labelMicro.copyWith(
+                    color: AppColors.error,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 13.sp,
+                  ),
                 ),
-              ),
-            )),
+              )),
+        ),
       ],
     );
   }
@@ -111,7 +118,8 @@ class DashboardView extends GetView<DashboardController> {
         Expanded(
           child: PrimaryButton(
             text: AppStrings.addHostel,
-            icon: const Icon(Icons.add_circle_outline, color: AppColors.background, size: 20),
+            icon: const Icon(Icons.add_circle_outline,
+                color: AppColors.background, size: 20),
             onPressed: () => controller.navigateToTab(2),
           ),
         ),
@@ -119,7 +127,8 @@ class DashboardView extends GetView<DashboardController> {
         Expanded(
           child: SecondaryButton(
             text: AppStrings.viewListingButton,
-            icon: const Icon(Icons.list_alt, color: AppColors.primary, size: 20),
+            icon:
+                const Icon(Icons.list_alt, color: AppColors.primary, size: 20),
             onPressed: () => controller.navigateToTab(1),
           ),
         ),
@@ -129,14 +138,17 @@ class DashboardView extends GetView<DashboardController> {
 
   Widget _buildVerificationAlert() {
     return Obx(() {
-      final status = controller.currentUser?.verificationStatus ?? VerificationStatus.unverified;
+      final status = controller.currentUser?.verificationStatus ??
+          VerificationStatus.unverified;
       if (status == VerificationStatus.verified) return const SizedBox.shrink();
-      
+
       // Prefer the first pending/draft listing's name, since that's what's
       // actually "under review" — falling back to any listing, then to a
       // generic name, only when nothing is pending/draft.
       final pendingOrDraft = controller.ownerListings.where(
-        (h) => h.status == ListingStatus.pending || h.status == ListingStatus.draft,
+        (h) =>
+            h.status == ListingStatus.pending ||
+            h.status == ListingStatus.draft,
       );
       final String hostelName = pendingOrDraft.isNotEmpty
           ? pendingOrDraft.first.name
@@ -165,13 +177,15 @@ class DashboardView extends GetView<DashboardController> {
       );
     }
     return Column(
-      children: activities.map((activity) => ActivityRow(
-        title: activity.title,
-        message: activity.message,
-        timeAgo: Formatters.timeAgo(activity.createdAt),
-        icon: Icons.notifications_outlined,
-        imageUrl: activity.thumbnailUrl,
-      )).toList(),
+      children: activities
+          .map((activity) => ActivityRow(
+                title: activity.title,
+                message: activity.message,
+                timeAgo: Formatters.timeAgo(activity.createdAt),
+                icon: Icons.notifications_outlined,
+                imageUrl: activity.thumbnailUrl,
+              ))
+          .toList(),
     );
   }
 }

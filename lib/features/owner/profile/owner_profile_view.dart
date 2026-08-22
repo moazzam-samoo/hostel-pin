@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'owner_profile_controller.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/routes/app_routes.dart';
@@ -36,9 +37,10 @@ class OwnerProfileView extends GetView<OwnerProfileController> {
           children: [
             Center(
               child: Obx(() => ProfileHeaderBlock(
-                    name: controller.currentUser.value?.displayName ?? 'Hostel Owner',
-                    email:
-                        controller.currentUser.value?.email ?? 'owner@example.com',
+                    name: controller.currentUser.value?.displayName ??
+                        'Hostel Owner',
+                    email: controller.currentUser.value?.email ??
+                        'owner@example.com',
                     imageUrl: controller.currentUser.value?.photoUrl,
                   )),
             ),
@@ -57,7 +59,7 @@ class OwnerProfileView extends GetView<OwnerProfileController> {
                   child: Text(
                     AppStrings.editProfileButton,
                     style: AppTextStyles.button.copyWith(
-                      fontSize: 14,
+                      fontSize: 14.sp,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -70,7 +72,7 @@ class OwnerProfileView extends GetView<OwnerProfileController> {
             Text(
               AppStrings.securityPrivacySection,
               style: AppTextStyles.cardTitle.copyWith(
-                fontSize: 16,
+                fontSize: 16.sp,
                 color: AppColors.textPrimary,
               ),
             ),
@@ -110,7 +112,7 @@ class OwnerProfileView extends GetView<OwnerProfileController> {
             Text(
               AppStrings.appPreferencesSection,
               style: AppTextStyles.cardTitle.copyWith(
-                fontSize: 16,
+                fontSize: 16.sp,
                 color: AppColors.textPrimary,
               ),
             ),
@@ -139,7 +141,7 @@ class OwnerProfileView extends GetView<OwnerProfileController> {
               trailing: SettingsRowTrailing.none,
               onTap: () => showLanguageSheet(),
             ),
-            
+
             SizedBox(height: AppSpacing.lg),
 
             // 3. Logout

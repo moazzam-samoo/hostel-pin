@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'welcome_controller.dart';
 import '../../core/constants/app_assets.dart';
 import '../../core/constants/app_strings.dart';
@@ -52,7 +53,7 @@ class WelcomeView extends GetView<WelcomeController> {
                       Text(
                         AppStrings.welcome,
                         style: AppTextStyles.authTitle.copyWith(
-                            fontSize: 28, fontWeight: FontWeight.bold),
+                            fontSize: 28.sp, fontWeight: FontWeight.bold),
                         textAlign: TextAlign.center,
                       ),
                       SizedBox(height: AppSpacing.xs),

@@ -6,7 +6,8 @@ final List<ActivityModel> mockActivities = [
     ownerId: 'owner_1',
     type: 'verification',
     title: 'Pending Verification',
-    message: 'Hostel "Bismilla Hostal" is currently under review by our team. This usually takes 24 hours.',
+    message:
+        'Hostel "Bismilla Hostal" is currently under review by our team. This usually takes 24 hours.',
     hostelId: 'hostel_1',
     hostelName: 'Bismilla Hostal',
     createdAt: DateTime.now().subtract(const Duration(hours: 2)),
@@ -16,7 +17,8 @@ final List<ActivityModel> mockActivities = [
     ownerId: 'owner_1',
     type: 'verification',
     title: 'Pending Verification',
-    message: 'Hostel "Bismilla Hostal" is currently under review by our team. This usually takes 24 hours.',
+    message:
+        'Hostel "Bismilla Hostal" is currently under review by our team. This usually takes 24 hours.',
     hostelId: 'hostel_1',
     hostelName: 'Bismilla Hostal',
     createdAt: DateTime.now().subtract(const Duration(hours: 5)),
@@ -26,7 +28,8 @@ final List<ActivityModel> mockActivities = [
     ownerId: 'owner_1',
     type: 'verification',
     title: 'Pending Verification',
-    message: 'Hostel "Bismilla Hostal" is currently under review by our team. This usually takes 24 hours.',
+    message:
+        'Hostel "Bismilla Hostal" is currently under review by our team. This usually takes 24 hours.',
     hostelId: 'hostel_1',
     hostelName: 'Bismilla Hostal',
     createdAt: DateTime.now().subtract(const Duration(days: 1)),
@@ -36,7 +39,8 @@ final List<ActivityModel> mockActivities = [
     ownerId: 'owner_1',
     type: 'verification',
     title: 'Pending Verification',
-    message: 'Hostel "Bismilla Hostal" is currently under review by our team. This usually takes 24 hours.',
+    message:
+        'Hostel "Bismilla Hostal" is currently under review by our team. This usually takes 24 hours.',
     hostelId: 'hostel_1',
     hostelName: 'Bismilla Hostal',
     createdAt: DateTime.now().subtract(const Duration(days: 2)),

@@ -45,7 +45,8 @@ class PhotoGrid extends StatelessWidget {
                       imageUrl: imageUrls[1],
                       borderRadius: BorderRadius.only(
                         topRight: Radius.circular(AppRadius.card),
-                        bottomRight: Radius.circular(imageUrls.length == 2 ? AppRadius.card : 0),
+                        bottomRight: Radius.circular(
+                            imageUrls.length == 2 ? AppRadius.card : 0),
                       ),
                     ),
                   ),
@@ -68,13 +69,15 @@ class PhotoGrid extends StatelessWidget {
                                 decoration: BoxDecoration(
                                   color: Colors.black54,
                                   borderRadius: BorderRadius.only(
-                                    bottomRight: Radius.circular(AppRadius.card),
+                                    bottomRight:
+                                        Radius.circular(AppRadius.card),
                                   ),
                                 ),
                                 alignment: Alignment.center,
                                 child: Text(
                                   '+${imageUrls.length - 3}',
-                                  style: AppTextStyles.sectionHeader.copyWith(color: AppColors.background),
+                                  style: AppTextStyles.sectionHeader
+                                      .copyWith(color: AppColors.background),
                                 ),
                               ),
                           ],

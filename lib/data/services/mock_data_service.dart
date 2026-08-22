@@ -8,11 +8,12 @@ import '../mock/mock_user.dart';
 class MockDataService extends GetxService {
   final RxList<HostelModel> hostels = <HostelModel>[].obs;
   final Rx<UserModel?> currentUser = Rx<UserModel?>(null);
-  
+
   // A set of saved hostel IDs to sync between Home, Saved, and Map screens.
   final RxSet<String> savedHostelIds = <String>{}.obs;
 
-  List<HostelModel> get ownerListings => hostels.where((h) => h.ownerId == currentUser.value?.uid).toList();
+  List<HostelModel> get ownerListings =>
+      hostels.where((h) => h.ownerId == currentUser.value?.uid).toList();
 
   Future<MockDataService> init() async {
     // Load mock data

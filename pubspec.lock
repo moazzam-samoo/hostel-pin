@@ -153,6 +153,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.9"
+  device_preview:
+    dependency: "direct dev"
+    description:
+      name: device_preview
+      sha256: "17904a409957093dd31e0b78fbc49df87645ef9e6809f792ee6e2f52b61590cb"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.0-prerelease3"
   fake_async:
     dependency: transitive
     description:
@@ -392,6 +400,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.7.3"
+  golden_toolkit:
+    dependency: "direct dev"
+    description:
+      name: golden_toolkit
+      sha256: "8f74adab33154fe7b731395782797021f97d2edc52f7bfb85ff4f1b5c4a215f0"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.15.0"
   google_maps:
     dependency: transitive
     description:

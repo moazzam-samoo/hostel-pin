@@ -33,7 +33,8 @@ enum Amenity {
   ),
   gym(
     title: 'Gym',
-    subtitle: 'Free gym access', // Gym subtitle doesn't exist in mockups, adding a default one
+    subtitle:
+        'Free gym access', // Gym subtitle doesn't exist in mockups, adding a default one
     icon: Icons.fitness_center,
   );
 

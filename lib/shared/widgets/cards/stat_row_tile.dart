@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
+import '../../../core/theme/app_radius.dart';
 import '../../../core/theme/app_text_styles.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 enum StatRowTileLayout {
   /// Full-width tinted row: icon circle, title, value, optional trailing —
@@ -46,7 +48,8 @@ class StatRowTile extends StatelessWidget {
   Widget _buildRow() {
     return Container(
       color: tileColor ?? AppColors.background,
-      padding: EdgeInsets.symmetric(vertical: AppSpacing.md, horizontal: AppSpacing.gutter),
+      padding: EdgeInsets.symmetric(
+          vertical: AppSpacing.md, horizontal: AppSpacing.gutter),
       child: Row(
         children: [
           Container(
@@ -61,12 +64,13 @@ class StatRowTile extends StatelessWidget {
           Expanded(
             child: Text(
               title,
-              style: AppTextStyles.body.copyWith(color: AppColors.textSecondary),
+              style:
+                  AppTextStyles.body.copyWith(color: AppColors.textSecondary),
             ),
           ),
           Text(
             value,
-            style: AppTextStyles.sectionHeader.copyWith(fontSize: 18),
+            style: AppTextStyles.sectionHeader.copyWith(fontSize: 18.sp),
           ),
           if (trailing != null) ...[
             SizedBox(width: AppSpacing.sm),
@@ -86,7 +90,7 @@ class StatRowTile extends StatelessWidget {
           height: 52,
           decoration: BoxDecoration(
             color: tileColor ?? AppColors.surfaceTonal,
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(AppRadius.iconBadge),
           ),
           child: Center(
             child: Icon(icon, color: iconColor ?? AppColors.primary, size: 28),
@@ -103,22 +107,31 @@ class StatRowTile extends StatelessWidget {
                 style: AppTextStyles.labelMicro.copyWith(
                   color: iconColor ?? AppColors.primary,
                   fontWeight: FontWeight.w600,
-                  fontSize: 13,
+                  fontSize: 13.sp,
                 ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
               const SizedBox(height: 2),
               Text(
                 value,
                 style: AppTextStyles.screenTitle.copyWith(
-                  fontSize: 22,
+                  fontSize: 22.sp,
                   fontWeight: FontWeight.w700,
                   color: AppColors.textPrimary,
                 ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),
         ),
-        if (trailing != null) trailing!,
+        // Flexible (not a bare widget) so this doesn't force a RenderFlex
+        // overflow when the tile is squeezed into a narrow Expanded slot
+        // (e.g. two stat cards side by side on Owner Dashboard) at small
+        // screen widths or 1.3x text scale — found via Phase 5's D.5
+        // responsiveness pass (TASK-Phase-5.md).
+        if (trailing != null) Flexible(child: trailing!),
       ],
     );
   }
