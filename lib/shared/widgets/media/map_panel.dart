@@ -1,20 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_radius.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/utils/hostel_marker_builder.dart';
 
 enum MapPanelMode { readonly, picker }
 
-/// Placeholder map surface used by the Detail screen (readonly) and the
-/// Owner Add form (picker, taps out to a full-screen location picker).
-/// Renders the dark panel + "Drop your location" chip shown in the mockups;
-/// the real map tiles are wired in once google_maps_flutter is added.
-class MapPanel extends StatelessWidget {
+/// Map surface used by the Detail screen (readonly, a hostel's location)
+/// and the Owner Add form (picker, taps out to a full-screen location
+/// picker). Renders a real, non-interactive Google Maps preview — a single
+/// marker, gestures disabled, `liteModeEnabled` on Android — when
+/// [latitude]/[longitude] are supplied; falls back to the dark "Drop your
+/// location" placeholder chip otherwise (e.g. before Add Listing has a
+/// picked location, or in the widget gallery with no coordinates).
+class MapPanel extends StatefulWidget {
   final MapPanelMode mode;
   final String label;
   final double height;
   final VoidCallback? onTap;
+  final double? latitude;
+  final double? longitude;
+  final String? markerLabel;
 
   const MapPanel({
     super.key,
@@ -22,39 +30,114 @@ class MapPanel extends StatelessWidget {
     this.label = 'Drop your location',
     this.height = 180,
     this.onTap,
+    this.latitude,
+    this.longitude,
+    this.markerLabel,
   });
 
   @override
+  State<MapPanel> createState() => _MapPanelState();
+}
+
+class _MapPanelState extends State<MapPanel> {
+  BitmapDescriptor? _customIcon;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCustomMarker();
+  }
+
+  @override
+  void didUpdateWidget(MapPanel oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.markerLabel != oldWidget.markerLabel) {
+      _loadCustomMarker();
+    }
+  }
+
+  Future<void> _loadCustomMarker() async {
+    if (widget.markerLabel != null) {
+      final icon = await buildHostelMarkerBitmap(
+        name: widget.markerLabel!,
+        isSelected: true,
+      );
+      if (mounted) {
+        setState(() {
+          _customIcon = icon;
+        });
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final hasLocation = widget.latitude != null && widget.longitude != null;
+
     return ClipRRect(
       borderRadius: BorderRadius.circular(AppRadius.card),
       child: InkWell(
-        onTap: mode == MapPanelMode.picker ? onTap : null,
-        child: Container(
-          height: height,
+        onTap: widget.mode == MapPanelMode.picker ? widget.onTap : null,
+        child: SizedBox(
+          height: widget.height,
           width: double.infinity,
-          color: AppColors.darkSurface,
-          alignment: Alignment.center,
-          child: Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: AppSpacing.md,
-              vertical: AppSpacing.sm,
-            ),
-            decoration: BoxDecoration(
-              color: AppColors.chipNeutral,
-              borderRadius: BorderRadius.circular(AppRadius.pill),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.gps_fixed, size: 16, color: AppColors.textPrimary),
-                SizedBox(width: AppSpacing.xs),
-                Text(
-                  label,
-                  style: AppTextStyles.caption.copyWith(color: AppColors.textPrimary),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              if (hasLocation)
+                // Preview only — the panel's own tap (picker mode) or the
+                // full readonly map on Hostel Detail's own screen handles
+                // real interaction, so ignore touches here.
+                IgnorePointer(
+                  child: GoogleMap(
+                    initialCameraPosition: CameraPosition(
+                      target: LatLng(widget.latitude!, widget.longitude!),
+                      zoom: 15,
+                    ),
+                    liteModeEnabled: true,
+                    zoomControlsEnabled: false,
+                    zoomGesturesEnabled: false,
+                    scrollGesturesEnabled: false,
+                    rotateGesturesEnabled: false,
+                    tiltGesturesEnabled: false,
+                    myLocationButtonEnabled: false,
+                    mapToolbarEnabled: false,
+                    markers: {
+                      Marker(
+                        markerId: const MarkerId('panel_location'),
+                        position: LatLng(widget.latitude!, widget.longitude!),
+                        icon: _customIcon ?? BitmapDescriptor.defaultMarker,
+                      ),
+                    },
+                  ),
+                )
+              else
+                Container(color: AppColors.darkSurface),
+              if (widget.markerLabel == null)
+                Center(
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: AppSpacing.md,
+                      vertical: AppSpacing.sm,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.chipNeutral,
+                      borderRadius: BorderRadius.circular(AppRadius.pill),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.gps_fixed, size: 16, color: AppColors.textPrimary),
+                        SizedBox(width: AppSpacing.xs),
+                        Text(
+                          widget.label,
+                          style: AppTextStyles.caption.copyWith(color: AppColors.textPrimary),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-              ],
-            ),
+            ],
           ),
         ),
       ),

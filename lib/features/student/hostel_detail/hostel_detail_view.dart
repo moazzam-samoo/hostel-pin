@@ -85,6 +85,7 @@ class HostelDetailView extends GetView<HostelDetailController> {
                   DetailLocationSection(
                     latitude: hostel.latitude,
                     longitude: hostel.longitude,
+                    hostelName: hostel.name,
                   ),
                   SizedBox(height: AppSpacing.xl),
                 ],

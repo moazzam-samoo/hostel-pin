@@ -7,7 +7,6 @@ import '../../../core/constants/app_strings.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_text_styles.dart';
-import '../../../core/theme/app_radius.dart';
 import '../../../shared/widgets/navigation/app_top_bar.dart';
 import '../../../shared/widgets/layout/screen_title_block.dart';
 import '../../../shared/widgets/feedback/empty_state.dart';
@@ -77,6 +76,8 @@ class ListingsView extends GetView<ListingsController> {
               Expanded(
                 child: SecondaryButton(
                   text: AppStrings.editButton,
+                  intent: ButtonIntent.primary,
+                  icon: const Icon(Icons.edit_outlined, color: AppColors.primary, size: 20),
                   onPressed: () => controller.editListing(hostel),
                 ),
               ),
@@ -98,31 +99,48 @@ class ListingsView extends GetView<ListingsController> {
   Widget _buildPromoFooter() {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: AppSpacing.gutter),
-      child: Container(
-        padding: EdgeInsets.all(AppSpacing.lg),
-        decoration: BoxDecoration(
-          color: AppColors.primaryContainer,
-          borderRadius: BorderRadius.circular(AppRadius.card),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              AppStrings.expandReachTitle,
-              style: AppTextStyles.cardTitle,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            padding: EdgeInsets.all(AppSpacing.md),
+            decoration: const BoxDecoration(
+              color: AppColors.surfaceTonal,
+              shape: BoxShape.circle,
             ),
-            SizedBox(height: AppSpacing.xs),
-            Text(
-              AppStrings.expandReachSubtitle,
-              style: AppTextStyles.body.copyWith(color: AppColors.textSecondary),
+            child: const Icon(Icons.home, color: AppColors.primary, size: 28),
+          ),
+          SizedBox(height: AppSpacing.md),
+          Text(
+            AppStrings.expandReachTitle,
+            style: AppTextStyles.sectionHeader.copyWith(color: AppColors.primary),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: AppSpacing.sm),
+          Text(
+            AppStrings.expandReachSubtitle,
+            style: AppTextStyles.body.copyWith(color: AppColors.textSecondary),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: AppSpacing.md),
+          TextButton(
+            onPressed: controller.navigateToAddListing,
+            style: TextButton.styleFrom(
+              padding: EdgeInsets.symmetric(vertical: AppSpacing.sm, horizontal: AppSpacing.md),
             ),
-            SizedBox(height: AppSpacing.md),
-            SecondaryButton(
-              text: AppStrings.addAnotherHostel,
-              onPressed: controller.navigateToAddListing,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  AppStrings.addAnotherHostel,
+                  style: AppTextStyles.button.copyWith(color: AppColors.primary),
+                ),
+                SizedBox(width: AppSpacing.xs),
+                const Icon(Icons.arrow_forward, color: AppColors.primary, size: 18),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

@@ -1,9 +1,14 @@
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+import '../../../core/enums/user_role.dart';
 import '../../../core/routes/app_routes.dart';
+import '../../../data/services/mock_data_service.dart';
 import '../../../shared/widgets/feedback/app_snackbar.dart';
+import '../auth_controller.dart';
 
 class SignupController extends GetxController {
+  final AuthController authController = Get.find<AuthController>();
+
   final formKey = GlobalKey<FormState>();
   final nameController = TextEditingController();
   final emailController = TextEditingController();
@@ -43,7 +48,10 @@ class SignupController extends GetxController {
     await Future.delayed(const Duration(milliseconds: 1200));
     isLoading.value = false;
 
-    // Route to role selection post-auth
-    Get.offAllNamed(Routes.roleSelection);
+    // Role was already chosen on Role Selection, before this screen. Fall
+    // back to student only if reached directly (e.g. deep link) with no role set.
+    final role = authController.selectedRole.value ?? UserRole.student;
+    Get.find<MockDataService>().setCurrentUserForRole(role);
+    Get.offAllNamed(role == UserRole.student ? Routes.studentShell : Routes.ownerShell);
   }
 }

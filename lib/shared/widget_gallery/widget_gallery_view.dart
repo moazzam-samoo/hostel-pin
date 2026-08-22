@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/constants/app_sizes.dart';
+import '../../core/theme/app_radius.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/constants/app_assets.dart';
@@ -55,6 +56,7 @@ import '../widgets/layout/heart_toggle.dart';
 import '../widgets/layout/profile_header_block.dart';
 import '../widgets/layout/tonal_icon_tile.dart';
 import '../widgets/layout/app_gap.dart';
+import '../widgets/layout/keyboard_dismiss_wrapper.dart';
 
 // Feedback
 import '../widgets/feedback/app_loader.dart';
@@ -202,6 +204,15 @@ class _WidgetGalleryViewState extends State<WidgetGalleryView> {
         message: 'Your profile is incomplete. Please add a photo.',
       ),
       const StatRowTile(title: 'Total Views', value: '1,240', icon: Icons.visibility),
+      StatRowTile(
+        layout: StatRowTileLayout.card,
+        title: 'Total Listing',
+        value: '08',
+        icon: Icons.apartment_rounded,
+        tileColor: AppColors.secondaryContainer,
+        iconColor: AppColors.secondary,
+        trailing: Text('Active', style: AppTextStyles.labelMicro.copyWith(color: AppColors.success, fontWeight: FontWeight.w600, fontSize: 13)),
+      ),
       const ActivityRow(
         title: 'New Booking',
         timeAgo: '2 hours ago',
@@ -324,6 +335,19 @@ class _WidgetGalleryViewState extends State<WidgetGalleryView> {
           TonalIconTile(icon: Icons.map, title: 'Map View', onTap: () {}),
           TonalIconTile(icon: Icons.support, title: 'Support', onTap: () {}),
         ],
+      ),
+      KeyboardDismissWrapper(
+        child: Container(
+          padding: EdgeInsets.all(AppSpacing.md),
+          decoration: BoxDecoration(
+            color: AppColors.surfaceTonal,
+            borderRadius: BorderRadius.circular(AppRadius.card),
+          ),
+          child: Text(
+            'KeyboardDismissWrapper — tap anywhere in this box to dismiss a focused field',
+            style: AppTextStyles.caption,
+          ),
+        ),
       ),
       SettingsRow(icon: Icons.person, title: 'Account Settings', onTap: () {}),
       SettingsRow(

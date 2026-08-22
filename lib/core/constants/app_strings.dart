@@ -111,6 +111,8 @@ class AppStrings {
   static const String monthlyPriceLabel = 'Monthly Price';
   static const String totalRoomsLabel = 'Total Rooms';
   static const String includedFacilitiesLabel = 'Included Facilities..';
+  static const String availabilityLabel = 'Availability';
+  static const String fullStatus = 'Full';
   static const String ownerConnectivitySection = 'Owner Connectivity';
   static const String phoneNoLabel = 'Phone no:';
   static const String phoneHint = '+92-320605300';
@@ -178,6 +180,9 @@ class AppStrings {
   static const String errorPriceInvalid = 'Enter a valid price';
   static const String errorRoomsInvalid = 'Enter a valid number of rooms';
 
+  // Owner Dashboard
+  static const String noRecentActivity = 'No recent activity';
+
   // Home & Shared
   static const String searchHint = 'Search...';
   static const String featuredHostels = 'Featured Hostels';
@@ -199,6 +204,8 @@ class AppStrings {
 
   // Map
   static const String viewDetailsLink = 'View details';
+  static const String getDirectionsButton = 'Get Directions';
+  static const String noMapsAppFound = 'No maps app found on this device.';
 
   // Saved
   static const String savedEmptyTitle = 'No saved hostels yet';

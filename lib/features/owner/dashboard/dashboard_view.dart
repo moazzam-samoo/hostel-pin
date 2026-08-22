@@ -13,7 +13,6 @@ import '../../../shared/widgets/layout/section_header.dart';
 import '../../../shared/widgets/cards/stat_row_tile.dart';
 import '../../../shared/widgets/cards/alert_card.dart';
 import '../../../shared/widgets/cards/activity_row.dart';
-import '../../../shared/widgets/layout/status_chip.dart';
 import '../../../shared/widgets/buttons/primary_button.dart';
 import '../../../shared/widgets/buttons/secondary_button.dart';
 
@@ -67,29 +66,41 @@ class DashboardView extends GetView<DashboardController> {
   }
 
   Widget _buildStatRow() {
-    return Row(
+    return Column(
       children: [
-        Expanded(
-          child: Obx(() => StatRowTile(
-                title: AppStrings.totalListingLabel,
-                value: controller.ownerListings.length.toString(),
-                trailing: const StatusChip(type: StatusChipType.active),
-                icon: Icons.list_alt,
-                tileColor: AppColors.secondaryContainer,
-                iconColor: AppColors.secondary,
-              )),
-        ),
-        SizedBox(width: AppSpacing.md),
-        Expanded(
-          child: Obx(() => StatRowTile(
-                title: AppStrings.totalViewsLabel,
-                value: Formatters.compact(controller.totalViews),
-                trailing: const StatusChip(type: StatusChipType.traffic),
-                icon: Icons.visibility,
-                tileColor: AppColors.primaryContainer,
-                iconColor: AppColors.primaryVariant,
-              )),
-        ),
+        Obx(() => StatRowTile(
+              layout: StatRowTileLayout.card,
+              title: AppStrings.totalListingLabel,
+              value: controller.ownerListings.length.toString().padLeft(2, '0'),
+              icon: Icons.apartment_rounded,
+              tileColor: AppColors.secondaryContainer,
+              iconColor: AppColors.secondary,
+              trailing: Text(
+                AppStrings.activeLabel,
+                style: AppTextStyles.labelMicro.copyWith(
+                  color: AppColors.success,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13,
+                ),
+              ),
+            )),
+        SizedBox(height: AppSpacing.md),
+        Obx(() => StatRowTile(
+              layout: StatRowTileLayout.card,
+              title: AppStrings.totalViewsLabel,
+              value: Formatters.compact(controller.totalViews),
+              icon: Icons.visibility_outlined,
+              tileColor: AppColors.primaryContainer,
+              iconColor: AppColors.primaryVariant,
+              trailing: Text(
+                AppStrings.trafficLabel,
+                style: AppTextStyles.labelMicro.copyWith(
+                  color: AppColors.error,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13,
+                ),
+              ),
+            )),
       ],
     );
   }
@@ -100,6 +111,7 @@ class DashboardView extends GetView<DashboardController> {
         Expanded(
           child: PrimaryButton(
             text: AppStrings.addHostel,
+            icon: const Icon(Icons.add_circle_outline, color: AppColors.background, size: 20),
             onPressed: () => controller.navigateToTab(2),
           ),
         ),
@@ -107,6 +119,7 @@ class DashboardView extends GetView<DashboardController> {
         Expanded(
           child: SecondaryButton(
             text: AppStrings.viewListingButton,
+            icon: const Icon(Icons.list_alt, color: AppColors.primary, size: 20),
             onPressed: () => controller.navigateToTab(1),
           ),
         ),
@@ -139,28 +152,26 @@ class DashboardView extends GetView<DashboardController> {
   }
 
   Widget _buildRecentActivityList() {
-    return Obx(() {
-      final activities = controller.recentActivities;
-      if (activities.isEmpty) {
-        return Center(
-          child: Padding(
-            padding: EdgeInsets.symmetric(vertical: AppSpacing.xl),
-            child: Text(
-              'No recent activity',
-              style: AppTextStyles.body.copyWith(color: AppColors.textTertiary),
-            ),
+    final activities = controller.recentActivities;
+    if (activities.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: AppSpacing.xl),
+          child: Text(
+            AppStrings.noRecentActivity,
+            style: AppTextStyles.body.copyWith(color: AppColors.textTertiary),
           ),
-        );
-      }
-      return Column(
-        children: activities.map((activity) => ActivityRow(
-          title: activity.title,
-          message: activity.message,
-          timeAgo: Formatters.timeAgo(activity.createdAt),
-          icon: Icons.notifications_outlined,
-          imageUrl: activity.thumbnailUrl,
-        )).toList(),
+        ),
       );
-    });
+    }
+    return Column(
+      children: activities.map((activity) => ActivityRow(
+        title: activity.title,
+        message: activity.message,
+        timeAgo: Formatters.timeAgo(activity.createdAt),
+        icon: Icons.notifications_outlined,
+        imageUrl: activity.thumbnailUrl,
+      )).toList(),
+    );
   }
 }

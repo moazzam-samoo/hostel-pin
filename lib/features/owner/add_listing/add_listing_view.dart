@@ -14,6 +14,8 @@ import '../../../shared/widgets/feedback/confirm_dialog.dart';
 import '../../../shared/widgets/inputs/app_text_field.dart';
 import '../../../shared/widgets/inputs/field_label.dart';
 import '../../../shared/widgets/inputs/amenity_selector.dart';
+import '../../../shared/widgets/inputs/app_switch.dart';
+import '../../../core/enums/availability_status.dart';
 import '../../../shared/widgets/buttons/primary_button.dart';
 import '../../../shared/widgets/buttons/secondary_button.dart';
 import '../../../shared/widgets/media/map_panel.dart';
@@ -73,6 +75,8 @@ class AddListingView extends GetView<AddListingController> {
                                 mode: MapPanelMode.picker,
                                 height: 140,
                                 onTap: controller.pickLocation,
+                                latitude: controller.hasPickedLocation.value ? controller.latitude.value : null,
+                                longitude: controller.hasPickedLocation.value ? controller.longitude.value : null,
                                 label: controller.hasPickedLocation.value
                                     ? AppStrings.locationCoordinatesLabel(
                                         controller.latitude.value, controller.longitude.value)
@@ -120,10 +124,35 @@ class AddListingView extends GetView<AddListingController> {
                             ],
                           ),
                           SizedBox(height: AppSpacing.md),
+                          Obx(() {
+                            final isAvailable = controller.availability.value == AvailabilityStatus.available;
+                            return Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    AppStrings.availabilityLabel,
+                                    style: AppTextStyles.body.copyWith(color: AppColors.textPrimary),
+                                  ),
+                                ),
+                                Text(
+                                  isAvailable ? AppStrings.availableStatus : AppStrings.fullStatus,
+                                  style: AppTextStyles.caption.copyWith(
+                                    color: isAvailable ? AppColors.success : AppColors.error,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                AppSwitch(
+                                  value: isAvailable,
+                                  onChanged: controller.toggleAvailability,
+                                ),
+                              ],
+                            );
+                          }),
+                          SizedBox(height: AppSpacing.md),
                           const FieldLabel(AppStrings.includedFacilitiesLabel),
                           SizedBox(height: AppSpacing.sm),
                           Obx(() => AmenitySelector(
-                                selectedAmenities: controller.selectedAmenities,
+                                selectedAmenities: controller.selectedAmenities.toSet(),
                                 onToggle: controller.toggleAmenity,
                               )),
                           SizedBox(height: AppSpacing.xl),

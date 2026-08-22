@@ -5,6 +5,7 @@ import 'package:geolocator/geolocator.dart';
 import '../../../data/models/hostel_model.dart';
 import '../../../data/services/mock_data_service.dart';
 import '../../../shared/widgets/feedback/app_snackbar.dart';
+import '../../../core/utils/hostel_marker_builder.dart';
 
 class MapController extends GetxController {
   final _dataService = Get.find<MockDataService>();
@@ -13,18 +14,14 @@ class MapController extends GetxController {
   final markers = <Marker>{}.obs;
   final selectedHostel = Rxn<HostelModel>();
 
-  /// Whether the GoogleMap widget should be built. Set to `false` to prevent
-  /// the fatal PlatformException when no API key is configured in
-  /// AndroidManifest.xml. Flip to `true` once you've added a real
-  /// `com.google.android.geo.API_KEY` meta-data entry.
-  final mapReady = false.obs;
-  
   GoogleMapController? mapController;
   
-  // Default to Hyderabad or center of mock data
+  // Hyderabad, Sindh, Pakistan — matches every mock hostel's coordinates
+  // (all cluster around 25.39, 68.37). Overwritten by the user's live
+  // location once permission is granted, via onMapCreated -> getCurrentLocation().
   final initialPosition = const CameraPosition(
-    target: LatLng(17.3850, 78.4867),
-    zoom: 12,
+    target: LatLng(25.3960, 68.3722),
+    zoom: 13,
   );
 
   @override
@@ -38,35 +35,46 @@ class MapController extends GetxController {
     _updateMarkers();
   }
 
-  void _updateMarkers() {
-    // TODO(map-fidelity): the mockup calls for a custom bitmap marker (a
-    // name chip above a teardrop pin, pre-rendered per (name, selected) and
-    // cached) plus a custom terracotta/white/teal map style JSON. Both are
-    // real design work, not a quick code fix — see IMPLEMENTATION_PLAN.md
-    // §3.E. This uses hue-differentiated default markers as an interim step
-    // so selection is at least visually distinguishable.
-    markers.assignAll(hostels.map((hostel) {
+  final Map<String, BitmapDescriptor> _markerBitmapCache = {};
+
+  Future<void> _updateMarkers() async {
+    final newMarkers = <Marker>{};
+    for (var hostel in hostels) {
       final isSelected = selectedHostel.value?.id == hostel.id;
-      return Marker(
-        markerId: MarkerId(hostel.id),
-        position: LatLng(hostel.latitude, hostel.longitude),
-        icon: BitmapDescriptor.defaultMarkerWithHue(
-          isSelected ? BitmapDescriptor.hueRed : BitmapDescriptor.hueViolet,
+      final cacheKey = '${hostel.id}_$isSelected';
+      
+      BitmapDescriptor bitmap;
+      if (_markerBitmapCache.containsKey(cacheKey)) {
+        bitmap = _markerBitmapCache[cacheKey]!;
+      } else {
+        bitmap = await buildHostelMarkerBitmap(
+          name: hostel.name,
+          isSelected: isSelected,
+        );
+        _markerBitmapCache[cacheKey] = bitmap;
+      }
+      
+      newMarkers.add(
+        Marker(
+          markerId: MarkerId(hostel.id),
+          position: LatLng(hostel.latitude, hostel.longitude),
+          icon: bitmap,
+          onTap: () {
+            selectedHostel.value = hostel;
+            _updateMarkers();
+          },
         ),
-        infoWindow: InfoWindow(
-          title: hostel.name,
-          snippet: 'Rs ${hostel.pricePerMonth}/month',
-        ),
-        onTap: () {
-          selectedHostel.value = hostel;
-          _updateMarkers();
-        },
       );
-    }));
+    }
+    markers.assignAll(newMarkers);
   }
 
   void onMapCreated(GoogleMapController controller) {
     mapController = controller;
+    // Proactively ask for location permission and center on the user's
+    // real position as soon as the map is ready, instead of waiting for
+    // an explicit FAB tap.
+    getCurrentLocation();
   }
 
   Future<void> getCurrentLocation() async {

@@ -33,6 +33,7 @@ class AddListingController extends GetxController {
 
   final selectedAmenities = <Amenity>{}.obs;
   final sameAsPhone = false.obs;
+  final availability = AvailabilityStatus.available.obs;
 
   // For mock photos, just storing local file paths or URLs
   final photos = <String>[].obs;
@@ -136,6 +137,7 @@ class AddListingController extends GetxController {
     latitude.value = hostel.latitude;
     longitude.value = hostel.longitude;
     hasPickedLocation.value = true;
+    availability.value = hostel.availability;
   }
 
   @override
@@ -147,6 +149,10 @@ class AddListingController extends GetxController {
     phoneController.dispose();
     whatsappController.dispose();
     super.onClose();
+  }
+
+  void toggleAvailability(bool isAvailable) {
+    availability.value = isAvailable ? AvailabilityStatus.available : AvailabilityStatus.full;
   }
 
   void toggleAmenity(Amenity amenity) {
@@ -222,7 +228,7 @@ class AddListingController extends GetxController {
       longitude: longitude.value,
       amenities: selectedAmenities.toSet(),
       photos: photos.toList(),
-      availability: AvailabilityStatus.available,
+      availability: availability.value,
       status: status,
     );
 

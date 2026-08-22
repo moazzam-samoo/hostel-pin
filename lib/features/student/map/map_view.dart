@@ -5,10 +5,11 @@ import 'map_controller.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
-import '../../../core/theme/app_text_styles.dart';
 import '../../../core/routes/app_routes.dart';
 import '../../../shared/widgets/inputs/app_search_bar.dart';
 import '../../../shared/widgets/cards/hostel_card.dart';
+import '../../../shared/widgets/buttons/primary_button.dart';
+import '../../../core/utils/directions_launcher.dart';
 
 class MapView extends GetView<MapController> {
   const MapView({super.key});
@@ -18,43 +19,15 @@ class MapView extends GetView<MapController> {
     return Scaffold(
       body: Stack(
         children: [
-          // Only build GoogleMap when the controller signals it's ready.
-          // If the API key is missing, show a graceful placeholder instead
-          // of crashing the entire app.
-          Obx(() {
-            if (!controller.mapReady.value) {
-              return Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.map_outlined, size: 64, color: AppColors.textSecondary),
-                    SizedBox(height: AppSpacing.md),
-                    Text(
-                      'Map requires a Google Maps API key',
-                      style: AppTextStyles.body.copyWith(color: AppColors.textSecondary),
-                      textAlign: TextAlign.center,
-                    ),
-                    SizedBox(height: AppSpacing.xs),
-                    Text(
-                      'Add your API key to AndroidManifest.xml\nto enable the map view.',
-                      style: AppTextStyles.caption,
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-              );
-            }
-
-            return GoogleMap(
-              initialCameraPosition: controller.initialPosition,
-              markers: controller.markers.toSet(),
-              onMapCreated: controller.onMapCreated,
-              myLocationEnabled: true,
-              myLocationButtonEnabled: false,
-              zoomControlsEnabled: false,
-              onTap: (_) => controller.selectedHostel.value = null,
-            );
-          }),
+          Obx(() => GoogleMap(
+                initialCameraPosition: controller.initialPosition,
+                markers: controller.markers.toSet(),
+                onMapCreated: controller.onMapCreated,
+                myLocationEnabled: true,
+                myLocationButtonEnabled: false,
+                zoomControlsEnabled: false,
+                onTap: (_) => controller.selectedHostel.value = null,
+              )),
           
           SafeArea(
             child: Padding(
@@ -75,22 +48,39 @@ class MapView extends GetView<MapController> {
               left: AppSpacing.gutter,
               right: AppSpacing.gutter,
               bottom: AppSpacing.gutter,
-              child: GestureDetector(
-                onTap: () => Get.toNamed(Routes.studentHostelDetail, arguments: selected),
-                child: HostelCard(
-                  id: selected.id,
-                  name: selected.name,
-                  location: selected.city,
-                  price: selected.pricePerMonth,
-                  rating: selected.rating,
-                  imageUrl: selected.photos.first,
-                  amenities: selected.amenities,
-                  layout: HostelCardLayout.compact,
-                  surface: HostelCardSurface.elevated,
-                  isSaved: controller.isSaved(selected.id),
-                  onHeartTap: () => controller.toggleSaved(selected.id),
-                  onTap: () => Get.toNamed(Routes.studentHostelDetail, arguments: selected),
-                ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  GestureDetector(
+                    onTap: () => Get.toNamed(Routes.studentHostelDetail, arguments: selected),
+                    child: HostelCard(
+                      id: selected.id,
+                      name: selected.name,
+                      location: selected.city,
+                      price: selected.pricePerMonth,
+                      rating: selected.rating,
+                      imageUrl: selected.photos.first,
+                      amenities: selected.amenities,
+                      layout: HostelCardLayout.compact,
+                      surface: HostelCardSurface.elevated,
+                      isSaved: controller.isSaved(selected.id),
+                      onHeartTap: () => controller.toggleSaved(selected.id),
+                      onTap: () => Get.toNamed(Routes.studentHostelDetail, arguments: selected),
+                    ),
+                  ),
+                  SizedBox(height: AppSpacing.sm),
+                  PrimaryButton(
+                    text: AppStrings.getDirectionsButton,
+                    icon: const Icon(Icons.directions, size: 20, color: AppColors.background),
+                    expand: true,
+                    onPressed: () => openDirectionsTo(
+                      latitude: selected.latitude,
+                      longitude: selected.longitude,
+                      title: selected.name,
+                    ),
+                  ),
+                ],
               ),
             );
           }),
