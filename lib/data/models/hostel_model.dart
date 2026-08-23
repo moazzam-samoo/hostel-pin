@@ -154,7 +154,17 @@ class HostelModel {
       pricePerMonth: data['pricePerMonth'] as num? ?? 0,
       totalRooms: data['totalRooms'] as int? ?? 1,
       photos: (data['photos'] as List<dynamic>?)
-              ?.map((e) => UploadResultModel.fromMap(e as Map<String, dynamic>))
+              ?.map((e) {
+                if (e is Map<String, dynamic>) {
+                  return UploadResultModel.fromMap(e);
+                } else if (e is Map) {
+                  return UploadResultModel.fromMap(Map<String, dynamic>.from(e));
+                } else if (e is String) {
+                  return UploadResultModel(url: e, publicId: '');
+                }
+                return const UploadResultModel(url: '', publicId: '');
+              })
+              .where((p) => p.url.isNotEmpty)
               .toList() ??
           [],
       amenities: (data['amenities'] as List<dynamic>?)

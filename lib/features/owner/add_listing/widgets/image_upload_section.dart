@@ -137,19 +137,26 @@ class ImageUploadSection extends GetView<AddListingController> {
           Positioned.fill(
             child: ClipRRect(
               borderRadius: BorderRadius.circular(AppRadius.field),
-              child: photo.publicId.isNotEmpty
+              child: photo.publicId.isNotEmpty || photo.url.startsWith('http')
                   ? NetworkImageBox(
                       imageUrl: photo.url,
                       width: 80,
                       height: 80,
                       borderRadius: BorderRadius.circular(AppRadius.field),
                     )
-                  : Image.file(
-                      File(photo.url),
-                      width: 80,
-                      height: 80,
-                      fit: BoxFit.cover,
-                    ),
+                  : (photo.url.isNotEmpty && File(photo.url).existsSync()
+                      ? Image.file(
+                          File(photo.url),
+                          width: 80,
+                          height: 80,
+                          fit: BoxFit.cover,
+                        )
+                      : Container(
+                          color: AppColors.surfaceTonal,
+                          alignment: Alignment.center,
+                          child: const Icon(Icons.image,
+                              color: AppColors.textTertiary, size: 24),
+                        )),
             ),
           ),
           Positioned(

@@ -8,10 +8,10 @@ import '../profile/owner_profile_controller.dart';
 class OwnerShellBinding extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut<OwnerShellController>(() => OwnerShellController());
-    Get.lazyPut<DashboardController>(() => DashboardController());
-    Get.lazyPut<ListingsController>(() => ListingsController());
-    Get.lazyPut<AddListingController>(() => AddListingController());
-    Get.lazyPut<OwnerProfileController>(() => OwnerProfileController());
+    Get.lazyPut<OwnerShellController>(() => OwnerShellController(), fenix: true);
+    Get.lazyPut<DashboardController>(() => DashboardController(), fenix: true);
+    Get.lazyPut<ListingsController>(() => ListingsController(), fenix: true);
+    Get.lazyPut<AddListingController>(() => AddListingController(), fenix: true);
+    Get.lazyPut<OwnerProfileController>(() => OwnerProfileController(), fenix: true);
   }
 }

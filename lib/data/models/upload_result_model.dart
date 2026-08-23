@@ -9,8 +9,8 @@ class UploadResultModel {
 
   factory UploadResultModel.fromMap(Map<String, dynamic> map) {
     return UploadResultModel(
-      url: map['url'] as String,
-      publicId: map['publicId'] as String,
+      url: (map['url'] as String?) ?? '',
+      publicId: (map['publicId'] as String?) ?? '',
     );
   }
 

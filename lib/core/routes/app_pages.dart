@@ -29,6 +29,7 @@ import '../../features/owner/shell/owner_shell_view.dart';
 import '../../features/owner/shell/owner_shell_binding.dart';
 import '../../features/owner/add_listing/add_listing_view.dart';
 import '../../features/owner/add_listing/add_listing_controller.dart';
+import '../../features/owner/add_listing/add_listing_binding.dart';
 import '../../features/owner/profile/verification_center_view.dart';
 import '../../features/owner/profile/verification_center_controller.dart';
 import '../../features/owner/profile/account_settings_view.dart';
@@ -167,7 +168,9 @@ class AppPages {
     ),
     GetPage(
       name: Routes.ownerAddListing,
-      page: () => const Scaffold(body: Center(child: Text('Add Listing'))),
+      page: () => const AddListingView(),
+      binding: AddListingBinding(),
+      middlewares: [AuthMiddleware()],
     ),
     GetPage(
       name: Routes.ownerProfile,
@@ -175,13 +178,9 @@ class AppPages {
     ),
     GetPage(
       name: Routes.ownerEdit,
-      // Tagged separately from the Owner Shell's "Add" tab instance so
-      // editing an existing listing gets its own fresh controller (reads
-      // Get.arguments correctly, doesn't share/leak state with the blank
-      // Add-tab form) instead of colliding on one untagged singleton.
       page: () => const AddListingView(tag: 'edit'),
       binding: BindingsBuilder(() {
-        Get.lazyPut<AddListingController>(() => AddListingController(), tag: 'edit');
+        Get.lazyPut<AddListingController>(() => AddListingController(), tag: 'edit', fenix: true);
       }),
       middlewares: [AuthMiddleware()],
     ),

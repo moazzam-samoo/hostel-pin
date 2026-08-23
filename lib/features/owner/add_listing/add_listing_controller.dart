@@ -65,17 +65,15 @@ class AddListingController extends GetxController {
   HostelModel? _editingHostel;
   bool get isEditMode => _editingHostel != null;
 
-  // Snapshot of every field's initial value, captured once in onInit, used
-  // by the unsaved-changes guard (PopScope + ConfirmDialog) on back nav.
-  late final String _initialName;
-  late final String _initialAddress;
-  late final String _initialDescription;
-  late final String _initialPrice;
-  late final String _initialRooms;
-  late final String _initialPhone;
-  late final String _initialWhatsapp;
-  late final Set<Amenity> _initialAmenities;
-  late final List<UploadResultModel> _initialPhotos;
+  String _initialName = '';
+  String _initialAddress = '';
+  String _initialDescription = '';
+  String _initialPrice = '';
+  String _initialRooms = '';
+  String _initialPhone = '';
+  String _initialWhatsapp = '';
+  Set<Amenity> _initialAmenities = const {};
+  List<UploadResultModel> _initialPhotos = const [];
 
   @override
   void onInit() {

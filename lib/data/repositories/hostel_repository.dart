@@ -50,7 +50,7 @@ class HostelRepository {
           geopointFrom: (model) => model.location ?? const GeoPoint(0, 0),
           queryBuilder: (query) => query.where('status', isEqualTo: ListingStatus.published.name),
         )
-        .map((docs) => docs.map((d) => d.data()!).toList());
+        .map((docs) => docs.map((d) => d.data()).whereType<HostelModel>().toList());
   }
 
   Stream<List<HostelModel>> streamByOwner(String ownerId) {

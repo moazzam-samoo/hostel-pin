@@ -356,6 +356,7 @@ class AddListingView extends GetView<AddListingController> {
               SizedBox(width: AppSpacing.md),
               Expanded(
                 child: GetBuilder<AddListingController>(
+                  tag: tag,
                   builder: (c) => PrimaryButton(
                     text: c.isEditMode
                         ? AppStrings.updateListingButton
