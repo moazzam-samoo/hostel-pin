@@ -1,7 +1,9 @@
 import 'package:flutter/foundation.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../core/enums/amenity.dart';
 import '../../core/enums/availability_status.dart';
 import '../../core/enums/listing_status.dart';
+import 'upload_result_model.dart';
 
 class HostelModel {
   final String id;
@@ -14,7 +16,8 @@ class HostelModel {
   final double longitude;
   final String description;
   final num pricePerMonth;
-  final List<String> photos;
+  final int totalRooms; // NEW in Phase 7
+  final List<UploadResultModel> photos; // Updated in Phase 7
   final Set<Amenity> amenities;
   final AvailabilityStatus availability;
   final String contactPhone;
@@ -24,6 +27,8 @@ class HostelModel {
   final int viewCount;
   final bool isFeatured;
   final ListingStatus status;
+  final GeoPoint? location; // NEW in Phase 7
+  final String? geohash; // NEW in Phase 7
 
   const HostelModel({
     required this.id,
@@ -36,6 +41,7 @@ class HostelModel {
     required this.longitude,
     required this.description,
     required this.pricePerMonth,
+    this.totalRooms = 1,
     required this.photos,
     required this.amenities,
     required this.availability,
@@ -46,6 +52,8 @@ class HostelModel {
     this.viewCount = 0,
     this.isFeatured = false,
     required this.status,
+    this.location,
+    this.geohash,
   });
 
   HostelModel copyWith({
@@ -59,7 +67,8 @@ class HostelModel {
     double? longitude,
     String? description,
     num? pricePerMonth,
-    List<String>? photos,
+    int? totalRooms,
+    List<UploadResultModel>? photos,
     Set<Amenity>? amenities,
     AvailabilityStatus? availability,
     String? contactPhone,
@@ -69,6 +78,8 @@ class HostelModel {
     int? viewCount,
     bool? isFeatured,
     ListingStatus? status,
+    GeoPoint? location,
+    String? geohash,
   }) {
     return HostelModel(
       id: id ?? this.id,
@@ -81,6 +92,7 @@ class HostelModel {
       longitude: longitude ?? this.longitude,
       description: description ?? this.description,
       pricePerMonth: pricePerMonth ?? this.pricePerMonth,
+      totalRooms: totalRooms ?? this.totalRooms,
       photos: photos ?? this.photos,
       amenities: amenities ?? this.amenities,
       availability: availability ?? this.availability,
@@ -91,7 +103,117 @@ class HostelModel {
       viewCount: viewCount ?? this.viewCount,
       isFeatured: isFeatured ?? this.isFeatured,
       status: status ?? this.status,
+      location: location ?? this.location,
+      geohash: geohash ?? this.geohash,
     );
+  }
+
+  factory HostelModel.fromFirestore(
+    DocumentSnapshot<Map<String, dynamic>> snapshot,
+    SnapshotOptions? options,
+  ) {
+    final data = snapshot.data()!;
+
+    // Two on-disk shapes exist for a hostel's position:
+    //   legacy — `location` is a bare GeoPoint, `geohash` a sibling field
+    //   current — `location` is a {geopoint, geohash} map, which is
+    //             GeoFirePoint.data's shape and the only thing
+    //             geoflutterfire_plus's orderBy('location.geohash') can
+    //             query (see toFirestore below).
+    // Documents written before that change still carry the legacy shape,
+    // so read both rather than blowing up on a cast.
+    final rawLocation = data['location'];
+    final GeoPoint? parsedLocation;
+    final String? parsedGeohash;
+    if (rawLocation is Map) {
+      parsedLocation = rawLocation['geopoint'] as GeoPoint?;
+      parsedGeohash = rawLocation['geohash'] as String?;
+    } else {
+      parsedLocation = rawLocation as GeoPoint?;
+      parsedGeohash = data['geohash'] as String?;
+    }
+
+    final rawAddress = data['fullAddress'] as String? ?? '';
+    final rawCity = data['city'] as String? ?? '';
+    String resolvedCity = rawCity;
+    if (resolvedCity.isEmpty || resolvedCity.toLowerCase() == 'unknown city') {
+      final parts = rawAddress.split(',').map((p) => p.trim()).where((p) => p.isNotEmpty).toList();
+      resolvedCity = parts.isNotEmpty ? parts.last : 'Hyderabad';
+    }
+
+    return HostelModel(
+      id: snapshot.id,
+      ownerId: data['ownerId'] as String? ?? '',
+      ownerName: data['ownerName'] as String? ?? '',
+      name: data['name'] as String? ?? '',
+      fullAddress: rawAddress,
+      city: resolvedCity,
+      latitude: (data['latitude'] as num?)?.toDouble() ?? 0.0,
+      longitude: (data['longitude'] as num?)?.toDouble() ?? 0.0,
+      description: data['description'] as String? ?? '',
+      pricePerMonth: data['pricePerMonth'] as num? ?? 0,
+      totalRooms: data['totalRooms'] as int? ?? 1,
+      photos: (data['photos'] as List<dynamic>?)
+              ?.map((e) => UploadResultModel.fromMap(e as Map<String, dynamic>))
+              .toList() ??
+          [],
+      amenities: (data['amenities'] as List<dynamic>?)
+              ?.map((e) => Amenity.values.firstWhere(
+                    (a) => a.name == e,
+                    orElse: () => Amenity.wifi,
+                  ))
+              .toSet() ??
+          {},
+      availability: AvailabilityStatus.values.firstWhere(
+        (e) => e.name == data['availability'],
+        orElse: () => AvailabilityStatus.available,
+      ),
+      contactPhone: data['contactPhone'] as String? ?? '',
+      contactWhatsapp: data['contactWhatsapp'] as String? ?? '',
+      rating: (data['rating'] as num?)?.toDouble() ?? 0.0,
+      reviewCount: data['reviewCount'] as int? ?? 0,
+      viewCount: data['viewCount'] as int? ?? 0,
+      isFeatured: data['isFeatured'] as bool? ?? false,
+      status: ListingStatus.values.firstWhere(
+        (e) => e.name == data['status'],
+        orElse: () => ListingStatus.draft,
+      ),
+      location: parsedLocation,
+      geohash: parsedGeohash,
+    );
+  }
+
+  Map<String, dynamic> toFirestore() {
+    return {
+      'ownerId': ownerId,
+      'ownerName': ownerName,
+      'name': name,
+      'fullAddress': fullAddress,
+      'city': city,
+      'latitude': latitude,
+      'longitude': longitude,
+      'description': description,
+      'pricePerMonth': pricePerMonth,
+      'totalRooms': totalRooms,
+      'photos': photos.map((p) => p.toMap()).toList(),
+      'amenities': amenities.map((a) => a.name).toList(),
+      'availability': availability.name,
+      'contactPhone': contactPhone,
+      'contactWhatsapp': contactWhatsapp,
+      'rating': rating,
+      'reviewCount': reviewCount,
+      'viewCount': viewCount,
+      'isFeatured': isFeatured,
+      'status': status.name,
+      // geoflutterfire_plus's queries (HostelRepository.streamNearbyHostels)
+      // do `orderBy('location.geohash')` — it expects ONE field ("location")
+      // holding a {geopoint, geohash} map (GeoFirePoint.data's exact shape),
+      // not two flat top-level fields. Writing them flat meant the geo query
+      // could never match any document — new listings never appeared on the
+      // Map tab, regardless of where they were actually located.
+      if (location != null && geohash != null)
+        'location': {'geopoint': location, 'geohash': geohash},
+    };
   }
 
   @override
@@ -109,6 +231,7 @@ class HostelModel {
         other.longitude == longitude &&
         other.description == description &&
         other.pricePerMonth == pricePerMonth &&
+        other.totalRooms == totalRooms &&
         listEquals(other.photos, photos) &&
         setEquals(other.amenities, amenities) &&
         other.availability == availability &&
@@ -118,7 +241,9 @@ class HostelModel {
         other.reviewCount == reviewCount &&
         other.viewCount == viewCount &&
         other.isFeatured == isFeatured &&
-        other.status == status;
+        other.status == status &&
+        other.location == location &&
+        other.geohash == geohash;
   }
 
   @override
@@ -134,6 +259,7 @@ class HostelModel {
       longitude,
       description,
       pricePerMonth,
+      totalRooms,
       Object.hashAll(photos),
       Object.hashAll(amenities),
       availability,
@@ -144,6 +270,8 @@ class HostelModel {
       viewCount,
       isFeatured,
       status,
+      location,
+      geohash,
     ]);
   }
 }

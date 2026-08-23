@@ -13,6 +13,11 @@ class AppTextField extends StatelessWidget {
   final bool enabled;
   final TextInputType? keyboardType;
   final void Function(String)? onChanged;
+  // maxLines/minLines default to single-line (1), matching every pre-existing
+  // call site's behavior exactly. Only when maxLines > 1 does the field grow
+  // with content instead of using AppSizes.field's fixed single-line height.
+  final int maxLines;
+  final int? minLines;
 
   const AppTextField({
     super.key,
@@ -25,38 +30,39 @@ class AppTextField extends StatelessWidget {
     this.enabled = true,
     this.keyboardType,
     this.onChanged,
+    this.maxLines = 1,
+    this.minLines,
   });
 
   @override
   Widget build(BuildContext context) {
+    final field = TextField(
+      controller: controller,
+      obscureText: obscureText,
+      enabled: enabled,
+      keyboardType: keyboardType,
+      onChanged: onChanged,
+      maxLines: obscureText ? 1 : maxLines,
+      minLines: obscureText ? 1 : minLines,
+      style: AppTextStyles.body.copyWith(
+        color: enabled ? AppColors.textPrimary : AppColors.textSecondary,
+      ),
+      decoration: InputDecoration(
+        hintText: hintText,
+        hintStyle: AppTextStyles.body.copyWith(color: AppColors.textSecondary),
+        prefixIcon: leadingIcon != null
+            ? Icon(leadingIcon, color: AppColors.textSecondary, size: 20)
+            : null,
+        suffixIcon: trailing,
+        errorText: null, // Displayed manually below for better height control
+      ),
+    );
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        SizedBox(
-          height: AppSizes.field,
-          child: TextField(
-            controller: controller,
-            obscureText: obscureText,
-            enabled: enabled,
-            keyboardType: keyboardType,
-            onChanged: onChanged,
-            style: AppTextStyles.body.copyWith(
-              color: enabled ? AppColors.textPrimary : AppColors.textSecondary,
-            ),
-            decoration: InputDecoration(
-              hintText: hintText,
-              hintStyle:
-                  AppTextStyles.body.copyWith(color: AppColors.textSecondary),
-              prefixIcon: leadingIcon != null
-                  ? Icon(leadingIcon, color: AppColors.textSecondary, size: 20)
-                  : null,
-              suffixIcon: trailing,
-              errorText:
-                  null, // Displayed manually below for better height control
-            ),
-          ),
-        ),
+        maxLines == 1 ? SizedBox(height: AppSizes.field, child: field) : field,
         if (errorText != null)
           Padding(
             padding: const EdgeInsets.only(top: 4, left: 16),

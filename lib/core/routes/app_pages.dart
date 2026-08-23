@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../features/splash/splash_view.dart';
 import '../../features/splash/splash_binding.dart';
 import '../../features/welcome/welcome_view.dart';
@@ -174,15 +175,24 @@ class AppPages {
     ),
     GetPage(
       name: Routes.ownerEdit,
-      page: () => const AddListingView(),
+      // Tagged separately from the Owner Shell's "Add" tab instance so
+      // editing an existing listing gets its own fresh controller (reads
+      // Get.arguments correctly, doesn't share/leak state with the blank
+      // Add-tab form) instead of colliding on one untagged singleton.
+      page: () => const AddListingView(tag: 'edit'),
       binding: BindingsBuilder(() {
-        Get.lazyPut<AddListingController>(() => AddListingController());
+        Get.lazyPut<AddListingController>(() => AddListingController(), tag: 'edit');
       }),
       middlewares: [AuthMiddleware()],
     ),
     GetPage(
       name: Routes.ownerLocationPicker,
-      page: () => const LocationPickerView(),
+      page: () {
+        final args = Get.arguments;
+        return LocationPickerView(
+          initialLocation: args is LatLng ? args : const LatLng(25.3960, 68.3722),
+        );
+      },
       middlewares: [AuthMiddleware()],
     ),
     GetPage(

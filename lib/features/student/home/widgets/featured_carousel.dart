@@ -25,7 +25,9 @@ class FeaturedCarousel extends GetView<HomeController> {
                 location: hostel.city,
                 price: hostel.pricePerMonth,
                 rating: hostel.rating,
-                imageUrl: hostel.photos.first,
+                imageUrl: hostel.photos.isNotEmpty
+                    ? hostel.photos.first.url
+                    : '',
                 ownerName: hostel.ownerName,
                 amenities: hostel.amenities,
                 layout: HostelCardLayout.featured,

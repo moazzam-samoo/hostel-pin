@@ -8,7 +8,6 @@ import '../../../core/theme/app_radius.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../shared/widgets/navigation/app_top_bar.dart';
-import '../../../shared/widgets/buttons/icon_circle_button.dart';
 import '../../../shared/widgets/layout/profile_header_block.dart';
 import '../../../shared/widgets/layout/settings_row.dart';
 import 'widgets/language_sheet.dart';
@@ -19,14 +18,8 @@ class ProfileView extends GetView<ProfileController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppTopBar(
+      appBar: const AppTopBar(
         variant: AppTopBarVariant.brand,
-        actions: [
-          IconCircleButton(
-            icon: Icons.more_vert,
-            onPressed: () {},
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(
@@ -40,6 +33,7 @@ class ProfileView extends GetView<ProfileController> {
                     email:
                         controller.user?.email ?? 'usaidKhanChandio@gmail.com',
                     imageUrl: controller.user?.photoUrl,
+                    onEdit: controller.onEditAvatar,
                   )),
             ),
             SizedBox(height: AppSpacing.md),
@@ -86,7 +80,7 @@ class ProfileView extends GetView<ProfileController> {
                   icon: Icons.favorite_border,
                   title: AppStrings.savedHostelsTitle,
                   subtitle:
-                      AppStrings.savedHostelsSubtitle(controller.savedCount),
+                      AppStrings.savedHostelsSubtitle(controller.savedCount.value),
                   trailing: SettingsRowTrailing.chevron,
                   onTap: controller.onSavedHostels,
                 )),

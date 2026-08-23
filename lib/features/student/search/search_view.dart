@@ -262,7 +262,7 @@ class SearchView extends GetView<SearchController> {
           location: hostel.city,
           price: hostel.pricePerMonth,
           rating: hostel.rating,
-          imageUrl: hostel.photos.first,
+          imageUrl: hostel.photos.first.url,
           amenities: hostel.amenities,
           layout: HostelCardLayout.compact,
           surface: HostelCardSurface.tonal,

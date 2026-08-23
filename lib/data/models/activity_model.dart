@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class ActivityModel {
   final String id;
   final String ownerId;
@@ -43,6 +45,37 @@ class ActivityModel {
       thumbnailUrl: thumbnailUrl ?? this.thumbnailUrl,
       createdAt: createdAt ?? this.createdAt,
     );
+  }
+
+  factory ActivityModel.fromFirestore(
+    DocumentSnapshot<Map<String, dynamic>> snapshot,
+    SnapshotOptions? options,
+  ) {
+    final data = snapshot.data()!;
+    return ActivityModel(
+      id: snapshot.id,
+      ownerId: data['ownerId'] as String? ?? '',
+      type: data['type'] as String? ?? '',
+      title: data['title'] as String? ?? '',
+      message: data['message'] as String? ?? '',
+      hostelId: data['hostelId'] as String?,
+      hostelName: data['hostelName'] as String?,
+      thumbnailUrl: data['thumbnailUrl'] as String?,
+      createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+    );
+  }
+
+  Map<String, dynamic> toFirestore() {
+    return {
+      'ownerId': ownerId,
+      'type': type,
+      'title': title,
+      'message': message,
+      if (hostelId != null) 'hostelId': hostelId,
+      if (hostelName != null) 'hostelName': hostelName,
+      if (thumbnailUrl != null) 'thumbnailUrl': thumbnailUrl,
+      'createdAt': Timestamp.fromDate(createdAt),
+    };
   }
 
   @override

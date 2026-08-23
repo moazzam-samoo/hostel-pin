@@ -40,7 +40,7 @@ class DashboardView extends GetView<DashboardController> {
             SizedBox(height: AppSpacing.xl),
             const SectionHeader(title: AppStrings.recentActivity),
             SizedBox(height: AppSpacing.sm),
-            _buildRecentActivityList(),
+            Obx(() => _buildRecentActivityList()),
           ],
         ),
       ),

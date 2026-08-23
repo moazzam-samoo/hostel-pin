@@ -21,11 +21,32 @@ import '../../../shared/widgets/buttons/secondary_button.dart';
 import '../../../shared/widgets/media/map_panel.dart';
 
 class AddListingView extends GetView<AddListingController> {
-  const AddListingView({super.key});
+  // Distinguishes the Owner Shell's long-lived "Add" tab instance (untagged,
+  // registered once by OwnerShellBinding, alive for the whole shell session)
+  // from a one-off Edit session (tagged 'edit', registered fresh per push at
+  // Routes.ownerEdit). Both used to share one untagged AddListingController
+  // singleton — since IndexedStack builds all shell tabs eagerly, the blank
+  // Add tab claimed it first, so opening Edit reused that same
+  // already-initialized instance instead of a fresh one populated from the
+  // real HostelModel, and any location/form state set in one bled into the
+  // other. See app_pages.dart's Routes.ownerEdit registration.
+  //
+  // This is GetX's own documented pattern for a tagged GetView (see
+  // get_view.dart's doc comment); GetView.controller already does
+  // `GetInstance().find<T>(tag: tag)`, so overriding this field is how the
+  // tag reaches it, not a mistake. NOTE: `super.tag` does NOT work here —
+  // GetView's constructor (installed version 4.7.3) only accepts `key`,
+  // not `tag`, so that shorthand is a real compile error.
+  @override
+  // ignore: overridden_fields
+  final String? tag;
+
+  const AddListingView({super.key, this.tag});
 
   @override
   Widget build(BuildContext context) {
     return GetBuilder<AddListingController>(
+      tag: tag,
       builder: (_) => PopScope(
         canPop: !controller.hasUnsavedChanges,
         onPopInvokedWithResult: (didPop, result) {
@@ -75,6 +96,14 @@ class AddListingView extends GetView<AddListingController> {
                             validator: Validators.required,
                           ),
                           SizedBox(height: AppSpacing.md),
+                          _buildValidatedField(
+                            label: AppStrings.descriptionLabel,
+                            controller: controller.descriptionController,
+                            hintText: AppStrings.descriptionHint,
+                            validator: Validators.required,
+                            maxLines: 5,
+                          ),
+                          SizedBox(height: AppSpacing.md),
                           Obx(() => MapPanel(
                                 mode: MapPanelMode.picker,
                                 height: 140,
@@ -103,7 +132,7 @@ class AddListingView extends GetView<AddListingController> {
                                 .copyWith(color: AppColors.textTertiary),
                           ),
                           SizedBox(height: AppSpacing.md),
-                          const ImageUploadSection(),
+                          ImageUploadSection(tag: tag),
                           SizedBox(height: AppSpacing.xl),
 
                           // 3. Rooms & Pricing
@@ -251,6 +280,7 @@ class AddListingView extends GetView<AddListingController> {
     TextInputType? keyboardType,
     IconData? leadingIcon,
     bool enabled = true,
+    int maxLines = 1,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -265,6 +295,7 @@ class AddListingView extends GetView<AddListingController> {
             keyboardType: keyboardType,
             leadingIcon: leadingIcon,
             enabled: enabled,
+            maxLines: maxLines,
             errorText: state.errorText,
             onChanged: (val) {
               state.didChange(val);
@@ -306,28 +337,38 @@ class AddListingView extends GetView<AddListingController> {
         ],
       ),
       child: SafeArea(
-        child: Row(
-          children: [
-            Expanded(
-              child: SecondaryButton(
-                text: AppStrings.saveAsDraft,
-                onPressed: controller.saveAsDraft,
-              ),
-            ),
-            SizedBox(width: AppSpacing.md),
-            Expanded(
-              child: GetBuilder<AddListingController>(
-                builder: (c) => PrimaryButton(
-                  text: c.isEditMode
-                      ? AppStrings.updateListingButton
-                      : AppStrings.publishListing,
-                  isDisabled: !c.isValid,
-                  onPressed: controller.publishListing,
+        child: Obx(() {
+          // Upload + save is now async/network-dependent (Block A.6) — both
+          // buttons must be disabled and the in-flight one must show a
+          // spinner for the whole upload+write batch, not just the form's
+          // synchronous field-validity check.
+          final isSaving = controller.isLoading.value;
+          return Row(
+            children: [
+              Expanded(
+                child: SecondaryButton(
+                  text: AppStrings.saveAsDraft,
+                  isLoading: isSaving,
+                  isDisabled: isSaving,
+                  onPressed: controller.saveAsDraft,
                 ),
               ),
-            ),
-          ],
-        ),
+              SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: GetBuilder<AddListingController>(
+                  builder: (c) => PrimaryButton(
+                    text: c.isEditMode
+                        ? AppStrings.updateListingButton
+                        : AppStrings.publishListing,
+                    isLoading: isSaving,
+                    isDisabled: isSaving,
+                    onPressed: controller.publishListing,
+                  ),
+                ),
+              ),
+            ],
+          );
+        }),
       ),
     );
   }

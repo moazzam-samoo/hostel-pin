@@ -1,0 +1,13 @@
+{
+  "name": "hostel-finder-firestore-rules-tests",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Firestore security-rules emulator tests for hostel_finder_app (TASK-Phase-7.md Block D.7). Not part of the Flutter app itself — a separate Node harness, the standard tooling for testing firestore.rules.",
+  "scripts": {
+    "test": "mocha rules.test.js --timeout 20000"
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^3.0.4",
+    "mocha": "^10.7.3"
+  }
+}

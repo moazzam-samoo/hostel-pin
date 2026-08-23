@@ -5,10 +5,10 @@ import '../../../core/constants/app_strings.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/routes/app_routes.dart';
 import '../../../shared/widgets/navigation/app_top_bar.dart';
-import '../../../shared/widgets/buttons/icon_circle_button.dart';
 import '../../../shared/widgets/inputs/app_search_bar.dart';
 import '../../../shared/widgets/layout/section_header.dart';
 import '../../../shared/widgets/feedback/state_view.dart';
+import '../../../shared/widgets/feedback/empty_state.dart';
 import '../../../shared/widgets/cards/hostel_card.dart';
 import 'widgets/featured_carousel.dart';
 
@@ -18,18 +18,17 @@ class HomeView extends GetView<HomeController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppTopBar(
+      appBar: const AppTopBar(
         variant: AppTopBarVariant.brand,
-        actions: [
-          IconCircleButton(
-            icon: Icons.more_vert,
-            onPressed: () {},
-          ),
-        ],
       ),
       body: Obx(() => StateView(
             state: controller.status.value,
             contentBuilder: _buildContent(context),
+            emptyBuilder: const EmptyState(
+              title: AppStrings.noHostelsAddedYetTitle,
+              message: AppStrings.noHostelsAddedYetMessage,
+              icon: Icons.apartment_rounded,
+            ),
           )),
     );
   }
@@ -81,7 +80,9 @@ class HomeView extends GetView<HomeController> {
                     location: hostel.city,
                     price: hostel.pricePerMonth,
                     rating: hostel.rating,
-                    imageUrl: hostel.photos.first,
+                    imageUrl: hostel.photos.isNotEmpty
+                        ? hostel.photos.first.url
+                        : '',
                     amenities: hostel.amenities,
                     layout: HostelCardLayout.compact,
                     surface: HostelCardSurface.tonal,

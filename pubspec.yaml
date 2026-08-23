@@ -25,20 +25,16 @@ dependencies:
   image_picker: ^1.1.2
   flutter_image_compress: ^2.3.0
   map_launcher: ^6.0.0
-  # Phase 6 (Task-6.md §6.D) pinned firebase_core ^3.6.0 / firebase_auth ^5.3.1
-  # / cloud_firestore ^5.4.4 / connectivity_plus ^6.0.5. `flutter pub get`
-  # resolved these newer majors instead — they are the versions compatible
-  # with this project's installed Flutter/Dart SDK at implementation time and
-  # its existing pins (intl ^0.19.0, get ^4.6.6, flutter_screenutil ^5.9.3);
-  # no downgrade was needed to satisfy version solving, so the newer majors
-  # were kept rather than force-pinning the older ones. google_sign_in stays
-  # pinned at the plan's exact ^6.2.1 per §6.D/F.4 (v7 is a breaking API
-  # change — GoogleSignIn.instance, no signIn()).
   firebase_core: ^4.13.0
   firebase_auth: ^6.5.7
   cloud_firestore: ^6.8.0
   google_sign_in: ^6.2.1
   connectivity_plus: ^7.3.1
+  cloudinary_public: ^0.23.1
+  dio: ^5.11.0
+  geoflutterfire_plus: ^0.0.34
+  path_provider: ^2.1.2
+  uuid: ^4.3.3
 
 dev_dependencies:
   flutter_test:
@@ -47,6 +43,7 @@ dev_dependencies:
   flutter_launcher_icons: ^0.14.1
   flutter_native_splash: ^2.4.1
   golden_toolkit: ^0.15.0
+  fake_cloud_firestore: ^4.2.0
   # Task spec calls for ^1.2.0, but that version's transitive
   # flutter_localizations/intl requirement (intl 0.20.2) conflicts with this
   # project's pinned intl ^0.19.0 — `flutter pub get` fails version solving.
@@ -75,3 +72,11 @@ flutter:
           weight: 500
         - asset: assets/fonts/Inter-SemiBold.ttf
           weight: 600
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/app_logo.png"
+  min_sdk_android: 21
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/images/app_logo.png"

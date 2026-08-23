@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'hostel_detail_controller.dart';
 import '../../../core/constants/app_strings.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/enums/availability_status.dart';
 import '../../../shared/widgets/navigation/app_top_bar.dart';
+import '../../../shared/widgets/buttons/icon_square_button.dart';
 import '../../../shared/widgets/media/photo_grid.dart';
 import '../../../shared/widgets/layout/status_chip.dart';
 import '../../../shared/widgets/layout/price_label.dart';
@@ -24,17 +26,38 @@ class HostelDetailView extends GetView<HostelDetailController> {
     final hostel = controller.hostel;
 
     return Scaffold(
-      appBar: const AppTopBar(
+      appBar: AppTopBar(
         variant: AppTopBarVariant.brandWithBack,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 12.0),
+            child: Center(
+              child: Obx(
+                () => IconSquareButton(
+                  icon: controller.isSaved.value
+                      ? Icons.favorite
+                      : Icons.favorite_border,
+                  iconColor: controller.isSaved.value
+                      ? AppColors.heartActive
+                      : AppColors.textSecondary,
+                  borderColor: controller.isSaved.value
+                      ? AppColors.heartActive.withValues(alpha: 0.3)
+                      : AppColors.border,
+                  onPressed: controller.toggleSaved,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             PhotoGrid(
-              imageUrls: hostel.photos,
+              imageUrls: hostel.photos.map((p) => p.url).toList(),
               onSeeAll: () {
-                Get.to(() => PhotoViewerView(imageUrls: hostel.photos));
+                Get.to(() => PhotoViewerView(imageUrls: hostel.photos.map((p) => p.url).toList()));
               },
             ),
             Padding(

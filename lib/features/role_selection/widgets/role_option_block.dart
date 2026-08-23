@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../core/constants/app_sizes.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_spacing.dart';
-import '../../../core/theme/app_text_styles.dart';
 
 class RoleOptionBlock extends StatelessWidget {
   final IconData icon;
@@ -24,47 +22,80 @@ class RoleOptionBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: AppSizes.roleIcon,
-          height: AppSizes.roleIcon,
-          decoration: const BoxDecoration(
-            color: AppColors.secondary,
-            shape: BoxShape.circle,
-          ),
-          child: Icon(icon, color: AppColors.background, size: 44),
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24.r),
+        border: Border.all(
+          color: const Color(0xFFEBEBEB),
+          width: 1.2,
         ),
-        SizedBox(height: AppSpacing.md),
-        Text(sectionTitle,
-            style: AppTextStyles.authTitle, textAlign: TextAlign.center),
-        SizedBox(height: AppSpacing.xs),
-        Text(descriptionTitle,
-            style: AppTextStyles.cardTitle, textAlign: TextAlign.center),
-        SizedBox(height: AppSpacing.xs),
-        Text(descriptionBody,
-            style: AppTextStyles.labelSentence, textAlign: TextAlign.center),
-        SizedBox(height: AppSpacing.md),
-        GestureDetector(
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.06),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
           onTap: onTap,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                ctaText,
-                style: AppTextStyles.body.copyWith(
-                  color: AppColors.primary,
-                  fontWeight: FontWeight.w600,
+          borderRadius: BorderRadius.circular(24.r),
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              vertical: 24.h,
+              horizontal: 20.w,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  icon,
+                  color: AppColors.secondary,
+                  size: 48.sp,
                 ),
-              ),
-              SizedBox(width: AppSpacing.xs),
-              const Icon(Icons.arrow_forward,
-                  size: 16, color: AppColors.primary),
-            ],
+                SizedBox(height: 12.h),
+                Text(
+                  sectionTitle,
+                  style: TextStyle(
+                    color: AppColors.primary,
+                    fontSize: 24.sp,
+                    fontWeight: FontWeight.w700,
+                    fontFamily: 'Poppins',
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 8.h),
+                Text(
+                  '$descriptionTitle\n$descriptionBody',
+                  style: TextStyle(
+                    color: AppColors.textPrimary,
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w500,
+                    height: 1.35,
+                    fontFamily: 'Poppins',
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 20.h),
+                Text(
+                  ctaText.toLowerCase(),
+                  style: TextStyle(
+                    color: AppColors.secondary,
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w600,
+                    fontFamily: 'Poppins',
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
           ),
         ),
-      ],
+      ),
     );
   }
 }

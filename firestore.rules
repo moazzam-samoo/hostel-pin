@@ -1,0 +1,114 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Auth validation
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Role validation — reads the caller's OWN users/{uid} doc only
+    // (request.auth.uid), which the tightened `users/{uid}` read rule
+    // below always permits, so this never trips permission-denied on
+    // itself.
+    function isOwner() {
+      return isAuthenticated() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'owner';
+    }
+
+    // D.6 — server-side backstop mirroring Validators.required/Validators.price
+    // client-side checks. Applied on create; update re-checks the fields an
+    // owner edit can actually change (name/price/city/etc.), while rating/
+    // viewCount immutability is enforced separately below.
+    function isValidHostelData() {
+      let d = request.resource.data;
+      return d.name is string && d.name.size() > 0 && d.name.size() < 200 &&
+             d.fullAddress is string && d.fullAddress.size() > 0 &&
+             d.city is string && d.city.size() > 0 && d.city.size() < 100 &&
+             d.pricePerMonth is number && d.pricePerMonth > 0 &&
+             d.ownerId is string && d.ownerId.size() > 0;
+    }
+
+    // Users Collection
+    match /users/{userId} {
+      // Own profile only — no legitimate read path in this app touches
+      // another user's doc (see UserRepository.getUserDoc call sites, all
+      // self-uid only); ownerName/etc. shown on cards is denormalized
+      // onto the hostel/activity/saved docs instead.
+      allow read: if request.auth.uid == userId;
+
+      allow create: if request.auth.uid == userId &&
+                    request.resource.data.role in ['student', 'owner'];
+
+      // `role` is known and written at doc creation (Role Selection runs
+      // pre-auth — see Appendix C's corrected header) — there is no
+      // `null -> role` transition, only "never changes after creation".
+      // `verificationStatus` (owner-only field) is likewise never
+      // client-writable — nothing in this app's current design lets a
+      // user self-verify; only its *presence unchanged* is required here,
+      // not who/what sets it, since no verification-granting flow exists
+      // yet.
+      allow update: if request.auth.uid == userId &&
+                    request.resource.data.role == resource.data.role &&
+                    request.resource.data.verificationStatus == resource.data.verificationStatus;
+
+      allow delete: if false;
+
+      // Saved Subcollection — owner-only (the signed-in student who owns
+      // this saved-list subcollection, not a hostel owner; same field
+      // name `userId`/`uid`, different meaning).
+      match /saved/{hostelId} {
+        allow read, write: if request.auth.uid == userId;
+      }
+    }
+
+    // Hostels Collection
+    match /hostels/{hostelId} {
+      // Public read when published — signed-out students can browse the
+      // catalog; an owner can always read their own doc regardless of
+      // status (draft/pending/rejected included).
+      allow read: if resource.data.status == 'published' ||
+                  (isAuthenticated() && resource.data.ownerId == request.auth.uid);
+
+      // Only owners can create, and only for themselves.
+      allow create: if isOwner() &&
+                    request.resource.data.ownerId == request.auth.uid &&
+                    isValidHostelData();
+
+      // Owner's own full-document update — verificationStatus/rating/
+      // viewCount are NOT client-writable here (must stay unchanged from
+      // resource.data); viewCount's one legitimate non-owner increment
+      // path is the separate, narrower rule below.
+      allow update: if isOwner() &&
+                    resource.data.ownerId == request.auth.uid &&
+                    request.resource.data.ownerId == resource.data.ownerId &&
+                    request.resource.data.rating == resource.data.rating &&
+                    request.resource.data.viewCount == resource.data.viewCount &&
+                    isValidHostelData();
+
+      // viewCount increments from any signed-in reader (not just the
+      // owner) — a student viewing the listing is exactly who calls
+      // HostelRepository.incrementViews, and is never the owner. Scoped
+      // to a single-field, exactly-+1 change so it can't be used to write
+      // anything else.
+      allow update: if isAuthenticated() &&
+                    request.resource.data.diff(resource.data).affectedKeys().hasOnly(['viewCount']) &&
+                    request.resource.data.viewCount == resource.data.viewCount + 1;
+
+      allow delete: if isOwner() && resource.data.ownerId == request.auth.uid;
+    }
+
+    // Activities Collection — owner-facing only (Dashboard's own feed),
+    // append-only: no update/delete anywhere calls for editing or
+    // removing an activity entry.
+    match /activities/{activityId} {
+      allow read: if isOwner() && resource.data.ownerId == request.auth.uid;
+      allow create: if isOwner() && request.resource.data.ownerId == request.auth.uid;
+    }
+
+    // reviews/ and inquiries/ — intentionally no rules (Block B.4 scope
+    // deferral). Neither collection exists; writing rules against
+    // assumptions with no real writer would be a plausible source of a
+    // later silent bug once they're actually designed.
+  }
+}

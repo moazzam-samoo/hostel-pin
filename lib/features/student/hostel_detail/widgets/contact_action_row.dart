@@ -17,17 +17,32 @@ class ContactActionRow extends StatelessWidget {
   });
 
   Future<void> _launchPhone() async {
-    final uri = Uri.parse('tel:$phone');
-    if (await canLaunchUrl(uri)) {
+    final cleanPhone = phone.replaceAll(RegExp(r'[^0-9+]'), '');
+    final uri = Uri.parse('tel:$cleanPhone');
+    try {
       await launchUrl(uri);
+    } catch (e) {
+      debugPrint('Error launching phone: $e');
     }
   }
 
   Future<void> _launchWhatsapp() async {
-    final formattedNum = whatsapp.replaceAll(' ', '').replaceAll('+', '');
-    final uri = Uri.parse('https://wa.me/$formattedNum');
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    String cleanNum = whatsapp.replaceAll(RegExp(r'[^0-9]'), '');
+    if (cleanNum.startsWith('0')) {
+      cleanNum = '92${cleanNum.substring(1)}';
+    }
+    const message = "Hello i want to see your hostel and want further details.";
+    final uri = Uri.parse(
+        'https://wa.me/$cleanNum?text=${Uri.encodeComponent(message)}');
+
+    try {
+      final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+      if (!launched) {
+        // Fallback to web URL or standard mode if external app launcher failed
+        await launchUrl(uri, mode: LaunchMode.platformDefault);
+      }
+    } catch (e) {
+      debugPrint('Error opening WhatsApp: $e');
     }
   }
 

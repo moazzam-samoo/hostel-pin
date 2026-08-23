@@ -1,10 +1,10 @@
 class AppStrings {
   // App
-  static const String appName = 'Hostel Finder';
+  static const String appName = 'HostelPin';
 
   // Onboarding
   static const String welcome = 'Welcome!';
-  static const String welcomeTo = 'To Hostel Finder App';
+  static const String welcomeTo = 'To HostelPin App';
   static const String continueButton = 'Continue';
 
   // Role Selection
@@ -115,10 +115,13 @@ class AppStrings {
   static const String hostelNameHint = 'e.g: Chandia Hostel';
   static const String fullAddressLabel = 'FULL ADDRESS';
   static const String fullAddressHint = 'e.g: in Qasimabad';
+  static const String descriptionLabel = 'DESCRIPTION';
+  static const String descriptionHint =
+      'Tell students about your hostel — rooms, nearby landmarks, house rules...';
   static const String addPhotosSection = 'Add Photos of your Hostel';
   static const String uploadPicturesLabel = 'Upload pictures';
   static const String uploadPicturesHint = 'click to browse';
-  static const String minPhotosNote = '(Minimum 5 photos recommended)';
+  static const String minPhotosNote = '(Minimum 3 photos required, max 10)';
   static const String roomsPricingSection = 'Rooms & Pricing';
   static const String monthlyPriceLabel = 'Monthly Price';
   static const String totalRoomsLabel = 'Total Rooms';
@@ -155,6 +158,14 @@ class AppStrings {
   static const String confirmLocationButton = 'Confirm Location';
   static const String backToDashboardButton = 'Back to Dashboard';
   static const String tapToPinLocation = 'Tap to pin location';
+  static const String locationSourceSheetTitle = 'Set hostel location';
+  static const String useCurrentLocationOption = 'Use current location';
+  static const String useCurrentLocationSubtitle =
+      "Use your device's live GPS position";
+  static const String chooseOnMapOption = 'Choose location from map';
+  static const String chooseOnMapSubtitle = 'Drag the map to drop a pin';
+  static const String errorLocationUnavailable =
+      'Could not get your current location. Check that location services and permission are enabled.';
   static String photosSelectedCount(int count) =>
       '$count/10 photo${count == 1 ? '' : 's'} selected';
   static String locationCoordinatesLabel(double lat, double lng) =>
@@ -164,7 +175,7 @@ class AppStrings {
       'You have unsaved changes. Are you sure you want to leave without saving?';
   static const String discardButton = 'Discard';
   static const String priceMonthSuffix = '/mnth';
-  static const String errorMinPhotos = 'Please add at least 5 photos.';
+  static const String errorMinPhotos = 'Please add at least 3 photos.';
   static const String errorMaxPhotos = 'You can add up to 10 photos only.';
   static const String draftSavedMessage =
       'Your listing has been saved as a draft.';
@@ -193,19 +204,26 @@ class AppStrings {
       'Enter a valid number starting with +92';
   static const String errorPriceInvalid = 'Enter a valid price';
   static const String errorRoomsInvalid = 'Enter a valid number of rooms';
-  static const String errorGeneric = 'An unexpected error occurred. Please try again.';
+  static const String errorGeneric =
+      'An unexpected error occurred. Please try again.';
 
   // Firebase Errors
   static const String errorUserNotFound = 'No user found for that email.';
   static const String errorWrongPassword = 'Wrong password provided.';
   static const String errorInvalidCredential = 'Invalid email or password.';
-  static const String errorEmailInUse = 'The account already exists for that email.';
+  static const String errorEmailInUse =
+      'The account already exists for that email.';
   static const String errorWeakPassword = 'The password provided is too weak.';
-  static const String errorOperationNotAllowed = 'This sign-in method is not enabled.';
-  static const String errorTooManyRequests = 'Too many requests. Please try again later.';
-  static const String errorUserDisabled = 'This user account has been disabled.';
-  static const String errorNetwork = 'Network error. Please check your connection.';
-  static const String errorRequiresRecentLogin = 'This operation requires you to re-authenticate.';
+  static const String errorOperationNotAllowed =
+      'This sign-in method is not enabled.';
+  static const String errorTooManyRequests =
+      'Too many requests. Please try again later.';
+  static const String errorUserDisabled =
+      'This user account has been disabled.';
+  static const String errorNetwork =
+      'Network error. Please check your connection.';
+  static const String errorRequiresRecentLogin =
+      'This operation requires you to re-authenticate.';
   static const String errorAccountExistsWithDifferentCredential =
       'An account already exists with the same email but a different sign-in method.';
 
@@ -220,6 +238,9 @@ class AppStrings {
   static const String gymLabel = 'Gym';
   static const String security247 = '24/7 Sec';
   static const String allHostelsSection = 'All Hostels';
+  static const String noHostelsAddedYetTitle = 'No Hostels Added Yet';
+  static const String noHostelsAddedYetMessage =
+      "Hostels haven't been added yet, we'll add soon!";
 
   // Hostel Detail
   static const String availableStatus = 'Available';

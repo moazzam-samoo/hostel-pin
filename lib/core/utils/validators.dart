@@ -49,7 +49,9 @@ class Validators {
     if (value == null || value.trim().isEmpty) {
       return AppStrings.errorPhoneRequired;
     }
-    if (!value.startsWith('+92') || value.length != 13) {
+    final clean = value.replaceAll(RegExp(r'[\s\-\(\)]'), '');
+    final pakPhoneRegex = RegExp(r'^(?:\+92|92|0)?3[0-9]{9}$');
+    if (!pakPhoneRegex.hasMatch(clean)) {
       return AppStrings.errorPhoneInvalid;
     }
     return null;

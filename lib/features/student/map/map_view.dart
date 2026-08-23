@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -26,6 +28,16 @@ class MapView extends GetView<MapController> {
                 myLocationEnabled: true,
                 myLocationButtonEnabled: false,
                 zoomControlsEnabled: false,
+                zoomGesturesEnabled: true,
+                scrollGesturesEnabled: true,
+                rotateGesturesEnabled: true,
+                tiltGesturesEnabled: true,
+                gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{
+                  Factory<OneSequenceGestureRecognizer>(
+                    () => EagerGestureRecognizer(),
+                  ),
+                },
+                onCameraIdle: controller.onCameraIdle,
                 onTap: (_) => controller.selectedHostel.value = null,
               )),
           SafeArea(
@@ -59,7 +71,7 @@ class MapView extends GetView<MapController> {
                       location: selected.city,
                       price: selected.pricePerMonth,
                       rating: selected.rating,
-                      imageUrl: selected.photos.first,
+                      imageUrl: selected.photos.first.url,
                       amenities: selected.amenities,
                       layout: HostelCardLayout.compact,
                       surface: HostelCardSurface.elevated,

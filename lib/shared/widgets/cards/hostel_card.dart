@@ -6,6 +6,7 @@ import '../../../core/constants/app_sizes.dart';
 import '../../../core/theme/app_shadows.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/utils/formatters.dart';
+import '../../../core/utils/cloudinary_thumbnail.dart';
 import '../../../core/enums/amenity.dart';
 import '../media/network_image_box.dart';
 
@@ -270,7 +271,10 @@ class HostelCard extends StatelessWidget {
                     // (TASK-Phase-5.md).
                     Expanded(
                       child: Text(
-                        location.toUpperCase(),
+                        (location.isEmpty ||
+                                location.toLowerCase() == 'unknown city')
+                            ? 'HYDERABAD'
+                            : location.toUpperCase(),
                         style: AppTextStyles.caption.copyWith(
                           color: AppColors.textSecondary,
                           fontWeight: FontWeight.w500,
@@ -343,7 +347,7 @@ class HostelCard extends StatelessWidget {
 
   Widget _buildImage() {
     return NetworkImageBox(
-      imageUrl: imageUrl,
+      imageUrl: CloudinaryThumbnail.of(imageUrl),
       fit: BoxFit.cover,
       borderRadius: BorderRadius.zero,
     );

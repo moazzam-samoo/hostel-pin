@@ -1,16 +1,25 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/enums/amenity.dart';
 import '../../../data/models/hostel_model.dart';
-import '../../../data/services/mock_data_service.dart';
+import '../../../data/repositories/hostel_repository.dart';
+import '../../../data/repositories/saved_repository.dart';
+import '../../../data/services/session_service.dart';
+import '../../../core/utils/logger.dart';
 
 class SearchController extends GetxController {
-  final _dataService = Get.find<MockDataService>();
+  final HostelRepository _hostelRepo = Get.find<HostelRepository>();
+  final SavedRepository _savedRepo = Get.find<SavedRepository>();
+  final SessionService _sessionService = Get.find<SessionService>();
 
   final searchController = TextEditingController();
   final searchQuery = ''.obs;
 
   final recentSearches = ['Ameerpet', 'Boys hostel', 'Under 10k'].obs;
+  
+  final RxList<HostelModel> _allPublished = <HostelModel>[].obs;
+  final RxSet<String> savedHostelIds = <String>{}.obs;
 
   // Basic filtering state
   final isSortPriceLowToHigh = false.obs;
@@ -21,25 +30,58 @@ class SearchController extends GetxController {
   final priceRange = const RangeValues(minPrice, maxPrice).obs;
   final selectedAmenities = <Amenity>{}.obs;
 
+  StreamSubscription? _publishedSub;
+  StreamSubscription? _savedSub;
+
   @override
   void onInit() {
     super.onInit();
     searchController.addListener(() {
       searchQuery.value = searchController.text;
     });
+    
+    _publishedSub = _hostelRepo.streamAllPublished().listen(
+      (hostels) {
+        _allPublished.assignAll(hostels);
+      },
+      onError: (e) {
+        Logger.e('Error streaming hostels in search: $e');
+      },
+    );
+
+    final uid = _sessionService.currentUser.value?.uid;
+    if (uid != null) {
+      _savedSub = _savedRepo.streamSaved(uid).listen(
+        (saved) {
+          savedHostelIds.assignAll(saved.map((s) => s.hostelId));
+        },
+        onError: (e) {
+          Logger.e('Error streaming saved in search: $e');
+        },
+      );
+    }
   }
 
   @override
   void onClose() {
+    _publishedSub?.cancel();
+    _savedSub?.cancel();
     searchController.dispose();
     super.onClose();
   }
 
+  // TASK-Phase-7.md Block E: deliberate scope-narrowing, not an oversight
+  // — name/city/price/amenity filtering stays client-side over the full
+  // streamed catalog rather than building server-side compound-filter
+  // Firestore queries. Composite indexes only pay off once filtering
+  // moves server-side, which isn't justified for this catalog's size yet;
+  // revisit if the real hostel count grows past what's reasonable to hold
+  // in memory.
   List<HostelModel> get searchResults {
     if (searchQuery.value.trim().isEmpty) return [];
 
     final query = searchQuery.value.toLowerCase();
-    var results = _dataService.hostels.where((h) {
+    var results = _allPublished.where((h) {
       final matchesQuery = h.name.toLowerCase().contains(query) ||
           h.city.toLowerCase().contains(query);
       final matchesPrice = h.pricePerMonth >= priceRange.value.start &&
@@ -58,8 +100,31 @@ class SearchController extends GetxController {
     return results;
   }
 
-  bool isSaved(String id) => _dataService.isSaved(id);
-  void toggleSaved(String id) => _dataService.toggleSaved(id);
+  bool isSaved(String id) => savedHostelIds.contains(id);
+
+  void toggleSaved(String id) {
+    final uid = _sessionService.currentUser.value?.uid;
+    if (uid == null) return;
+    final currentlySaved = isSaved(id);
+
+    // Optimistic UI: flip local state immediately, roll back on failure.
+    if (currentlySaved) {
+      savedHostelIds.remove(id);
+    } else {
+      savedHostelIds.add(id);
+    }
+
+    final hostel = _allPublished.firstWhereOrNull((h) => h.id == id);
+    _savedRepo
+        .toggleSave(uid, id, currentlySaved, hostel: hostel)
+        .catchError((_) {
+      if (currentlySaved) {
+        savedHostelIds.add(id);
+      } else {
+        savedHostelIds.remove(id);
+      }
+    });
+  }
 
   void toggleAmenity(Amenity amenity) {
     if (selectedAmenities.contains(amenity)) {

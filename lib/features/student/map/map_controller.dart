@@ -1,19 +1,27 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:geolocator/geolocator.dart';
+
 import '../../../data/models/hostel_model.dart';
-import '../../../data/services/mock_data_service.dart';
+import '../../../data/repositories/hostel_repository.dart';
+import '../../../data/repositories/saved_repository.dart';
+import '../../../data/services/session_service.dart';
+import '../../../data/services/location_service.dart';
 import '../../../shared/widgets/feedback/app_snackbar.dart';
 import '../../../core/utils/hostel_marker_builder.dart';
 import '../../../core/constants/app_strings.dart';
 
 class MapController extends GetxController {
-  final _dataService = Get.find<MockDataService>();
+  final HostelRepository _hostelRepo = Get.find<HostelRepository>();
+  final SavedRepository _savedRepo = Get.find<SavedRepository>();
+  final SessionService _sessionService = Get.find<SessionService>();
+  final LocationService _locationService = Get.find<LocationService>();
 
-  final hostels = <HostelModel>[].obs;
-  final markers = <Marker>{}.obs;
-  final selectedHostel = Rxn<HostelModel>();
+  final RxList<HostelModel> hostels = <HostelModel>[].obs;
+  final RxSet<Marker> markers = <Marker>{}.obs;
+  final RxSet<String> savedHostelIds = <String>{}.obs;
+  final Rxn<HostelModel> selectedHostel = Rxn<HostelModel>();
 
   GoogleMapController? mapController;
 
@@ -24,6 +32,9 @@ class MapController extends GetxController {
     target: LatLng(25.3960, 68.3722),
     zoom: 13,
   );
+  
+  // To manage the stream subscription
+  StreamSubscription? _geoSubscription;
 
   @override
   void onInit() {
@@ -31,9 +42,55 @@ class MapController extends GetxController {
     _loadHostels();
   }
 
+  @override
+  void onClose() {
+    _geoSubscription?.cancel();
+    super.onClose();
+  }
+
   void _loadHostels() {
-    hostels.value = _dataService.hostels;
-    _updateMarkers();
+    // Initial fetch before map moves
+    _fetchNearby(initialPosition.target.latitude, initialPosition.target.longitude, 10.0);
+
+    final uid = _sessionService.currentUser.value?.uid;
+    if (uid != null) {
+      _savedRepo.streamSaved(uid).listen(
+        (saved) {
+          savedHostelIds.assignAll(saved.map((s) => s.hostelId));
+        },
+        onError: (e) {
+          debugPrint('Error streaming saved on map: $e');
+        },
+      );
+    }
+  }
+
+  void _fetchNearby(double lat, double lng, double radiusKm) {
+    _geoSubscription?.cancel();
+    _geoSubscription = _hostelRepo
+        .streamNearbyHostels(lat, lng, radiusKm)
+        .listen(
+      (newHostels) {
+        hostels.assignAll(newHostels);
+        _updateMarkers();
+      },
+      onError: (e) {
+        debugPrint('Error streaming nearby hostels: $e');
+      },
+    );
+  }
+  
+  void onCameraIdle() async {
+    if (mapController == null) return;
+    
+    // Calculate radius based on zoom level (approximate)
+    // Zoom 13 ~ 10km, zoom 10 ~ 100km etc.
+    final region = await mapController!.getVisibleRegion();
+    final centerLat = (region.northeast.latitude + region.southwest.latitude) / 2;
+    final centerLng = (region.northeast.longitude + region.southwest.longitude) / 2;
+    
+    // For simplicity, fixed 20km radius on move, or we could calculate based on bounds.
+    _fetchNearby(centerLat, centerLng, 20.0);
   }
 
   final Map<String, BitmapDescriptor> _markerBitmapCache = {};
@@ -79,42 +136,20 @@ class MapController extends GetxController {
   }
 
   Future<void> getCurrentLocation() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      AppSnackbar.showGlobal(
-          message: 'Please enable location services.',
-          type: SnackbarType.error);
-      return;
-    }
-
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      // Show a rationale before the OS permission prompt (§3.E — this was
-      // previously undesigned/unaddressed).
+    final position = await _locationService.getCurrentLocation();
+    
+    if (position == null) {
+      // It handles its own permissions, but if it fails we might need to show rationale
       final shouldRequest = await _showLocationRationale();
       if (shouldRequest != true) return;
-
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        AppSnackbar.showGlobal(
-            message: 'Location permissions are denied.',
-            type: SnackbarType.error);
-        return;
-      }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
+      
+      // Request permission again or show error (simplified here)
       AppSnackbar.showGlobal(
-          message: 'Location permissions are permanently denied.',
-          type: SnackbarType.error);
+          message: 'Location permissions denied or unavailable.', type: SnackbarType.error);
       return;
     }
-
+    
     try {
-      final position = await Geolocator.getCurrentPosition();
       mapController?.animateCamera(
         CameraUpdate.newCameraPosition(
           CameraPosition(
@@ -125,7 +160,7 @@ class MapController extends GetxController {
       );
     } catch (e) {
       AppSnackbar.showGlobal(
-          message: 'Could not get current location.', type: SnackbarType.error);
+          message: 'Could not update camera position.', type: SnackbarType.error);
     }
   }
 
@@ -148,6 +183,29 @@ class MapController extends GetxController {
     );
   }
 
-  bool isSaved(String id) => _dataService.isSaved(id);
-  void toggleSaved(String id) => _dataService.toggleSaved(id);
+  bool isSaved(String id) => savedHostelIds.contains(id);
+
+  void toggleSaved(String id) {
+    final uid = _sessionService.currentUser.value?.uid;
+    if (uid == null) return;
+    final currentlySaved = isSaved(id);
+
+    // Optimistic UI: flip local state immediately, roll back on failure.
+    if (currentlySaved) {
+      savedHostelIds.remove(id);
+    } else {
+      savedHostelIds.add(id);
+    }
+
+    final hostel = hostels.firstWhereOrNull((h) => h.id == id);
+    _savedRepo
+        .toggleSave(uid, id, currentlySaved, hostel: hostel)
+        .catchError((_) {
+      if (currentlySaved) {
+        savedHostelIds.add(id);
+      } else {
+        savedHostelIds.remove(id);
+      }
+    });
+  }
 }

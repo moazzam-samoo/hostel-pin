@@ -9,7 +9,6 @@ import '../../../core/theme/app_radius.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../shared/widgets/navigation/app_top_bar.dart';
-import '../../../shared/widgets/buttons/icon_circle_button.dart';
 import '../../../shared/widgets/layout/profile_header_block.dart';
 import '../../../shared/widgets/layout/settings_row.dart';
 import '../../student/profile/widgets/language_sheet.dart';
@@ -20,14 +19,8 @@ class OwnerProfileView extends GetView<OwnerProfileController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppTopBar(
+      appBar: const AppTopBar(
         variant: AppTopBarVariant.brand,
-        actions: [
-          IconCircleButton(
-            icon: Icons.more_vert,
-            onPressed: () {},
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(
@@ -42,6 +35,7 @@ class OwnerProfileView extends GetView<OwnerProfileController> {
                     email: controller.currentUser.value?.email ??
                         'owner@example.com',
                     imageUrl: controller.currentUser.value?.photoUrl,
+                    onEdit: controller.onEditAvatar,
                   )),
             ),
             SizedBox(height: AppSpacing.md),

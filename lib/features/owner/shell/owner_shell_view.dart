@@ -24,15 +24,16 @@ class OwnerShellView extends GetView<OwnerShellController> {
         }
       },
       child: Scaffold(
-        body: Obx(() => IndexedStack(
-              index: controller.currentIndex.value,
-              children: const [
-                DashboardView(),
-                ListingsView(),
-                AddListingView(),
-                OwnerProfileView(),
-              ],
-            )),
+        body: PageView(
+          controller: controller.pageController,
+          onPageChanged: controller.onPageChanged,
+          children: const [
+            DashboardView(),
+            ListingsView(),
+            AddListingView(),
+            OwnerProfileView(),
+          ],
+        ),
         bottomNavigationBar: Obx(() => AppBottomNav(
               currentIndex: controller.currentIndex.value,
               onTabSelected: controller.onTabSelected,

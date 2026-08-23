@@ -28,15 +28,16 @@ class StudentShellView extends GetView<StudentShellController> {
         }
       },
       child: Scaffold(
-        body: Obx(() => IndexedStack(
-              index: controller.currentIndex.value,
-              children: const [
-                HomeView(),
-                MapView(),
-                SavedView(),
-                ProfileView(),
-              ],
-            )),
+        body: PageView(
+          controller: controller.pageController,
+          onPageChanged: controller.onPageChanged,
+          children: const [
+            HomeView(),
+            MapView(),
+            SavedView(),
+            ProfileView(),
+          ],
+        ),
         bottomNavigationBar: Obx(() => AppBottomNav(
               currentIndex: controller.currentIndex.value,
               onTabSelected: controller.onTabSelected,

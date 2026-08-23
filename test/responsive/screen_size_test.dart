@@ -9,9 +9,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
+import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 
 import 'package:hostel_finder_app/core/theme/app_theme.dart';
-import 'package:hostel_finder_app/data/services/mock_data_service.dart';
+import 'package:hostel_finder_app/data/repositories/hostel_repository.dart';
+import 'package:hostel_finder_app/data/repositories/saved_repository.dart';
+import 'package:hostel_finder_app/data/repositories/activity_repository.dart';
+import 'package:hostel_finder_app/data/services/storage_service.dart';
+import 'package:hostel_finder_app/data/services/location_service.dart';
 import 'package:hostel_finder_app/data/services/session_service.dart';
 import 'package:hostel_finder_app/features/owner/add_listing/add_listing_controller.dart';
 import 'package:hostel_finder_app/features/owner/add_listing/add_listing_view.dart';
@@ -78,7 +83,15 @@ Future<void> _pumpAtSize(
 
 void main() {
   setUp(() async {
-    await Get.putAsync(() => MockDataService().init(), permanent: true);
+    // Phase 7: these screens' controllers now call Get.find<HostelRepository>()
+    // (and friends) directly in a field initializer — a FakeFirebaseFirestore
+    // avoids ever touching the real Firebase singleton in a plain widget test.
+    final fakeFirestore = FakeFirebaseFirestore();
+    Get.put(HostelRepository(firestore: fakeFirestore));
+    Get.put(SavedRepository(firestore: fakeFirestore));
+    Get.put(ActivityRepository(firestore: fakeFirestore));
+    Get.put(StorageService());
+    Get.put(LocationService());
     Get.put<SessionService>(_FakeSessionService());
   });
 

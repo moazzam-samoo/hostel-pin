@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../data/models/hostel_model.dart';
+import '../../../../core/utils/cloudinary_thumbnail.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -40,7 +41,9 @@ class OwnerListingCard extends StatelessWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(AppRadius.card),
                 child: NetworkImageBox(
-                  imageUrl: hostel.photos.isNotEmpty ? hostel.photos.first : '',
+                  imageUrl: hostel.photos.isNotEmpty
+                      ? CloudinaryThumbnail.of(hostel.photos.first.url)
+                      : '',
                   width: double.infinity,
                   height: 180,
                   fit: BoxFit.cover,
