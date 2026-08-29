@@ -22,21 +22,50 @@ class HomeController extends GetxController {
   StreamSubscription? _publishedSub;
   StreamSubscription? _savedSub;
 
+  /// Size of the live window into `hostels` (FIX-7.5). Grows by
+  /// [kHostelPageSize] each time [loadMore] is called; the stream is
+  /// re-subscribed at the larger limit so every row on screen stays live.
+  final RxInt pageLimit = kHostelPageSize.obs;
+
+  /// True while the last page came back full, i.e. there may be more.
+  final RxBool hasMore = true.obs;
+  final RxBool isLoadingMore = false.obs;
+
   @override
   void onInit() {
     super.onInit();
     _loadData();
   }
 
+  /// Widens the window by one page. No-op when the previous page came back
+  /// short (nothing left) or a widen is already in flight.
+  void loadMore() {
+    if (!hasMore.value || isLoadingMore.value) return;
+    isLoadingMore.value = true;
+    pageLimit.value += kHostelPageSize;
+    _loadData();
+  }
+
   Future<void> _loadData() async {
-    status.value = StateViewStatus.loading;
-    
+    // Only show the full-screen loader for the first page — widening the
+    // window must not blank out the list the user is already reading.
+    if (pageLimit.value == kHostelPageSize) {
+      status.value = StateViewStatus.loading;
+    }
+
     _publishedSub?.cancel();
     _savedSub?.cancel();
 
     try {
-      _publishedSub = _hostelRepo.streamAllPublished().listen(
+      _publishedSub = _hostelRepo
+          .streamAllPublished(limit: pageLimit.value)
+          .listen(
         (hostels) {
+          // A short page means the collection is exhausted; a full one means
+          // there may be more behind it.
+          hasMore.value = hostels.length >= pageLimit.value;
+          isLoadingMore.value = false;
+
           final explicitFeatured =
               hostels.where((h) => h.isFeatured).toList();
           if (explicitFeatured.isNotEmpty) {
@@ -52,6 +81,7 @@ class HomeController extends GetxController {
         },
         onError: (e) {
           Logger.e('Error streaming published hostels: $e');
+          isLoadingMore.value = false;
           status.value = StateViewStatus.error;
         },
       );

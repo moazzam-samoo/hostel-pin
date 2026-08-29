@@ -223,6 +223,13 @@ class HostelModel {
       // Map tab, regardless of where they were actually located.
       if (location != null && geohash != null)
         'location': {'geopoint': location, 'geohash': geohash},
+      // Stamped server-side on create (FIX-7.5/FIX-7.11).
+      // `HostelRepository.update` strips this key before merging so an edit
+      // never re-dates the listing. Documents created before this field
+      // existed have no `createdAt` at all and must be backfilled before any
+      // query orders by it — Firestore drops documents missing the ordered
+      // field, which would silently empty the feed.
+      'createdAt': FieldValue.serverTimestamp(),
     };
   }
 

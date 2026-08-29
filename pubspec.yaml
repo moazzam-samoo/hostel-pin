@@ -35,6 +35,11 @@ dependencies:
   geoflutterfire_plus: ^0.0.34
   path_provider: ^2.1.2
   uuid: ^4.3.3
+  # Reverse-geocoding for Add Listing (FIX-7.13). Listed in IMPLEMENTATION_PLAN
+  # §7.D from the start but never actually declared, which left the typed Full
+  # Address and the map-pinned coordinates as two unrelated, unvalidated
+  # inputs — and left `city` with no source at all (FIX-7.15).
+  geocoding: ^3.0.0
 
 dev_dependencies:
   flutter_test:

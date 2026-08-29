@@ -40,7 +40,14 @@ class SearchController extends GetxController {
       searchQuery.value = searchController.text;
     });
     
-    _publishedSub = _hostelRepo.streamAllPublished().listen(
+    // Deliberately NOT paginated (FIX-7.5). Every filter on this screen —
+    // query text, price range, amenities — is applied client-side over
+    // `_allPublished`, so windowing this stream would not just show fewer
+    // results, it would make search silently miss hostels that are outside
+    // the loaded window. Bounding this one properly means moving the filters
+    // server-side (real Firestore range/array queries, or a search index),
+    // which is a larger change than pagination and is tracked separately.
+    _publishedSub = _hostelRepo.streamAllPublished(limit: 1000).listen(
       (hostels) {
         _allPublished.assignAll(hostels);
       },

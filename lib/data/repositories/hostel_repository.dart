@@ -4,15 +4,17 @@ import '../models/hostel_model.dart';
 import '../../core/enums/listing_status.dart';
 import '../../core/utils/logger.dart';
 
-// Pagination/infinite scroll (TASK-Phase-7.md Block G) — explicitly
-// DEFERRED, not silently skipped. Every list screen (Home, Search, Saved,
-// Owner Listings) is a SingleChildScrollView over a plain Column with no
-// ScrollController anywhere (finding #11) — adding real windowing would be
-// a view-level change on every one of those screens, not just a repository
-// change, for a catalog size this app doesn't have yet. streamFeatured/
-// streamAllPublished/streamByOwner below intentionally return the full
-// matching set; revisit with startAfter/limit cursors once the real
-// listing count justifies not holding it all in memory.
+/// Pagination (FIX-7.5). Previously every stream returned its whole
+/// matching set, so read cost grew linearly with the catalogue.
+///
+/// These are live `snapshots()` streams, so the plan's `startAfterDocument`
+/// cursor doesn't apply directly — cursors page a one-shot `get()`, whereas
+/// re-subscribing per page would drop realtime updates for earlier pages.
+/// The equivalent for a stream is a growing window: hold `limit(n)` and
+/// raise `n` when the user asks for more. Cost is bounded the same way,
+/// every visible row stays live, and the view keeps one subscription.
+const int kHostelPageSize = 10;
+
 class HostelRepository {
   final FirebaseFirestore _firestore;
 
@@ -26,17 +28,28 @@ class HostelRepository {
         toFirestore: (model, options) => model.toFirestore(),
       );
 
-  Stream<List<HostelModel>> streamFeatured() {
+  Stream<List<HostelModel>> streamFeatured({int limit = kHostelPageSize}) {
     return _hostelsRef
         .where('status', isEqualTo: ListingStatus.published.name)
         .where('isFeatured', isEqualTo: true)
+        .limit(limit)
         .snapshots()
         .map((snapshot) => snapshot.docs.map((doc) => doc.data()).toList());
   }
 
-  Stream<List<HostelModel>> streamAllPublished() {
+  /// Published listings, capped at [limit] (FIX-7.5).
+  ///
+  /// NOT ordered by `createdAt`, deliberately. `HostelModel` has never had a
+  /// `createdAt` field, and Firestore silently drops documents missing the
+  /// field you order by — adding `orderBy('createdAt')` here would empty the
+  /// Home feed for every listing already in the database. The field is now
+  /// written on create (see `toFirestore`), so once the FIX-7.2 backfill has
+  /// stamped the existing documents this can become an ordered query and the
+  /// plan's `status` + `createdAt` index starts earning its keep.
+  Stream<List<HostelModel>> streamAllPublished({int limit = kHostelPageSize}) {
     return _hostelsRef
         .where('status', isEqualTo: ListingStatus.published.name)
+        .limit(limit)
         .snapshots()
         .map((snapshot) => snapshot.docs.map((doc) => doc.data()).toList());
   }
@@ -53,6 +66,12 @@ class HostelRepository {
         .map((docs) => docs.map((d) => d.data()).whereType<HostelModel>().toList());
   }
 
+  /// Deliberately NOT paginated (FIX-7.5). This query is already bounded by
+  /// a single owner's listing count, and `DashboardController.totalViews`
+  /// folds over the whole result — capping it would make the dashboard
+  /// silently under-report stats rather than merely show fewer rows.
+  /// Pagination targets the catalogue-sized student queries above; a correct
+  /// owner-side cap needs the server-maintained counters of FIX-7.9 first.
   Stream<List<HostelModel>> streamByOwner(String ownerId) {
     return _hostelsRef
         .where('ownerId', isEqualTo: ownerId)
@@ -81,7 +100,14 @@ class HostelRepository {
 
   Future<void> update(HostelModel hostel) async {
     try {
-      await _hostelsRef.doc(hostel.id).set(hostel, SetOptions(merge: true));
+      // Bypass the converter so `createdAt` can be stripped: toFirestore()
+      // stamps a fresh serverTimestamp, and merging that on every edit would
+      // continually re-date the listing and reshuffle any newest-first feed.
+      final data = hostel.toFirestore()..remove('createdAt');
+      await _firestore
+          .collection('hostels')
+          .doc(hostel.id)
+          .set(data, SetOptions(merge: true));
     } catch (e) {
       Logger.e('Error updating hostel: $e');
       throw Exception('Failed to update hostel: $e');

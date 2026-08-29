@@ -18,6 +18,7 @@ import '../../../core/enums/listing_status.dart';
 import '../../../core/enums/availability_status.dart';
 import '../../../core/routes/app_routes.dart';
 import '../../../core/utils/validators.dart';
+import '../../../core/utils/logger.dart';
 import '../../../core/utils/cloudinary_thumbnail.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../shared/widgets/feedback/app_snackbar.dart';
@@ -40,6 +41,13 @@ class AddListingController extends GetxController {
   final formKey = GlobalKey<FormState>();
   final isLoading = false.obs;
 
+  /// Per-file upload progress for the publish batch (FIX-7.14).
+  /// `uploadIndex` is 1-based and `uploadTotal` is 0 when nothing is
+  /// uploading, so the UI can render "Uploading photo 2 of 5 — 40%".
+  final uploadProgress = 0.0.obs;
+  final uploadIndex = 0.obs;
+  final uploadTotal = 0.obs;
+
   final nameController = TextEditingController();
   final addressController = TextEditingController();
   final descriptionController = TextEditingController();
@@ -59,6 +67,12 @@ class AddListingController extends GetxController {
   final latitude = 25.3960.obs;
   final longitude = 68.3722.obs;
   final hasPickedLocation = false.obs;
+
+  /// City resolved by reverse-geocoding whatever location the owner pinned
+  /// (FIX-7.13/FIX-7.15). Authoritative when present: coordinates the owner
+  /// actually dropped a pin on beat `_extractCity`'s string-guessing at the
+  /// typed address. Empty when geocoding is unavailable or found nothing.
+  final resolvedCity = ''.obs;
 
   final ImagePicker _picker = ImagePicker();
 
@@ -219,6 +233,27 @@ class AddListingController extends GetxController {
     latitude.value = position.latitude;
     longitude.value = position.longitude;
     hasPickedLocation.value = true;
+    await _resolvePinnedPlace();
+  }
+
+  /// Reverse-geocodes the pinned coordinates to fill `city`, and to offer the
+  /// owner a starting address when they haven't typed one (FIX-7.13). Never
+  /// overwrites an address the owner already wrote, and never blocks or
+  /// errors — an unresolved place just leaves `city` to the text heuristic.
+  Future<void> _resolvePinnedPlace() async {
+    final place = await _locationService.resolvePlace(
+      latitude.value,
+      longitude.value,
+    );
+    if (place == null) return;
+
+    if (place.city != null && place.city!.isNotEmpty) {
+      resolvedCity.value = place.city!;
+    }
+    if (addressController.text.trim().isEmpty &&
+        place.formattedAddress != null) {
+      addressController.text = place.formattedAddress!;
+    }
   }
 
   Future<void> _chooseOnMap() async {
@@ -241,6 +276,7 @@ class AddListingController extends GetxController {
       latitude.value = result.latitude;
       longitude.value = result.longitude;
       hasPickedLocation.value = true;
+      await _resolvePinnedPlace();
     }
   }
 
@@ -295,29 +331,47 @@ class AddListingController extends GetxController {
 
     isLoading.value = true;
     try {
-      // 1. Upload new photos
-      final uploadedPhotos = <UploadResultModel>[];
-      for (var photo in photos) {
-        if (photo.publicId.isEmpty) {
-          // It's a local file
-          final result = await _storageService.uploadImage(
-            File(photo.url),
-            'hostels',
-          );
-          uploadedPhotos.add(result);
-        } else {
-          // Already uploaded
-          uploadedPhotos.add(photo);
+      // 1. Upload new photos.
+      // Photos already carrying a publicId are untouched; only locally
+      // picked files are uploaded, in one batch so a mid-way failure can
+      // report exactly which assets were orphaned (FIX-7.8), with per-file
+      // progress surfaced to the UI (FIX-7.14).
+      final pendingIndices = <int>[];
+      final pendingFiles = <File>[];
+      for (var i = 0; i < photos.length; i++) {
+        if (photos[i].publicId.isEmpty) {
+          pendingIndices.add(i);
+          pendingFiles.add(File(photos[i].url));
         }
       }
 
-      // description now has a real form field (descriptionController) —
-      // shown to students on Hostel Detail via AboutSection. `city` still
-      // has no dedicated input (per AGENTS.md/finding #6, out of this
-      // change's scope) — preserve it on update, placeholder on create only.
+      final uploadedPhotos = List<UploadResultModel>.from(photos);
+      if (pendingFiles.isNotEmpty) {
+        uploadTotal.value = pendingFiles.length;
+        final results = await _storageService.uploadImages(
+          pendingFiles,
+          'hostels',
+          onFileProgress: (index, progress) {
+            uploadIndex.value = index + 1;
+            uploadProgress.value = progress;
+          },
+        );
+        for (var i = 0; i < pendingIndices.length; i++) {
+          uploadedPhotos[pendingIndices[i]] = results[i];
+        }
+      }
+
+      // description has a real form field (descriptionController), shown to
+      // students on Hostel Detail via AboutSection. `city` has no dedicated
+      // input either, but it is no longer pure string-guessing (FIX-7.15):
+      // if the owner pinned a location we reverse-geocode it and trust that;
+      // `_extractCity` is now only the fallback for when geocoding returned
+      // nothing (offline, no Play Services, unmapped coordinates).
       final geohash = _locationService.getGeohash(latitude.value, longitude.value);
       final rawAddress = addressController.text.trim();
-      final extractedCity = _extractCity(rawAddress);
+      final extractedCity = resolvedCity.value.isNotEmpty
+          ? resolvedCity.value
+          : _extractCity(rawAddress);
 
       final hostel = HostelModel(
         id: _editingHostel?.id ??
@@ -393,6 +447,15 @@ class AddListingController extends GetxController {
           type: SnackbarType.info,
         );
       }
+    } on PartialUploadException catch (e) {
+      // Some photos reached Cloudinary before the batch failed. No listing
+      // document is written, so those assets are orphaned — record them for
+      // the sweep job rather than losing the ids entirely (FIX-7.8).
+      await _recordOrphanedUploads(uid, e.orphanedPublicIds);
+      AppSnackbar.showGlobal(
+        message: 'Failed to save listing: ${e.message}',
+        type: SnackbarType.error,
+      );
     } catch (e) {
       // Upstream services (StorageService/CloudinaryService) already throw
       // clean, user-facing Exception messages — strip the "Exception: "
@@ -408,6 +471,31 @@ class AddListingController extends GetxController {
       );
     } finally {
       isLoading.value = false;
+      uploadProgress.value = 0.0;
+      uploadIndex.value = 0;
+      uploadTotal.value = 0;
+    }
+  }
+
+  /// Queues orphaned Cloudinary assets for server-side deletion (FIX-7.8).
+  /// A signed destroy needs the API secret and can never run on the client,
+  /// so the ids are parked in `cloudinary_orphans` for the sweep function in
+  /// `functions/` to pick up. Best-effort: if this write itself fails the
+  /// user still gets their upload error, which is the one that matters.
+  Future<void> _recordOrphanedUploads(
+    String uid,
+    List<String> publicIds,
+  ) async {
+    if (publicIds.isEmpty) return;
+    try {
+      await FirebaseFirestore.instance.collection('cloudinary_orphans').add({
+        'publicIds': publicIds,
+        'ownerId': uid,
+        'reason': 'partial_upload',
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+    } catch (e) {
+      Logger.e('Could not record orphaned uploads $publicIds: $e');
     }
   }
 

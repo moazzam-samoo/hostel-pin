@@ -34,13 +34,28 @@ class CloudinaryService {
     dioClient: _timeoutBoundDioClient(),
   );
 
-  /// Uploads a single image to the specified folder preset
-  Future<UploadResultModel> uploadImage(File file, String folder) async {
+  /// Uploads a single image to the specified folder preset.
+  ///
+  /// [onProgress] reports 0.0–1.0 for this one file (FIX-7.14) so a
+  /// multi-photo publish can show real per-file progress instead of an
+  /// indeterminate spinner. Cloudinary reports sent/total bytes; `total` is
+  /// -1 when the length is unknown, which is reported as indeterminate by
+  /// simply not emitting.
+  Future<UploadResultModel> uploadImage(
+    File file,
+    String folder, {
+    void Function(double progress)? onProgress,
+  }) async {
     try {
       final cloudinary = folder == 'hostels' ? _cloudinaryHostels : _cloudinaryAvatars;
 
       CloudinaryResponse response = await cloudinary.uploadFile(
         CloudinaryFile.fromFile(file.path, folder: folder),
+        onProgress: onProgress == null
+            ? null
+            : (count, total) {
+                if (total > 0) onProgress((count / total).clamp(0.0, 1.0));
+              },
       );
 
       return UploadResultModel(

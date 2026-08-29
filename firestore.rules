@@ -106,6 +106,24 @@ service cloud.firestore {
       allow create: if isOwner() && request.resource.data.ownerId == request.auth.uid;
     }
 
+    // Cloudinary orphan sweep queue (FIX-7.8). When a multi-photo publish
+    // fails partway, the assets that already landed are recorded here for
+    // the server-side destroy job — a signed destroy needs the API secret
+    // and can never run on the client.
+    //
+    // Create-only, and never readable by any client: the sweep function runs
+    // with the Admin SDK, which bypasses these rules entirely, so there is no
+    // reason to expose the backlog to the app. Owners may only file orphans
+    // against their own uid, which stops one account filling another's queue.
+    match /cloudinary_orphans/{entryId} {
+      allow create: if isOwner()
+                    && request.resource.data.ownerId == request.auth.uid
+                    && request.resource.data.publicIds is list
+                    && request.resource.data.publicIds.size() > 0
+                    && request.resource.data.publicIds.size() <= 10;
+      allow read, update, delete: if false;
+    }
+
     // reviews/ and inquiries/ — intentionally no rules (Block B.4 scope
     // deferral). Neither collection exists; writing rules against
     // assumptions with no real writer would be a plausible source of a

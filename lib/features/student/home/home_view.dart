@@ -34,7 +34,18 @@ class HomeView extends GetView<HomeController> {
   }
 
   Widget _buildContent(BuildContext context) {
-    return SingleChildScrollView(
+    // Infinite scroll (FIX-7.5). A NotificationListener reads the scroll
+    // metrics of the existing SingleChildScrollView, so no ScrollController
+    // has to be created, owned and disposed just to know we're near the end.
+    return NotificationListener<ScrollNotification>(
+      onNotification: (notification) {
+        final metrics = notification.metrics;
+        if (metrics.pixels >= metrics.maxScrollExtent - 400) {
+          controller.loadMore();
+        }
+        return false; // keep letting the scroll view handle it
+      },
+      child: SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -93,7 +104,14 @@ class HomeView extends GetView<HomeController> {
                   ));
             },
           ),
+          Obx(() => controller.isLoadingMore.value
+              ? Padding(
+                  padding: EdgeInsets.only(bottom: AppSpacing.xl),
+                  child: const Center(child: CircularProgressIndicator()),
+                )
+              : SizedBox(height: AppSpacing.md)),
         ],
+      ),
       ),
     );
   }
