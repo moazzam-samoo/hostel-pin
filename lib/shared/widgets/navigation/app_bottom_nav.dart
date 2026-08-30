@@ -22,68 +22,67 @@ class AppBottomNav extends StatelessWidget {
     return Container(
       height: AppSizes.nav,
       decoration: const BoxDecoration(
-        color: AppColors.navBackground,
+        color: Colors.white,
         border: Border(
           top: BorderSide(color: AppColors.border, width: 1),
         ),
       ),
       child: SafeArea(
         top: false,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: items.asMap().entries.map((entry) {
-            final index = entry.key;
-            final item = entry.value;
-            final isSelected = index == currentIndex;
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: items.asMap().entries.map((entry) {
+              final index = entry.key;
+              final item = entry.value;
+              final isSelected = index == currentIndex;
 
-            return Expanded(
-              child: GestureDetector(
+              return GestureDetector(
                 behavior: HitTestBehavior.opaque,
                 onTap: () => onTabSelected(index),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      curve: Curves.easeInOut,
-                      padding: EdgeInsets.symmetric(
-                        horizontal: isSelected ? 20 : 12,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: isSelected
-                            ? AppColors.primaryContainer
-                            : Colors.transparent,
-                        borderRadius: BorderRadius.circular(AppRadius.pill),
-                      ),
-                      child: Icon(
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  curve: Curves.easeInOut,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: isSelected ? 18 : 12,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isSelected ? AppColors.primary : Colors.transparent,
+                    borderRadius: BorderRadius.circular(AppRadius.pill),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
                         item.icon,
                         color: isSelected
-                            ? AppColors.primary
+                            ? Colors.white
                             : AppColors.textSecondary,
-                        size: 24,
+                        size: isSelected ? 20 : 24,
                       ),
-                    ),
-                    const SizedBox(height: 4),
-                    // Always render the text, but control color/weight to prevent layout jumps
-                    Text(
-                      item.label,
-                      style: AppTextStyles.labelMicro.copyWith(
-                        color: isSelected
-                            ? AppColors.primary
-                            : AppColors.textSecondary,
-                        fontWeight:
-                            isSelected ? FontWeight.w600 : FontWeight.w500,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+                      if (isSelected) ...[
+                        const SizedBox(width: 6),
+                        Flexible(
+                          child: Text(
+                            item.label,
+                            style: AppTextStyles.caption.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
                 ),
-              ),
-            );
-          }).toList(),
+              );
+            }).toList(),
+          ),
         ),
       ),
     );

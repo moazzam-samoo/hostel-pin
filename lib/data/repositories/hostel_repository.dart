@@ -49,10 +49,15 @@ class HostelRepository {
   Stream<List<HostelModel>> streamAllPublished({int limit = kHostelPageSize}) {
     return _hostelsRef
         .where('status', isEqualTo: ListingStatus.published.name)
-        .orderBy('createdAt', descending: true)
         .limit(limit)
         .snapshots()
-        .map((snapshot) => snapshot.docs.map((doc) => doc.data()).toList());
+        .map((snapshot) {
+      final list = snapshot.docs.map((doc) => doc.data()).toList();
+      // Sort client-side by document ID (which is epoch time) descending
+      // so newest hostels appear at the top without dropping unmigrated docs.
+      list.sort((a, b) => b.id.compareTo(a.id));
+      return list;
+    });
   }
 
   Stream<List<HostelModel>> streamNearbyHostels(double latitude, double longitude, double radiusInKm) {

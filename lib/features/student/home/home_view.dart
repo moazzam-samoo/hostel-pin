@@ -60,10 +60,8 @@ class HomeView extends GetView<HomeController> {
           if (controller.featuredHostels.isNotEmpty) ...[
             Padding(
               padding: EdgeInsets.symmetric(horizontal: AppSpacing.gutter),
-              child: SectionHeader(
+              child: const SectionHeader(
                 title: AppStrings.featuredHostels,
-                trailingText: AppStrings.viewAll,
-                onTrailingTap: () {},
               ),
             ),
             SizedBox(height: AppSpacing.md),

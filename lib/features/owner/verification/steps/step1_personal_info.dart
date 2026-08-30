@@ -95,7 +95,7 @@ class Step1PersonalInfo extends GetView<VerificationController> {
       ),
       ),
       _buildBottomAction(
-        text: 'Continue',
+        text: AppStrings.continueButton,
         isLoading: controller.isLoading.value,
         onPressed: () => controller.nextStep(),
       ),

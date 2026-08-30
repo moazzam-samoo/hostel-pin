@@ -50,11 +50,10 @@ class OwnerShellView extends GetView<OwnerShellController> {
               currentIndex: controller.currentIndex.value,
               onTabSelected: controller.onTabSelected,
               items: const [
-                NavItem(label: 'Dashboard', icon: Icons.dashboard, route: ''),
-                NavItem(label: 'Listing', icon: Icons.list_alt, route: ''),
-                NavItem(
-                    label: 'Add', icon: Icons.add_circle_outline, route: ''),
-                NavItem(label: 'Profile', icon: Icons.person, route: ''),
+                NavItem(label: 'Dashboard', icon: Icons.grid_view_rounded, route: ''),
+                NavItem(label: 'Listing', icon: Icons.apartment_rounded, route: ''),
+                NavItem(label: 'Add', icon: Icons.add_circle_outline_rounded, route: ''),
+                NavItem(label: 'Profile', icon: Icons.person_rounded, route: ''),
               ],
             )),
       ),

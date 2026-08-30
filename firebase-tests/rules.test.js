@@ -431,4 +431,14 @@ describe('verifications/{uid}', () => {
         .update({ status: 'pending', submittedAt: new Date() })
     );
   });
+
+  it('a signed-out read of a verification doc fails', async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await ctx.firestore().collection('users').doc(OWNER_A).set({ role: 'owner' });
+      await ctx.firestore().collection('verifications').doc(OWNER_A).set({ status: 'pending' });
+    });
+
+    const asGuest = testEnv.unauthenticatedContext().firestore();
+    await assertFails(asGuest.collection('verifications').doc(OWNER_A).get());
+  });
 });

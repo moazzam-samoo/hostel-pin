@@ -42,14 +42,10 @@ class StudentShellView extends GetView<StudentShellController> {
               currentIndex: controller.currentIndex.value,
               onTabSelected: controller.onTabSelected,
               items: const [
-                NavItem(
-                    label: 'Home',
-                    icon: Icons.home_filled,
-                    route:
-                        ''), // Routes are not really used by this nav implementation for switching tabs
-                NavItem(label: 'Map', icon: Icons.map, route: ''),
-                NavItem(label: 'Saved', icon: Icons.favorite, route: ''),
-                NavItem(label: 'Profile', icon: Icons.person, route: ''),
+                NavItem(label: 'Home', icon: Icons.home_rounded, route: ''),
+                NavItem(label: 'Map', icon: Icons.location_on_rounded, route: ''),
+                NavItem(label: 'Saved', icon: Icons.favorite_rounded, route: ''),
+                NavItem(label: 'Profile', icon: Icons.person_rounded, route: ''),
               ],
             )),
       ),

@@ -53,17 +53,20 @@ class HostelCard extends StatelessWidget {
 
     switch (surface) {
       case HostelCardSurface.tonal:
-        bgColor = AppColors.surfaceTonal;
+        bgColor = Colors.white;
+        border = Border.all(color: AppColors.border, width: 1.0);
         break;
       case HostelCardSurface.lavender:
         bgColor = AppColors.primaryContainer;
+        border = Border.all(color: AppColors.border, width: 1.0);
         break;
       case HostelCardSurface.outlined:
-        bgColor = AppColors.background;
-        border = Border.all(color: AppColors.border);
+        bgColor = Colors.white;
+        border = Border.all(color: AppColors.border, width: 1.0);
         break;
       case HostelCardSurface.elevated:
-        bgColor = AppColors.background;
+        bgColor = Colors.white;
+        border = Border.all(color: AppColors.border, width: 1.0);
         shadows = AppShadows.card;
         break;
     }

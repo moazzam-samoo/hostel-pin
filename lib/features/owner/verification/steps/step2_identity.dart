@@ -10,6 +10,8 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/widgets/inputs/dotted_upload_box.dart';
 import '../../../../shared/widgets/feedback/instruction_box.dart';
 import '../../../../shared/widgets/buttons/primary_button.dart';
+import '../../../../shared/widgets/feedback/app_snackbar.dart';
+import '../../../../core/constants/app_strings.dart';
 
 class Step2Identity extends GetView<VerificationController> {
   const Step2Identity({super.key});
@@ -83,13 +85,15 @@ class Step2Identity extends GetView<VerificationController> {
           ),
         ),
         _buildBottomAction(
-          text: 'Continue',
+          text: AppStrings.continueButton,
           onPressed: () {
             bool hasFront = controller.cnicFrontPath.value.isNotEmpty || controller.cnicFrontUploaded.value;
             bool hasBack = controller.cnicBackPath.value.isNotEmpty || controller.cnicBackUploaded.value;
             if (!hasFront || !hasBack) {
-              Get.snackbar('Error', 'Please upload both front and back of your CNIC.', 
-                  backgroundColor: AppColors.errorContainer, colorText: AppColors.error);
+              AppSnackbar.showGlobal(
+                message: AppStrings.errorNoIdentityDocuments,
+                type: SnackbarType.error,
+              );
               return;
             }
             controller.isSelfieMode.value = true;

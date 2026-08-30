@@ -88,10 +88,9 @@ void main() {
           ],
         ),
       );
-      // Every tab always renders its label (styling differs by selection
-      // state, to avoid a layout jump when the active tab changes).
+      // Selected tab renders its label; inactive tabs render icon-only.
       expect(find.text('Home'), findsOneWidget);
-      expect(find.text('Profile'), findsOneWidget);
+      expect(find.text('Profile'), findsNothing);
 
       await tester.tap(find.byIcon(Icons.person));
       await tester.pump();
