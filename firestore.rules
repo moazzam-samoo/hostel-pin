@@ -20,6 +20,18 @@ service cloud.firestore {
     // client-side checks. Applied on create; update re-checks the fields an
     // owner edit can actually change (name/price/city/etc.), while rating/
     // viewCount immutability is enforced separately below.
+    // Note re: `ownershipDocumentId` (AddListingController's new
+    // property-ownership document, required client-side for every
+    // brand-new listing — see that controller's `_requiresOwnershipDocument`).
+    // Deliberately NOT validated here, same precedent as `totalBeds`/
+    // `amenities` (TASK-Phase-8.md Block C.4): this function runs on BOTH
+    // create and update, and a listing that predates this field has (and
+    // must keep) `ownershipDocumentId == null` forever — a presence rule
+    // would retroactively block editing every pre-existing listing, which
+    // is exactly the trap this feature explicitly avoids client-side.
+    // Enforcing "must be present to publish a NEW listing" is
+    // AddListingController's job (isValid/publishListing), not a
+    // defense-in-depth job for this rules layer.
     function isValidHostelData() {
       let d = request.resource.data;
       return d.name is string && d.name.size() > 0 && d.name.size() < 200 &&
@@ -70,20 +82,37 @@ service cloud.firestore {
       allow read: if resource.data.status == 'published' ||
                   (isAuthenticated() && resource.data.ownerId == request.auth.uid);
 
-      // Only owners can create, and only for themselves.
+      // Only owners can create, and only for themselves. `status` may
+      // never be 'published' on create (2.A — every brand-new listing goes
+      // through admin review first; nothing in this app ever legitimately
+      // originates a hostel doc as already-published, only draft/pending).
       allow create: if isOwner() &&
                     request.resource.data.ownerId == request.auth.uid &&
+                    request.resource.data.status != 'published' &&
                     isValidHostelData();
 
       // Owner's own full-document update — verificationStatus/rating/
       // viewCount are NOT client-writable here (must stay unchanged from
       // resource.data); viewCount's one legitimate non-owner increment
       // path is the separate, narrower rule below.
+      //
+      // 2.A server-side enforcement: `status` may become/stay 'published'
+      // only if it was ALREADY 'published' before this write. This is what
+      // makes "every new listing requires admin approval" a real, enforced
+      // gate rather than a client-UI-only suggestion — without it, an
+      // owner could bypass AddListingController.publishListing()'s pending
+      // gate entirely by writing `status: 'published'` straight to
+      // Firestore on their own pending/draft doc. Approving a pending
+      // listing (pending/draft -> published) is deliberately NOT possible
+      // via this rule at all in this phase — only Phase 9's not-yet-built
+      // admin action is meant to ever do that.
       allow update: if isOwner() &&
                     resource.data.ownerId == request.auth.uid &&
                     request.resource.data.ownerId == resource.data.ownerId &&
                     request.resource.data.rating == resource.data.rating &&
                     request.resource.data.viewCount == resource.data.viewCount &&
+                    (request.resource.data.status != 'published' ||
+                     resource.data.status == 'published') &&
                     isValidHostelData();
 
       // viewCount increments from any signed-in reader (not just the
@@ -128,5 +157,40 @@ service cloud.firestore {
     // deferral). Neither collection exists; writing rules against
     // assumptions with no real writer would be a plausible source of a
     // later silent bug once they're actually designed.
+    // verifications/ - Owner identity and property verification (Phase 8
+    // Block E). Deliberately its own collection, not a subfield of
+    // users/{uid} — CNIC number, DOB, and document public_ids are sensitive
+    // PII that must not sit on a doc every authenticated user can otherwise
+    // read fragments of.
+    match /verifications/{userId} {
+      // Owners can read their own verification doc only.
+      allow read: if isOwner() && request.auth.uid == userId;
+
+      // An owner never creates a doc that's already approved/rejected/
+      // changesRequested — only 'draft' or 'pending' are legal starting
+      // states for a client-created submission.
+      allow create: if isOwner() && request.auth.uid == userId &&
+                    (request.resource.data.status == 'draft' ||
+                     request.resource.data.status == 'pending');
+
+      // Owner-initiated updates: 'status' stays within the client-writable
+      // set (draft -> draft autosave, draft/pending -> pending on submit —
+      // never -> approved/rejected/changesRequested, admin-only and not
+      // built in this phase), AND reviewedAt/reviewedBy/rejectionReason
+      // must stay exactly what they already were (mirrors hostels' rating/
+      // viewCount immutability pattern above). Without this second half, an
+      // owner could self-write reviewedBy/reviewedAt on their own doc even
+      // though no client-side path is ever supposed to set them — those
+      // three fields have no legitimate client writer until Phase 9's
+      // isAdmin()-gated action exists.
+      allow update: if isOwner() && request.auth.uid == userId &&
+                    (request.resource.data.status == 'draft' ||
+                     request.resource.data.status == 'pending') &&
+                    request.resource.data.get('reviewedAt', null) == resource.data.get('reviewedAt', null) &&
+                    request.resource.data.get('reviewedBy', null) == resource.data.get('reviewedBy', null) &&
+                    request.resource.data.get('rejectionReason', null) == resource.data.get('rejectionReason', null);
+
+      allow delete: if false;
+    }
   }
 }

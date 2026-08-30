@@ -1,0 +1,17 @@
+{
+  "name": "hostelpin-verification-signer",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Cloudflare Worker replacement for the two undeployed Firebase Cloud Functions (getCloudinarySignature, getVerificationDocumentUrl) — see functions/index.js for the original Firebase versions this ports. Exists because Firebase's free Spark plan cannot deploy Cloud Functions at all; Cloudflare Workers' free tier (100k requests/day) needs no billing plan.",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "secret:cloudinary-secret": "wrangler secret put CLOUDINARY_API_SECRET"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  },
+  "dependencies": {
+    "jose": "^5.9.6"
+  }
+}

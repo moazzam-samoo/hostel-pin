@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/constants/app_sizes.dart';
 import '../../../core/theme/app_text_styles.dart';
@@ -18,6 +19,9 @@ class AppTextField extends StatelessWidget {
   // with content instead of using AppSizes.field's fixed single-line height.
   final int maxLines;
   final int? minLines;
+  final List<TextInputFormatter>? inputFormatters;
+  final bool readOnly;
+  final VoidCallback? onTap;
 
   const AppTextField({
     super.key,
@@ -32,6 +36,9 @@ class AppTextField extends StatelessWidget {
     this.onChanged,
     this.maxLines = 1,
     this.minLines,
+    this.inputFormatters,
+    this.readOnly = false,
+    this.onTap,
   });
 
   @override
@@ -42,6 +49,9 @@ class AppTextField extends StatelessWidget {
       enabled: enabled,
       keyboardType: keyboardType,
       onChanged: onChanged,
+      inputFormatters: inputFormatters,
+      readOnly: readOnly,
+      onTap: onTap,
       maxLines: obscureText ? 1 : maxLines,
       minLines: obscureText ? 1 : minLines,
       style: AppTextStyles.body.copyWith(

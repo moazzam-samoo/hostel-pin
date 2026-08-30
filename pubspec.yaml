@@ -25,9 +25,9 @@ dependencies:
   image_picker: ^1.1.2
   flutter_image_compress: ^2.3.0
   map_launcher: ^6.0.0
-  firebase_core: ^4.13.0
-  firebase_auth: ^6.5.7
-  cloud_firestore: ^6.8.0
+  firebase_core: any
+  firebase_auth: any
+  cloud_firestore: any
   google_sign_in: ^6.2.1
   connectivity_plus: ^7.3.1
   cloudinary_public: ^0.23.1
@@ -39,7 +39,17 @@ dependencies:
   # §7.D from the start but never actually declared, which left the typed Full
   # Address and the map-pinned coordinates as two unrelated, unvalidated
   # inputs — and left `city` with no source at all (FIX-7.15).
-  geocoding: ^3.0.0
+  # Pinned to what actually resolved (was `any`, which is how a v5 breaking
+  # API change — free functions replaced by instance methods on a new
+  # Geocoding class — silently broke `LocationService` until caught here).
+  geocoding: ^5.0.0
+  # cloud_functions removed 2026-08-30 — the app no longer calls any
+  # Firebase Cloud Function directly (getCloudinarySignature's client
+  # call now goes to a Cloudflare Worker instead; see
+  # cloudflare-worker/README.md for why). functions/index.js's two
+  # exports (onHostelDeleted, sweepCloudinaryOrphans) are Firestore/
+  # Pub-Sub triggers, never called via this package to begin with.
+  dotted_border: ^3.1.0
 
 dev_dependencies:
   flutter_test:

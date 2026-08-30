@@ -85,19 +85,20 @@ class _MapPanelState extends State<MapPanel> {
             fit: StackFit.expand,
             children: [
               if (hasLocation)
-                // Preview only — the panel's own tap (picker mode) or the
-                // full readonly map on Hostel Detail's own screen handles
-                // real interaction, so ignore touches here.
+                // In picker mode, we ignore map pointers so the InkWell can
+                // receive the tap to open the full-screen picker.
+                // In readonly mode, the map is interactive (zoom/scroll).
                 IgnorePointer(
+                  ignoring: widget.mode == MapPanelMode.picker,
                   child: GoogleMap(
                     initialCameraPosition: CameraPosition(
                       target: LatLng(widget.latitude!, widget.longitude!),
                       zoom: 15,
                     ),
-                    liteModeEnabled: true,
+                    liteModeEnabled: false,
                     zoomControlsEnabled: false,
-                    zoomGesturesEnabled: false,
-                    scrollGesturesEnabled: false,
+                    zoomGesturesEnabled: widget.mode == MapPanelMode.readonly,
+                    scrollGesturesEnabled: widget.mode == MapPanelMode.readonly,
                     rotateGesturesEnabled: false,
                     tiltGesturesEnabled: false,
                     myLocationButtonEnabled: false,

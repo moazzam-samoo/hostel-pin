@@ -37,6 +37,7 @@ class DashboardView extends GetView<DashboardController> {
             _buildActionRow(),
             SizedBox(height: AppSpacing.lg),
             _buildVerificationAlert(),
+            _buildPendingPropertyAlert(),
             SizedBox(height: AppSpacing.xl),
             const SectionHeader(title: AppStrings.recentActivity),
             SizedBox(height: AppSpacing.sm),
@@ -159,6 +160,36 @@ class DashboardView extends GetView<DashboardController> {
       return AlertCard(
         title: AppStrings.pendingVerificationTitle,
         message: AppStrings.pendingVerificationMessage(hostelName),
+      );
+    });
+  }
+
+  /// Distinct from _buildVerificationAlert above (identity verification):
+  /// this reacts to `controller.ownerListings` (an RxList, live via
+  /// HostelRepository.streamByOwner) rather than
+  /// SessionService.currentUser.value.verificationStatus, so it appears the
+  /// moment ANY listing is pending — including a listing an already-fully-
+  /// verified owner adds later (2.A's uniform review gate) — and disappears
+  /// once every pending listing resolves (approved -> published, or
+  /// rejected). Both alerts can show at once for a brand-new owner; that's
+  /// expected, not a bug.
+  Widget _buildPendingPropertyAlert() {
+    return Obx(() {
+      final pending = controller.ownerListings
+          .where((h) => h.status == ListingStatus.pending)
+          .toList();
+      if (pending.isEmpty) return const SizedBox.shrink();
+
+      final message = pending.length == 1
+          ? AppStrings.pendingPropertyMessage(pending.first.name)
+          : AppStrings.pendingPropertiesCountMessage(pending.length);
+
+      return Padding(
+        padding: EdgeInsets.only(top: AppSpacing.md),
+        child: AlertCard(
+          title: AppStrings.pendingPropertyTitle,
+          message: message,
+        ),
       );
     });
   }

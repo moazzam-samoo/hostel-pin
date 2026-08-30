@@ -36,6 +36,26 @@ enum Amenity {
     subtitle:
         'Free gym access', // Gym subtitle doesn't exist in mockups, adding a default one
     icon: Icons.fitness_center,
+  ),
+  solar(
+    title: 'Solar Power',
+    subtitle: 'Uninterruptible',
+    icon: Icons.wb_sunny,
+  ),
+  locker(
+    title: 'Locker',
+    subtitle: 'Secure storage',
+    icon: Icons.lock,
+  ),
+  water(
+    title: 'Filtered Water',
+    subtitle: '24/7 Supply',
+    icon: Icons.water_drop,
+  ),
+  acRooms(
+    title: 'AC Rooms',
+    subtitle: 'Air conditioned',
+    icon: Icons.ac_unit,
   );
 
   final String title;

@@ -1,8 +1,11 @@
 import 'dart:io';
 import 'package:cloudinary_public/cloudinary_public.dart';
 import 'package:dio/dio.dart';
+import 'package:get/get.dart' hide FormData, MultipartFile;
 import '../models/upload_result_model.dart';
+import 'auth_service.dart';
 import '../../core/config/cloudinary_config.dart';
+import '../../core/config/edge_signer_config.dart';
 import '../../core/utils/logger.dart';
 
 // CloudinaryPublic defaults to a bare Dio() when no client is supplied, and
@@ -80,6 +83,73 @@ class CloudinaryService {
     } catch (e) {
       Logger.e('Cloudinary upload error: $e');
       throw Exception('Could not upload photo. Please try again.');
+    }
+  }
+
+  /// Uploads an identity or verification document to the `verification` folder via
+  /// a signed request. The asset is stored as `type: authenticated` and returns
+  /// a `public_id` (not a URL) per Phase 8 requirements.
+  ///
+  /// The signature itself comes from a Cloudflare Worker
+  /// (`cloudflare-worker/`, see its README), not a Firebase Cloud Function —
+  /// Firebase's free Spark plan can't deploy Cloud Functions at all,
+  /// and this project deliberately stays off the paid Blaze plan. The
+  /// Worker holds the Cloudinary API secret instead and verifies the
+  /// caller's Firebase ID token itself before signing anything.
+  Future<String> uploadSignedDocument(
+    File file,
+    String uid,
+    String kind,
+  ) async {
+    try {
+      final idToken = await Get.find<AuthService>().currentUser?.getIdToken();
+      if (idToken == null) {
+        throw Exception('You must be signed in to upload a document.');
+      }
+
+      final dio = _timeoutBoundDioClient();
+
+      final sigResponse = await dio.post(
+        '${EdgeSignerConfig.baseUrl}/signature',
+        options: Options(headers: {'Authorization': 'Bearer $idToken'}),
+      );
+
+      final data = sigResponse.data as Map<String, dynamic>;
+      final timestamp = data['timestamp'];
+      final signature = data['signature'] as String;
+      final apiKey = data['api_key'] as String;
+      final cloudName = data['cloud_name'] as String;
+      final folder = data['folder'] as String;
+
+      final formData = FormData.fromMap({
+        'file': await MultipartFile.fromFile(file.path),
+        'timestamp': timestamp,
+        'signature': signature,
+        'api_key': apiKey,
+        'folder': folder,
+        'type': 'authenticated',
+      });
+
+      final response = await dio.post(
+        'https://api.cloudinary.com/v1_1/$cloudName/auto/upload',
+        data: formData,
+      );
+
+      return response.data['public_id'] as String;
+    } on DioException catch (e) {
+      Logger.e('Cloudinary signed upload error: $e');
+      switch (e.type) {
+        case DioExceptionType.connectionError:
+        case DioExceptionType.connectionTimeout:
+        case DioExceptionType.sendTimeout:
+        case DioExceptionType.receiveTimeout:
+          throw Exception('No internet connection. Check your network and try again.');
+        default:
+          throw Exception('Could not upload document. Please try again.');
+      }
+    } catch (e) {
+      Logger.e('Cloudinary signed upload error: $e');
+      throw Exception('Could not upload document. Please try again.');
     }
   }
 }

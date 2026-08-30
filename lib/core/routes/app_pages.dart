@@ -30,8 +30,8 @@ import '../../features/owner/shell/owner_shell_binding.dart';
 import '../../features/owner/add_listing/add_listing_view.dart';
 import '../../features/owner/add_listing/add_listing_controller.dart';
 import '../../features/owner/add_listing/add_listing_binding.dart';
-import '../../features/owner/profile/verification_center_view.dart';
-import '../../features/owner/profile/verification_center_controller.dart';
+import '../../features/owner/verification/verification_center_view.dart';
+import '../../features/owner/verification/verification_binding.dart';
 import '../../features/owner/profile/account_settings_view.dart';
 import '../../features/owner/profile/owner_edit_profile_view.dart';
 import '../../features/owner/profile/owner_edit_profile_controller.dart';
@@ -197,10 +197,7 @@ class AppPages {
     GetPage(
       name: Routes.ownerVerification,
       page: () => const VerificationCenterView(),
-      binding: BindingsBuilder(() {
-        Get.lazyPut<VerificationCenterController>(
-            () => VerificationCenterController());
-      }),
+      binding: VerificationBinding(),
       middlewares: [AuthMiddleware()],
     ),
     GetPage(

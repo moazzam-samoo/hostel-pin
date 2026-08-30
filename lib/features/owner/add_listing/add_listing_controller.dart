@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show setEquals, listEquals;
+import 'package:flutter/services.dart' show PlatformException;
 import 'package:get/get.dart';
 import '../../../data/models/hostel_model.dart';
 import '../../../data/models/upload_result_model.dart';
@@ -10,7 +11,9 @@ import '../../../data/repositories/activity_repository.dart';
 import '../../../data/services/session_service.dart';
 import '../../../data/services/storage_service.dart';
 import '../../../data/services/location_service.dart';
+import '../../../data/services/cloudinary_service.dart';
 import 'widgets/location_source_sheet.dart';
+import '../verification/widgets/image_source_sheet.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../../core/enums/amenity.dart';
@@ -22,6 +25,7 @@ import '../../../core/utils/logger.dart';
 import '../../../core/utils/cloudinary_thumbnail.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../shared/widgets/feedback/app_snackbar.dart';
+import '../shell/owner_shell_controller.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
@@ -37,6 +41,7 @@ class AddListingController extends GetxController {
   final _sessionService = Get.find<SessionService>();
   final _storageService = Get.find<StorageService>();
   final _locationService = Get.find<LocationService>();
+  final _cloudinaryService = Get.find<CloudinaryService>();
 
   final formKey = GlobalKey<FormState>();
   final isLoading = false.obs;
@@ -62,6 +67,16 @@ class AddListingController extends GetxController {
 
   // Holds both existing network photos (with publicId) and local picked files (empty publicId)
   final photos = <UploadResultModel>[].obs;
+
+  // Property ownership document (the gap this feature fills — see
+  // _requiresOwnershipDocument). Mirrors VerificationController's Step 4
+  // pattern exactly: `ownershipDocPath` holds a local file pending upload,
+  // `ownershipDocUploaded` is true once a public_id is persisted, and the
+  // private `_ownershipId` string holds that public_id (a resumed
+  // edit-mode document survives even after `ownershipDocPath` is cleared).
+  final RxString ownershipDocPath = ''.obs;
+  final RxBool ownershipDocUploaded = false.obs;
+  String _ownershipId = '';
 
   // Location
   final latitude = 25.3960.obs;
@@ -135,7 +150,25 @@ class AddListingController extends GetxController {
     // either mutates so the Publish button's isDisabled state stays live.
     ever(photos, (_) => update());
     ever(selectedAmenities, (_) => update());
+    ever(ownershipDocPath, (_) => update());
+    ever(ownershipDocUploaded, (_) => update());
   }
+
+  /// Whether this publish needs a fresh property-ownership document before
+  /// it can go through. Scoped identically to publishListing()'s
+  /// `wasAlreadyPublished` check below (NOT bare `!isEditMode`): a listing
+  /// that was already live before this feature shipped can keep being
+  /// edited/published without ever adding one — requiring it retroactively
+  /// would trap existing owners' pre-existing listings, the same reasoning
+  /// 2.A already established for the pending-review gate itself. A
+  /// draft/rejected listing being edited and published for the first time
+  /// (isEditMode true, but never actually published) is a genuinely new
+  /// go-live exactly like a from-scratch create, so it still needs one.
+  bool get _requiresOwnershipDocument =>
+      _editingHostel?.status != ListingStatus.published;
+
+  bool get _hasOwnershipDocument =>
+      ownershipDocPath.value.isNotEmpty || ownershipDocUploaded.value;
 
   /// Whether every field required to publish currently passes its
   /// validator, driving the Publish button's isDisabled state.
@@ -148,7 +181,8 @@ class AddListingController extends GetxController {
         Validators.phone(phoneController.text) == null &&
         (sameAsPhone.value || Validators.phone(whatsappController.text) == null) &&
         photos.length >= 3 &&
-        photos.length <= 10;
+        photos.length <= 10 &&
+        (!_requiresOwnershipDocument || _hasOwnershipDocument);
   }
 
   /// Whether the form differs from its initial (edit-mode prefill, or
@@ -162,7 +196,11 @@ class AddListingController extends GetxController {
         phoneController.text != _initialPhone ||
         whatsappController.text != _initialWhatsapp ||
         !setEquals(selectedAmenities.toSet(), _initialAmenities) ||
-        !listEquals(photos.toList(), _initialPhotos);
+        !listEquals(photos.toList(), _initialPhotos) ||
+        // _populateForm never sets a local path (only the uploaded flag from
+        // an existing hostel's already-persisted document), so any non-empty
+        // path here is always a fresh, unsaved pick.
+        ownershipDocPath.value.isNotEmpty;
   }
 
   void _populateForm(HostelModel hostel) {
@@ -179,6 +217,8 @@ class AddListingController extends GetxController {
     longitude.value = hostel.longitude;
     hasPickedLocation.value = true;
     availability.value = hostel.availability;
+    _ownershipId = hostel.ownershipDocumentId ?? '';
+    ownershipDocUploaded.value = _ownershipId.isNotEmpty;
   }
 
   @override
@@ -295,6 +335,66 @@ class AddListingController extends GetxController {
     }
   }
 
+  /// Property ownership document picker — mirrors
+  /// VerificationController.captureDocumentImage/`_pickImage` exactly
+  /// (camera-or-gallery via the shared showImageSourceSheet(), never
+  /// camera-only), including its PlatformException/permission handling.
+  /// Duplicated rather than shared because these two controllers
+  /// deliberately don't share a base class (see this feature's
+  /// VerificationController's own header comment on that decision) — save
+  /// timing genuinely diverges elsewhere between them.
+  Future<void> pickOwnershipDocument() async {
+    final source = await showImageSourceSheet();
+    if (source == null) return;
+    try {
+      final XFile? image = await _picker.pickImage(
+        source: source,
+        imageQuality: 70, // Compress slightly
+      );
+      if (image != null) {
+        ownershipDocPath.value = image.path;
+        ownershipDocUploaded.value = false; // a fresh pick supersedes any prior upload
+      }
+    } on PlatformException catch (e) {
+      Logger.e('Image picker permission error: $e');
+      final code = e.code.toLowerCase();
+      final message = (e.message ?? '').toLowerCase();
+      if (code.contains('denied') || code.contains('permission') || message.contains('permission')) {
+        await _showCameraPermissionRationale();
+      } else {
+        AppSnackbar.showGlobal(
+          message: AppStrings.cameraErrorGenericMessage,
+          type: SnackbarType.error,
+        );
+      }
+    } catch (e) {
+      Logger.e('Error picking ownership document: $e');
+      AppSnackbar.showGlobal(
+        message: AppStrings.cameraErrorGenericMessage,
+        type: SnackbarType.error,
+      );
+    }
+  }
+
+  /// Mirrors VerificationController._showCameraPermissionRationale, which
+  /// itself mirrors MapController._showLocationRationale's pattern — a
+  /// plain explanatory dialog, not a raw OS permission crash or a silent
+  /// failure.
+  Future<void> _showCameraPermissionRationale() {
+    return Get.dialog<void>(
+      AlertDialog(
+        title: const Text(AppStrings.cameraPermissionTitle),
+        content: const Text(AppStrings.cameraPermissionMessage),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Text(AppStrings.okButton),
+          ),
+        ],
+      ),
+    );
+  }
+
   void saveAsDraft() {
     _saveListing(ListingStatus.draft);
   }
@@ -321,7 +421,34 @@ class AddListingController extends GetxController {
       );
       return;
     }
-    _saveListing(ListingStatus.published);
+    if (_requiresOwnershipDocument && !_hasOwnershipDocument) {
+      AppSnackbar.showGlobal(
+        message: AppStrings.errorNoOwnershipDocument,
+        type: SnackbarType.error,
+      );
+      return;
+    }
+    // Every brand-new listing now requires admin approval before it's
+    // publicly visible (matches what the verification wizard's step 3
+    // already does for an owner's first hostel — see VerificationController.
+    // _completeHostelInfoStep) — write `pending`, not `published`, directly.
+    //
+    // Scoping decision: gated on whether this hostel was ALREADY published
+    // before, not on isEditMode. Editing an already-published (live)
+    // listing keeps writing `published` directly — an edit of a listing
+    // that's already live stays live; re-review-on-every-edit is a
+    // separate, bigger product decision nobody has made. But editing a
+    // DRAFT (or rejected) listing and hitting Publish for the first time is
+    // still a genuinely new go-live, so it must go through the same pending
+    // gate as a from-scratch create — `isEditMode` alone would wrongly let
+    // an owner dodge review by saving a draft first and then "editing" it
+    // straight to published. This reuses the exact same
+    // already-published-before check `_saveListing`'s activity-log branch
+    // below already makes (line ~424), rather than adding a second,
+    // differently-scoped seam.
+    final wasAlreadyPublished = _editingHostel?.status == ListingStatus.published;
+    final targetStatus = wasAlreadyPublished ? ListingStatus.published : ListingStatus.pending;
+    _saveListing(targetStatus);
   }
 
   Future<void> _saveListing(ListingStatus status) async {
@@ -361,6 +488,22 @@ class AddListingController extends GetxController {
         }
       }
 
+      // 2. Upload the ownership document, if a new local file was picked.
+      // Same "upload documents, then write the Firestore doc" ordering as
+      // the photo batch just above and as
+      // VerificationController._completeDocumentsStep's identical
+      // upload-on-submit (not upload-on-pick) timing. A resumed/edit-mode
+      // document that already carries a public_id (ownershipDocUploaded) is
+      // left untouched, never re-uploaded.
+      if (ownershipDocPath.value.isNotEmpty && !ownershipDocUploaded.value) {
+        _ownershipId = await _cloudinaryService.uploadSignedDocument(
+          File(ownershipDocPath.value),
+          uid,
+          'ownership',
+        );
+        ownershipDocUploaded.value = true;
+      }
+
       // description has a real form field (descriptionController), shown to
       // students on Hostel Detail via AboutSection. `city` has no dedicated
       // input either, but it is no longer pure string-guessing (FIX-7.15):
@@ -397,18 +540,22 @@ class AddListingController extends GetxController {
         status: status,
         location: GeoPoint(latitude.value, longitude.value),
         geohash: geohash,
+        ownershipDocumentId: _ownershipId.isNotEmpty ? _ownershipId : null,
       );
 
       if (_editingHostel == null) {
         await _hostelRepo.create(hostel);
-        if (status == ListingStatus.published) {
-          // Log activity for creation
+        // 2.A: a new create now writes `pending`, never `published`, directly
+        // (see publishListing) — log the submission-for-review as its own
+        // activity type rather than silently dropping the entry that used
+        // to fire here for every new publish.
+        if (status == ListingStatus.pending) {
           final activity = ActivityModel(
             id: DateTime.now().millisecondsSinceEpoch.toString(),
             ownerId: uid,
-            type: 'listing_created',
-            title: 'New Listing Published',
-            message: 'You published ${hostel.name}.',
+            type: 'listing_submitted',
+            title: AppStrings.listingSubmittedActivityTitle,
+            message: AppStrings.listingSubmittedActivityMessage(hostel.name),
             hostelId: hostel.id,
             hostelName: hostel.name,
             thumbnailUrl: hostel.photos.firstOrNull != null
@@ -435,17 +582,49 @@ class AddListingController extends GetxController {
             createdAt: DateTime.now(),
           );
           await _activityRepo.create(activity);
+        } else if (status == ListingStatus.pending && _editingHostel?.status != ListingStatus.pending) {
+          // 2.A: editing a draft (or a rejected listing) and hitting
+          // Publish for the first time is a genuinely new go-live, so
+          // publishListing() routes it through `pending` here too, not
+          // just on a from-scratch create — see that method's scoping note.
+          final activity = ActivityModel(
+            id: DateTime.now().millisecondsSinceEpoch.toString(),
+            ownerId: uid,
+            type: 'listing_submitted',
+            title: AppStrings.listingSubmittedActivityTitle,
+            message: AppStrings.listingSubmittedActivityMessage(hostel.name),
+            hostelId: hostel.id,
+            hostelName: hostel.name,
+            thumbnailUrl: hostel.photos.firstOrNull != null
+                ? CloudinaryThumbnail.of(hostel.photos.first.url)
+                : null,
+            createdAt: DateTime.now(),
+          );
+          await _activityRepo.create(activity);
         }
       }
 
-      if (status == ListingStatus.published) {
-        Get.offNamed(Routes.ownerPublishSuccess);
-      } else {
-        Get.back();
+      if (status == ListingStatus.draft) {
+        if (_editingHostel == null && Get.isRegistered<OwnerShellController>()) {
+          Get.find<OwnerShellController>().onTabSelected(3); // Switch to Listings tab
+          _resetForm();
+        } else {
+          Get.back();
+        }
         AppSnackbar.showGlobal(
           message: AppStrings.draftSavedMessage,
           type: SnackbarType.info,
         );
+      } else {
+        // `pending` (new listing, awaiting review — 2.A) and `published`
+        // (an edit that publishes directly) both land on the same success
+        // screen; it reads its copy from `status` (see PublishSuccessView)
+        // so a submission-for-review doesn't claim to already be live.
+        if (_editingHostel == null && Get.isRegistered<OwnerShellController>()) {
+          Get.toNamed(Routes.ownerPublishSuccess, arguments: status);
+        } else {
+          Get.offNamed(Routes.ownerPublishSuccess, arguments: status);
+        }
       }
     } on PartialUploadException catch (e) {
       // Some photos reached Cloudinary before the batch failed. No listing
@@ -533,5 +712,35 @@ class AddListingController extends GetxController {
       return words.last;
     }
     return 'Hyderabad';
+  }
+
+  void _resetForm() {
+    nameController.clear();
+    addressController.clear();
+    descriptionController.clear();
+    priceController.clear();
+    roomsController.clear();
+    phoneController.clear();
+    whatsappController.clear();
+    selectedAmenities.clear();
+    photos.clear();
+    availability.value = AvailabilityStatus.available;
+    sameAsPhone.value = false;
+    hasPickedLocation.value = false;
+    resolvedCity.value = '';
+    ownershipDocPath.value = '';
+    ownershipDocUploaded.value = false;
+    _ownershipId = '';
+    _editingHostel = null;
+
+    _initialName = '';
+    _initialAddress = '';
+    _initialDescription = '';
+    _initialPrice = '';
+    _initialRooms = '';
+    _initialPhone = '';
+    _initialWhatsapp = '';
+    _initialAmenities = {};
+    _initialPhotos = [];
   }
 }

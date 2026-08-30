@@ -13,6 +13,16 @@ class ResolvedPlace {
 }
 
 class LocationService {
+  // geocoding v5 moved from top-level free functions to instance methods on
+  // this class — pubspec.yaml pinned `geocoding: any`, which resolved to 5.0.0.
+  // Constructed lazily, inside resolvePlace()'s try block below, NOT as a
+  // field here: Geocoding()'s constructor does a synchronous null-check
+  // against the platform plugin registration, which throws in any context
+  // without a real platform channel (widget tests, or LocationService built
+  // before plugins finish registering) — a field initializer would crash
+  // eagerly, outside resolvePlace()'s own "never throw, return null" contract.
+  Geocoding? _geocoding;
+
   /// Request permissions and get the current user location.
   Future<Position?> getCurrentLocation() async {
     bool serviceEnabled;
@@ -50,7 +60,8 @@ class LocationService {
   /// blocking on, since the owner can always type the address by hand.
   Future<ResolvedPlace?> resolvePlace(double latitude, double longitude) async {
     try {
-      final placemarks = await placemarkFromCoordinates(latitude, longitude);
+      _geocoding ??= Geocoding();
+      final placemarks = await _geocoding!.placemarkFromCoordinates(latitude, longitude);
       if (placemarks.isEmpty) return null;
       final p = placemarks.first;
 

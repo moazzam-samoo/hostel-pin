@@ -41,6 +41,7 @@ import 'package:hostel_finder_app/data/repositories/activity_repository.dart';
 import 'package:hostel_finder_app/data/services/storage_service.dart';
 import 'package:hostel_finder_app/data/services/location_service.dart';
 import 'package:hostel_finder_app/data/services/session_service.dart';
+import 'package:hostel_finder_app/data/services/cloudinary_service.dart';
 import 'package:hostel_finder_app/features/owner/add_listing/add_listing_controller.dart';
 import 'package:hostel_finder_app/features/owner/add_listing/add_listing_view.dart';
 import 'package:hostel_finder_app/features/owner/dashboard/dashboard_controller.dart';
@@ -96,6 +97,11 @@ void main() {
     Get.put(ActivityRepository(firestore: fakeFirestore));
     Get.put(StorageService());
     Get.put(LocationService());
+    // Added alongside AddListingController's new ownership-document upload
+    // (calls Get.find<CloudinaryService>() in a field initializer, same
+    // shape as StorageService/LocationService above) — never hits the
+    // network in these render-only tests since no test picks/uploads a doc.
+    Get.put(CloudinaryService());
     Get.put<SessionService>(_FakeSessionService());
   });
 

@@ -33,17 +33,20 @@ class HostelDetailView extends GetView<HostelDetailController> {
             padding: const EdgeInsets.only(right: 12.0),
             child: Center(
               child: Obx(
-                () => IconSquareButton(
-                  icon: controller.isSaved.value
-                      ? Icons.favorite
-                      : Icons.favorite_border,
-                  iconColor: controller.isSaved.value
-                      ? AppColors.heartActive
-                      : AppColors.textSecondary,
-                  borderColor: controller.isSaved.value
-                      ? AppColors.heartActive.withValues(alpha: 0.3)
-                      : AppColors.border,
-                  onPressed: controller.toggleSaved,
+                () => Tooltip(
+                  message: controller.isSaved.value ? 'Remove from Saved' : 'Save Hostel',
+                  child: IconSquareButton(
+                    icon: controller.isSaved.value
+                        ? Icons.bookmark
+                        : Icons.bookmark_border,
+                    iconColor: controller.isSaved.value
+                        ? AppColors.primary
+                        : AppColors.textSecondary,
+                    borderColor: controller.isSaved.value
+                        ? AppColors.primary.withValues(alpha: 0.3)
+                        : AppColors.border,
+                    onPressed: controller.toggleSaved,
+                  ),
                 ),
               ),
             ),

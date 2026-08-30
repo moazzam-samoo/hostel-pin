@@ -32,14 +32,17 @@ class ContactActionRow extends StatelessWidget {
       cleanNum = '92${cleanNum.substring(1)}';
     }
     const message = "Hello i want to see your hostel and want further details.";
-    final uri = Uri.parse(
-        'https://wa.me/$cleanNum?text=${Uri.encodeComponent(message)}');
+    final textEncoded = Uri.encodeComponent(message);
+    
+    // Try native app scheme first
+    final appUri = Uri.parse('whatsapp://send?phone=$cleanNum&text=$textEncoded');
+    final webUri = Uri.parse('https://wa.me/$cleanNum?text=$textEncoded');
 
     try {
-      final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
-      if (!launched) {
-        // Fallback to web URL or standard mode if external app launcher failed
-        await launchUrl(uri, mode: LaunchMode.platformDefault);
+      if (await canLaunchUrl(appUri)) {
+        await launchUrl(appUri, mode: LaunchMode.externalApplication);
+      } else {
+        await launchUrl(webUri, mode: LaunchMode.externalApplication);
       }
     } catch (e) {
       debugPrint('Error opening WhatsApp: $e');

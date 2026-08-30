@@ -88,6 +88,15 @@ class AppStrings {
   static const String pendingVerificationTitle = 'Pending Verification';
   static String pendingVerificationMessage(String hostelName) =>
       'Hostel "$hostelName" is currently under review by our team. This usually takes 24 hours.';
+  // Distinct from pendingVerificationTitle/Message above (identity
+  // verification): this alert is about a specific LISTING awaiting admin
+  // approval, which can be true even once the owner is fully verified (any
+  // later listing they add still goes through the same review gate).
+  static const String pendingPropertyTitle = 'Pending Property';
+  static String pendingPropertyMessage(String hostelName) =>
+      'Hostel "$hostelName" is awaiting admin approval before it goes live. This usually takes 24 hours.';
+  static String pendingPropertiesCountMessage(int count) =>
+      '$count of your listings are awaiting admin approval before they go live.';
   static const String recentActivity = 'Recent Activity';
   static const String genericPropertyName = 'Your property';
 
@@ -133,13 +142,43 @@ class AppStrings {
   static const String phoneHint = '+92-320605300';
   static const String whatsappNumberLabel = 'Whatsapp number:';
   static const String sameAsPhoneLabel = 'Same as phone number';
+  // Property ownership document — required for every brand-new listing
+  // (an already-verified owner's 2nd, 3rd, ... hostel), same document kind
+  // the verification wizard's step 4 collects for an owner's first hostel,
+  // but never a full re-verification. See
+  // AddListingController._requiresOwnershipDocument.
+  static const String ownershipDocumentSection = 'Property Ownership Document';
+  static const String ownershipDocumentSectionNote =
+      'Upload proof you own or manage this property.';
+  static const String uploadOwnershipDocumentTitle = 'Upload Document';
+  static const String uploadOwnershipDocumentSubtitle =
+      'PDF, JPG, PNG (Max 5MB)';
+  static const List<String> ownershipDocumentInstructions = [
+    'Document must be issued within the last 6 months',
+    'All pages must be included',
+    'Name must match your registered business name',
+  ];
   static const String saveAsDraft = 'Save as Draft';
   static const String publishListing = 'Publish Listing';
+  // 2.A: every brand-new listing now goes through admin review before it's
+  // publicly visible — "Submit for Review" doesn't imply the immediacy
+  // "Publish Listing" would. Editing an already-existing listing (draft or
+  // published) keeps the original "Publish Listing"/"Update Listing"
+  // wording, since re-publishing an edit still applies to it directly.
+  static const String submitForReviewButton = 'Submit for Review';
+  static const String totalBedsLabel = 'Total Beds';
+  static const String bedsExample = 'e.g. 80 beds';
   static const String editListingTitle = 'Edit Listing';
   static const String updateListingButton = 'Update Listing';
   static const String listingPublishedTitle = 'Listing Published!';
   static const String listingPublishedBody =
       'Your hostel has been successfully published.';
+  static const String listingSubmittedTitle = 'Listing Submitted!';
+  static const String listingSubmittedBody =
+      'Your hostel has been submitted for review. We\'ll notify you once our team approves it — this usually takes 24 hours.';
+  static const String listingSubmittedActivityTitle = 'Listing Submitted for Review';
+  static String listingSubmittedActivityMessage(String hostelName) =>
+      'You submitted $hostelName for admin approval.';
 
   // Owner Profile
   static const String ownerProfileMyHostelsSubtitle = 'Manage your hostel';
@@ -153,6 +192,17 @@ class AppStrings {
   static const String verificationDocumentHint =
       'Upload your CNIC or Business Registration to verify your identity.';
 
+  // 2.B — Add tab gate. Shown instead of the real Add Listing form when the
+  // signed-in owner's SessionService.currentUser.value.verificationStatus
+  // is not VerificationStatus.verified.
+  static const String addTabGateTitle = 'Verification Required';
+  static const String addTabGateMessage =
+      'Complete identity verification before listing a hostel. It only takes a few minutes, and our team typically reviews it within 24 hours.';
+  static const String addTabGateButton = 'Start Verification';
+  static const String addTabGatePendingMessage =
+      'Your verification is under review by our team. You\'ll be able to list a hostel as soon as it\'s approved — this usually takes 24 hours.';
+  static const String addTabGateViewStatusButton = 'View Verification Status';
+
   // Owner Add Listing — location picker & publish success
   static const String pickLocationTitle = 'Pick Location';
   static const String confirmLocationButton = 'Confirm Location';
@@ -164,8 +214,19 @@ class AppStrings {
       "Use your device's live GPS position";
   static const String chooseOnMapOption = 'Choose location from map';
   static const String chooseOnMapSubtitle = 'Drag the map to drop a pin';
+  static const String imageSourceSheetTitle = 'Add photo';
+  static const String takePhotoOption = 'Take photo';
+  static const String takePhotoSubtitle = 'Use your camera';
+  static const String chooseFromGalleryOption = 'Choose from gallery';
+  static const String chooseFromGallerySubtitle = 'Pick an existing photo';
   static const String errorLocationUnavailable =
       'Could not get your current location. Check that location services and permission are enabled.';
+  // Owner Verification Wizard — camera permission-denied fallback (Block
+  // A.7), mirroring MapController._showLocationRationale's rationale-dialog
+  // pattern rather than a raw OS permission crash.
+  static const String cameraPermissionTitle = 'Camera Access Needed';
+  static const String cameraPermissionMessage =
+      'Hostel Finder needs camera access to capture your identity and ownership documents. Please enable it in your device settings and try again.';
   static String photosSelectedCount(int count) =>
       '$count/10 photo${count == 1 ? '' : 's'} selected';
   static String locationCoordinatesLabel(double lat, double lng) =>
@@ -204,6 +265,9 @@ class AppStrings {
       'Enter a valid number starting with +92';
   static const String errorPriceInvalid = 'Enter a valid price';
   static const String errorRoomsInvalid = 'Enter a valid number of rooms';
+  static const String errorBedsInvalid = 'Enter a valid number of beds';
+  static const String errorCnicInvalid = 'Enter a valid 13-digit CNIC number';
+  static const String errorDobRequired = 'Date of birth is required';
   static const String errorGeneric =
       'An unexpected error occurred. Please try again.';
 
@@ -318,4 +382,83 @@ class AppStrings {
   static const String sortPriceHighLow = 'Price: High to Low';
   static const String sortRating = 'Rating: High to Low';
   static const String sortDistance = 'Distance: Nearest First';
+
+  // Owner Verification Wizard — stepper action row
+  static const String verificationBackButton = 'Back';
+  static const String verificationNextButton = 'Next';
+  static const String submitVerificationButton = 'Submit Verification';
+
+  // Owner Verification Wizard — Step 1 (Personal Information)
+  static const String personalInfoStepTitle = 'Personal Information';
+  static const String personalInfoStepSubtitle =
+      'Please provide your details as they appear on your CNIC.';
+  static const String guardianNameLabel = 'Father/Guardian Name';
+  static const String guardianNameHint = 'Jane Doe';
+  static const String fullNameHint = 'John Doe';
+  static const String cnicNumberLabel = 'CNIC Number';
+  static const String cnicNumberHint = 'xxxxx-xxxxxxx-x';
+  static const String dobLabel = 'Date of Birth';
+  static const String dobHint = 'DD-MM-YYYY';
+  static const String emailAddressLabel = 'Email Address';
+  static const String emailAddressHint = 'john@example.com';
+  static const String cityFieldLabel = 'City';
+  static const String cityFieldHint = 'Hyderabad';
+
+  // Owner Verification Wizard — Step 2 (Identity Documents)
+  static const String identityDocumentsStepTitle = 'Identity Documents';
+  static const String identityDocumentsStepSubtitle =
+      'Please capture clear photos of your CNIC and a selfie for verification.';
+  static const String cnicFrontLabel = 'CNIC Front';
+  static const String cnicBackLabel = 'CNIC Back';
+  static const String selfieLabel = 'Selfie';
+  static const String tapToCaptureLabel = 'Tap to capture';
+  static const String alreadyCapturedRetakeLabel = 'Already captured — tap to retake';
+  static const String cameraErrorGenericMessage = 'Could not open camera. Please try again.';
+
+  // Owner Verification Wizard — Step 3 (Hostel Information)
+  static const String hostelInfoStepTitle = 'Hostel Information';
+  static const String hostelInfoStepSubtitle =
+      'Provide details about the primary hostel you intend to manage.';
+  static const String errorNoIdentityDocuments =
+      'Please capture all required identity documents.';
+  static const String errorNoOwnershipDocument =
+      'Please upload a property ownership document.';
+  static const String verificationSubmittedMessage =
+      'Verification request submitted successfully.';
+  static const String defaultCityFallback = 'Hyderabad';
+
+  // Owner Verification Wizard — Step 4 (Hostel Documents)
+  static const String hostelDocumentsStepTitle = 'Hostel Documents';
+  static const String hostelDocumentsStepSubtitle =
+      'Please capture clear photos of your property ownership or lease documents for verification.';
+  static const String ownershipDocumentLabel = 'Ownership/Lease Document';
+  static const String tapToCaptureDocumentLabel = 'Tap to capture document';
+
+  // Owner Verification Wizard — Step 5 (Review & Submit)
+  static const String reviewStepTitle = 'Review & Submit';
+  static const String reviewStepSubtitle =
+      'Please review your information before submitting for verification.';
+  static const String personalInfoSectionTitle = 'Personal Info';
+  static const String reviewLabelName = 'Name';
+  static const String reviewLabelCnic = 'CNIC';
+  static const String reviewLabelEmail = 'Email';
+  static const String capturedLabel = 'Captured';
+  static const String missingLabel = 'Missing';
+  static const String hostelInfoSectionTitle = 'Hostel Info';
+  static const String reviewLabelAddress = 'Address';
+  static const String reviewLabelPrice = 'Price';
+  static const String reviewLabelRoomsBeds = 'Rooms / Beds';
+  static const String reviewLabelPhotos = 'Photos';
+  static const String reviewLabelAmenities = 'Amenities';
+  static const String ownershipDocumentSectionTitle = 'Ownership Document';
+  // Review Step (Hostel Documents)
+  static const String reviewLabelOwnershipDoc = 'Ownership Doc';
+
+  static const String reviewPolicyText = 'I confirm that the information and documents provided are accurate and complete to the best of my knowledge. I understand that providing false information may result in verification failure or account suspension.';
+  static const String errorAcceptPolicy = 'Please confirm the policy to proceed.';
+  static const String submitForVerificationButton = 'Submit for verification';
+  static String reviewPhotosCount(int count) => '$count photo${count == 1 ? '' : 's'}';
+  static String amenitiesSelectedCount(int count) => '$count selected';
+  static String roomsAndBeds(String rooms, String beds) => '$rooms rooms, $beds beds';
+  static const String notAvailableDash = '—';
 }

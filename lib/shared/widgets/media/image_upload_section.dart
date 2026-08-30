@@ -1,94 +1,91 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import '../../../../data/models/upload_result_model.dart';
-import '../add_listing_controller.dart';
-import '../../../../core/constants/app_strings.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_radius.dart';
-import '../../../../core/theme/app_spacing.dart';
-import '../../../../core/theme/app_text_styles.dart';
-import '../../../../shared/widgets/media/network_image_box.dart';
-import '../../../../shared/widgets/media/upload_placeholder.dart';
+import '../../../core/constants/app_strings.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_radius.dart';
+import '../../../core/theme/app_spacing.dart';
+import '../../../core/theme/app_text_styles.dart';
+import 'network_image_box.dart';
+import 'upload_placeholder.dart';
 
-class ImageUploadSection extends GetView<AddListingController> {
-  // Must match whatever tag AddListingView (the parent) was given — see its
-  // own doc comment for why the Add-tab and Edit-screen controllers are
-  // tagged separately.
-  //
-  // GetX's own documented tag pattern, see AddListingView's identical
-  // comment. NOTE: `super.tag` does NOT work here — GetView's constructor
-  // (installed version 4.7.3) only accepts `key`, not `tag`; that
-  // shorthand is a real compile error.
-  @override
-  // ignore: overridden_fields
-  final String? tag;
+class ImageUploadSection extends StatelessWidget {
+  final List<UploadResultModel> photos;
+  final VoidCallback onPickImages;
+  final void Function(UploadResultModel) onRemovePhoto;
+  final int minRequired;
+  final int maxPhotos;
+  final String placeholderLabel;
 
-  const ImageUploadSection({super.key, this.tag});
+  const ImageUploadSection({
+    super.key,
+    required this.photos,
+    required this.onPickImages,
+    required this.onRemovePhoto,
+    this.minRequired = 3,
+    this.maxPhotos = 10,
+    this.placeholderLabel = AppStrings.uploadPicturesLabel,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() {
-      final photos = controller.photos;
-
-      if (photos.isEmpty) {
-        return UploadPlaceholder(
-          label: AppStrings.uploadPicturesLabel,
-          onTap: controller.pickImages,
-          height: 120,
-        );
-      }
-
-      final isMinMet = photos.length >= 3;
-
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                AppStrings.photosSelectedCount(photos.length),
-                style: AppTextStyles.body.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: isMinMet ? AppColors.textPrimary : AppColors.error,
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: isMinMet
-                      ? AppColors.primary.withValues(alpha: 0.1)
-                      : AppColors.error.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppRadius.pill),
-                ),
-                child: Text(
-                  isMinMet ? 'Min requirement met' : 'Min 3 required',
-                  style: AppTextStyles.caption.copyWith(
-                    color: isMinMet ? AppColors.primary : AppColors.error,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: AppSpacing.sm),
-          Wrap(
-            spacing: AppSpacing.sm,
-            runSpacing: AppSpacing.sm,
-            children: [
-              ...photos.map((photo) => _buildPhotoThumb(photo)),
-              if (photos.length < 10) _buildAddMoreButton(),
-            ],
-          ),
-        ],
+    if (photos.isEmpty) {
+      return UploadPlaceholder(
+        label: placeholderLabel,
+        onTap: onPickImages,
+        height: 120,
       );
-    });
+    }
+
+    final isMinMet = photos.length >= minRequired;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              AppStrings.photosSelectedCount(photos.length),
+              style: AppTextStyles.body.copyWith(
+                fontWeight: FontWeight.w600,
+                color: isMinMet ? AppColors.textPrimary : AppColors.error,
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: isMinMet
+                    ? AppColors.primary.withValues(alpha: 0.1)
+                    : AppColors.error.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(AppRadius.pill),
+              ),
+              child: Text(
+                isMinMet ? 'Min requirement met' : 'Min $minRequired required',
+                style: AppTextStyles.caption.copyWith(
+                  color: isMinMet ? AppColors.primary : AppColors.error,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: AppSpacing.sm),
+        Wrap(
+          spacing: AppSpacing.sm,
+          runSpacing: AppSpacing.sm,
+          children: [
+            ...photos.map((photo) => _buildPhotoThumb(photo)),
+            if (photos.length < maxPhotos) _buildAddMoreButton(),
+          ],
+        ),
+      ],
+    );
   }
 
   Widget _buildAddMoreButton() {
     return InkWell(
-      onTap: controller.pickImages,
+      onTap: onPickImages,
       borderRadius: BorderRadius.circular(AppRadius.field),
       child: Container(
         width: 80,
@@ -163,9 +160,7 @@ class ImageUploadSection extends GetView<AddListingController> {
             top: 4,
             right: 4,
             child: GestureDetector(
-              onTap: () {
-                controller.photos.remove(photo);
-              },
+              onTap: () => onRemovePhoto(photo),
               child: Container(
                 padding: EdgeInsets.all(AppSpacing.xxs),
                 decoration: const BoxDecoration(

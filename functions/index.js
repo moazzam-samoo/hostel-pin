@@ -1,17 +1,40 @@
 /**
  * FIX-7.7 / FIX-7.8 — server-side Cloudinary asset deletion.
+ * Phase 8 — signed-upload infrastructure for owner verification documents
+ * (getCloudinarySignature / getVerificationDocumentUrl, below).
  *
- * NOT DEPLOYED. Cloud Functions require the Firebase Blaze (pay-as-you-go)
- * plan, which was not confirmed for this project. Until it is deployed,
- * deleting a listing still orphans its Cloudinary photos and the
- * `cloudinary_orphans` queue simply accumulates entries — nothing breaks,
- * nothing is cleaned up either. See DEPLOY.md in this folder.
+ * NONE of the four exports in this file are DEPLOYED, and per a decision
+ * made 2026-08-30, two of them (getCloudinarySignature,
+ * getVerificationDocumentUrl) never will be — this project stays on
+ * Firebase's free Spark plan permanently (Cloud Functions require Blaze,
+ * pay-as-you-go, which was explicitly rejected). Those two functions'
+ * client caller has been repointed at a Cloudflare Worker instead
+ * (`../cloudflare-worker/`, see its README) — same job, same signing
+ * algorithm, same Cloudinary API secret (held there, not here), just a
+ * different free host that doesn't need a billing plan. The two functions
+ * below are left in place only as the original, documented reference
+ * implementation the Worker was ported from — they are dead code from the
+ * app's perspective (nothing calls them) and are not scheduled to deploy.
  *
- * Why this must live server-side: a Cloudinary `destroy` call has to be
- * signed with the API secret. Shipping that secret in the app would let
- * anyone who unpacks the APK delete every asset in the account, which is
- * exactly the risk IMPLEMENTATION_PLAN §7.E calls out. Uploads stay on the
- * client via the unsigned preset; only deletes come through here.
+ * onHostelDeleted/sweepCloudinaryOrphans (FIX-7.7/7.8) are a different
+ * case: still real, still wanted, still blocked on Blaze specifically
+ * because they're Firestore/Pub-Sub *triggers*, not client-callable
+ * endpoints — a Cloudflare Worker can't subscribe to Firestore document
+ * deletes or Cloud Scheduler the way a Cloud Function can. Until Blaze (or
+ * an equivalent trigger-capable host) is adopted, deleting a listing still
+ * orphans its Cloudinary photos (`cloudinary_orphans` simply accumulates
+ * entries) — see DEPLOY.md in this folder for the deploy steps whenever
+ * that changes.
+ *
+ * Why signing must live server-side at all: a Cloudinary `destroy`/
+ * signed-upload call has to be signed with the API secret. Shipping that
+ * secret in the app would let anyone who unpacks the APK delete or forge
+ * uploads for every asset in the account, which is exactly the risk
+ * IMPLEMENTATION_PLAN §7.E calls out. Unsigned hostel-photo uploads stay
+ * on the client via the unsigned preset; deletes and verification-document
+ * uploads both need a real secret-holding backend — Cloudflare Worker for
+ * the latter now, this file for the former once Blaze (or an alternative)
+ * is in place.
  */
 
 const functions = require('firebase-functions');
@@ -111,3 +134,87 @@ exports.sweepCloudinaryOrphans = functions.pubsub
     }
     return null;
   });
+
+/**
+ * Generates a Cloudinary signature for signed uploads.
+ * Restricts uploads to folder "verification" and type "authenticated".
+ */
+exports.getCloudinarySignature = functions.https.onCall((data, context) => {
+  if (!context.auth) {
+    throw new functions.https.HttpsError(
+      'unauthenticated',
+      'User must be authenticated to upload verification documents.'
+    );
+  }
+
+  const timestamp = Math.round(new Date().getTime() / 1000);
+  
+  const paramsToSign = {
+    timestamp: timestamp,
+    folder: 'verification',
+    type: 'authenticated',
+  };
+
+  const apiSecret = functions.config().cloudinary?.api_secret;
+  if (!apiSecret) {
+    throw new functions.https.HttpsError(
+      'internal',
+      'Cloudinary API secret not configured on the server.'
+    );
+  }
+
+  const signature = cloudinary.utils.api_sign_request(paramsToSign, apiSecret);
+
+  return {
+    timestamp,
+    signature,
+    api_key: functions.config().cloudinary?.api_key,
+    cloud_name: functions.config().cloudinary?.cloud_name,
+    folder: 'verification',
+    type: 'authenticated',
+  };
+});
+
+/**
+ * Returns a signed delivery URL for a type: authenticated asset.
+ * Used by Phase 9's Review screen to view documents.
+ *
+ * Scoping decision (Phase 8 Block A.2): this phase's own UI never calls
+ * this function — nothing under features/owner/verification/ resolves a
+ * viewable URL for a submitted document, only uploads them (public_ids are
+ * written straight to Firestore, never rendered as an image here). The only
+ * check applied for now is "the caller is signed in"; deliberately deferred
+ * to Phase 9 is scoping this to "the caller's own verifications/{uid} doc,
+ * or an admin" — until Phase 9's isAdmin()-equivalent exists, any
+ * authenticated user (including a student) who already knows another
+ * owner's public_id could resolve a viewable URL for it. Accepted as an
+ * explicit, recorded gap rather than a silent one: this function is inert
+ * from the client's perspective in this phase (nothing calls it) and is
+ * also undeployed (see the file header), so there is no live attack surface
+ * yet — but the check must be tightened before or alongside Phase 9 wiring
+ * this in for real.
+ */
+exports.getVerificationDocumentUrl = functions.https.onCall((data, context) => {
+  if (!context.auth) {
+    throw new functions.https.HttpsError(
+      'unauthenticated',
+      'User must be authenticated to view verification documents.'
+    );
+  }
+
+  const publicId = data.publicId;
+  if (!publicId) {
+    throw new functions.https.HttpsError(
+      'invalid-argument',
+      'The publicId parameter is required.'
+    );
+  }
+
+  const url = cloudinary.url(publicId, {
+    sign_url: true,
+    type: 'authenticated',
+    secure: true,
+  });
+
+  return { url };
+});

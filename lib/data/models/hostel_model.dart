@@ -17,6 +17,7 @@ class HostelModel {
   final String description;
   final num pricePerMonth;
   final int totalRooms; // NEW in Phase 7
+  final int totalBeds; // NEW in Phase 8
   final List<UploadResultModel> photos; // Updated in Phase 7
   final Set<Amenity> amenities;
   final AvailabilityStatus availability;
@@ -29,6 +30,22 @@ class HostelModel {
   final ListingStatus status;
   final GeoPoint? location; // NEW in Phase 7
   final String? geohash; // NEW in Phase 7
+  // Cloudinary public_id (NOT a URL, despite the name mirroring
+  // VerificationModel.ownershipDocumentUrl's same misleading naming) for the
+  // property-ownership document AddListingController now requires for every
+  // brand-new hostel added via the normal Add Listing screen (an already-
+  // verified owner's 2nd, 3rd, ... listing) — see
+  // AddListingController._requiresOwnershipDocument. It's a `type:
+  // authenticated` signed asset uploaded via
+  // CloudinaryService.uploadSignedDocument, same scheme as the wizard's CNIC/
+  // selfie/ownership documents.
+  //
+  // Null for two legitimate reasons, not just "not uploaded yet": (1) a
+  // hostel created by the owner-verification wizard's step 3
+  // (VerificationController._completeHostelInfoStep) — that flow's ownership
+  // proof lives on the separate verifications/{uid} doc instead, never on
+  // this one; (2) any listing created before this field existed.
+  final String? ownershipDocumentId;
 
   const HostelModel({
     required this.id,
@@ -42,6 +59,7 @@ class HostelModel {
     required this.description,
     required this.pricePerMonth,
     this.totalRooms = 1,
+    this.totalBeds = 1,
     required this.photos,
     required this.amenities,
     required this.availability,
@@ -54,6 +72,7 @@ class HostelModel {
     required this.status,
     this.location,
     this.geohash,
+    this.ownershipDocumentId,
   });
 
   HostelModel copyWith({
@@ -68,6 +87,7 @@ class HostelModel {
     String? description,
     num? pricePerMonth,
     int? totalRooms,
+    int? totalBeds,
     List<UploadResultModel>? photos,
     Set<Amenity>? amenities,
     AvailabilityStatus? availability,
@@ -80,6 +100,7 @@ class HostelModel {
     ListingStatus? status,
     GeoPoint? location,
     String? geohash,
+    String? ownershipDocumentId,
   }) {
     return HostelModel(
       id: id ?? this.id,
@@ -93,6 +114,7 @@ class HostelModel {
       description: description ?? this.description,
       pricePerMonth: pricePerMonth ?? this.pricePerMonth,
       totalRooms: totalRooms ?? this.totalRooms,
+      totalBeds: totalBeds ?? this.totalBeds,
       photos: photos ?? this.photos,
       amenities: amenities ?? this.amenities,
       availability: availability ?? this.availability,
@@ -105,6 +127,7 @@ class HostelModel {
       status: status ?? this.status,
       location: location ?? this.location,
       geohash: geohash ?? this.geohash,
+      ownershipDocumentId: ownershipDocumentId ?? this.ownershipDocumentId,
     );
   }
 
@@ -153,6 +176,7 @@ class HostelModel {
       description: data['description'] as String? ?? '',
       pricePerMonth: data['pricePerMonth'] as num? ?? 0,
       totalRooms: data['totalRooms'] as int? ?? 1,
+      totalBeds: data['totalBeds'] as int? ?? 1,
       photos: (data['photos'] as List<dynamic>?)
               ?.map((e) {
                 if (e is Map<String, dynamic>) {
@@ -190,6 +214,7 @@ class HostelModel {
       ),
       location: parsedLocation,
       geohash: parsedGeohash,
+      ownershipDocumentId: data['ownershipDocumentId'] as String?,
     );
   }
 
@@ -205,6 +230,7 @@ class HostelModel {
       'description': description,
       'pricePerMonth': pricePerMonth,
       'totalRooms': totalRooms,
+      'totalBeds': totalBeds,
       'photos': photos.map((p) => p.toMap()).toList(),
       'amenities': amenities.map((a) => a.name).toList(),
       'availability': availability.name,
@@ -223,6 +249,7 @@ class HostelModel {
       // Map tab, regardless of where they were actually located.
       if (location != null && geohash != null)
         'location': {'geopoint': location, 'geohash': geohash},
+      if (ownershipDocumentId != null) 'ownershipDocumentId': ownershipDocumentId,
       // Stamped server-side on create (FIX-7.5/FIX-7.11).
       // `HostelRepository.update` strips this key before merging so an edit
       // never re-dates the listing. Documents created before this field
@@ -249,6 +276,7 @@ class HostelModel {
         other.description == description &&
         other.pricePerMonth == pricePerMonth &&
         other.totalRooms == totalRooms &&
+        other.totalBeds == totalBeds &&
         listEquals(other.photos, photos) &&
         setEquals(other.amenities, amenities) &&
         other.availability == availability &&
@@ -260,7 +288,8 @@ class HostelModel {
         other.isFeatured == isFeatured &&
         other.status == status &&
         other.location == location &&
-        other.geohash == geohash;
+        other.geohash == geohash &&
+        other.ownershipDocumentId == ownershipDocumentId;
   }
 
   @override
@@ -277,6 +306,7 @@ class HostelModel {
       description,
       pricePerMonth,
       totalRooms,
+      totalBeds,
       Object.hashAll(photos),
       Object.hashAll(amenities),
       availability,
@@ -289,6 +319,7 @@ class HostelModel {
       status,
       location,
       geohash,
+      ownershipDocumentId,
     ]);
   }
 }

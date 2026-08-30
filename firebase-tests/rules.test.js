@@ -237,6 +237,67 @@ describe('hostels/{id}', () => {
     const asOwnerA = testEnv.authenticatedContext(OWNER_A).firestore();
     await assertSucceeds(asOwnerA.collection('hostels').doc('h1').get());
   });
+
+  // 2.A — every brand-new listing requires admin approval before going
+  // live. These two tests are the server-side enforcement of that: without
+  // them, a client could bypass AddListingController.publishListing()'s
+  // pending gate entirely by writing status: 'published' straight to
+  // Firestore.
+  it('an owner cannot create a hostel doc with status published directly', async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await ctx.firestore().collection('users').doc(OWNER_A).set({ role: 'owner' });
+    });
+
+    const asOwnerA = testEnv.authenticatedContext(OWNER_A).firestore();
+    await assertFails(
+      asOwnerA.collection('hostels').doc('h1').set(publishedHostel)
+    );
+  });
+
+  it('an owner can create a hostel doc with status pending', async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await ctx.firestore().collection('users').doc(OWNER_A).set({ role: 'owner' });
+    });
+
+    const asOwnerA = testEnv.authenticatedContext(OWNER_A).firestore();
+    await assertSucceeds(
+      asOwnerA.collection('hostels').doc('h1').set({ ...publishedHostel, status: 'pending' })
+    );
+  });
+
+  it('an owner cannot self-approve a pending hostel by updating status to published', async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await ctx.firestore().collection('users').doc(OWNER_A).set({ role: 'owner' });
+      await ctx
+        .firestore()
+        .collection('hostels')
+        .doc('h1')
+        .set({ ...publishedHostel, status: 'pending' });
+    });
+
+    const asOwnerA = testEnv.authenticatedContext(OWNER_A).firestore();
+    await assertFails(
+      asOwnerA
+        .collection('hostels')
+        .doc('h1')
+        .set({ ...publishedHostel, status: 'published' })
+    );
+  });
+
+  it('an owner can still edit an already-published hostel and it stays published', async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await ctx.firestore().collection('users').doc(OWNER_A).set({ role: 'owner' });
+      await ctx.firestore().collection('hostels').doc('h1').set(publishedHostel);
+    });
+
+    const asOwnerA = testEnv.authenticatedContext(OWNER_A).firestore();
+    await assertSucceeds(
+      asOwnerA
+        .collection('hostels')
+        .doc('h1')
+        .set({ ...publishedHostel, name: 'Sunrise Hostel (Updated)', status: 'published' })
+    );
+  });
 });
 
 describe('users/{uid}/saved/{hostelId}', () => {
@@ -272,5 +333,102 @@ describe('activities/{id}', () => {
 
     const asOwnerB = testEnv.authenticatedContext(OWNER_B).firestore();
     await assertFails(asOwnerB.collection('activities').doc('a1').get());
+  });
+});
+
+describe('verifications/{uid}', () => {
+  it('an owner can read and write their own verification doc', async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await ctx.firestore().collection('users').doc(OWNER_A).set({ role: 'owner' });
+    });
+
+    const asOwnerA = testEnv.authenticatedContext(OWNER_A).firestore();
+    await assertSucceeds(
+      asOwnerA.collection('verifications').doc(OWNER_A).set({ status: 'draft' })
+    );
+    await assertSucceeds(asOwnerA.collection('verifications').doc(OWNER_A).get());
+  });
+
+  it('an owner cannot read or write another owner verification doc', async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await ctx.firestore().collection('users').doc(OWNER_A).set({ role: 'owner' });
+      await ctx.firestore().collection('users').doc(OWNER_B).set({ role: 'owner' });
+      await ctx.firestore().collection('verifications').doc(OWNER_A).set({ status: 'pending' });
+    });
+
+    const asOwnerB = testEnv.authenticatedContext(OWNER_B).firestore();
+    await assertFails(asOwnerB.collection('verifications').doc(OWNER_A).get());
+    await assertFails(
+      asOwnerB.collection('verifications').doc(OWNER_A).set({ status: 'draft' })
+    );
+  });
+  
+  it('an owner cannot create a doc with status approved/rejected/changesRequested', async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await ctx.firestore().collection('users').doc(OWNER_A).set({ role: 'owner' });
+    });
+
+    const asOwnerA = testEnv.authenticatedContext(OWNER_A).firestore();
+    for (const status of ['approved', 'rejected', 'changesRequested']) {
+      await assertFails(
+        asOwnerA.collection('verifications').doc(OWNER_A).set({ status })
+      );
+    }
+  });
+
+  it('an owner cannot move their own doc to approved/rejected/changesRequested via update', async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await ctx.firestore().collection('users').doc(OWNER_A).set({ role: 'owner' });
+      await ctx.firestore().collection('verifications').doc(OWNER_A).set({ status: 'pending' });
+    });
+
+    const asOwnerA = testEnv.authenticatedContext(OWNER_A).firestore();
+    for (const status of ['approved', 'rejected', 'changesRequested']) {
+      await assertFails(
+        asOwnerA.collection('verifications').doc(OWNER_A).update({ status })
+      );
+    }
+  });
+
+  it('an owner cannot set reviewedBy/reviewedAt/rejectionReason on their own doc', async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await ctx.firestore().collection('users').doc(OWNER_A).set({ role: 'owner' });
+      await ctx.firestore().collection('verifications').doc(OWNER_A).set({ status: 'draft' });
+    });
+
+    const asOwnerA = testEnv.authenticatedContext(OWNER_A).firestore();
+    await assertFails(
+      asOwnerA
+        .collection('verifications')
+        .doc(OWNER_A)
+        .update({ status: 'pending', reviewedBy: 'admin_uid' })
+    );
+    await assertFails(
+      asOwnerA
+        .collection('verifications')
+        .doc(OWNER_A)
+        .update({ status: 'pending', reviewedAt: new Date() })
+    );
+    await assertFails(
+      asOwnerA
+        .collection('verifications')
+        .doc(OWNER_A)
+        .update({ status: 'pending', rejectionReason: 'self-approved, nice try' })
+    );
+  });
+
+  it('a draft -> pending submit that leaves reviewedBy/reviewedAt untouched succeeds', async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await ctx.firestore().collection('users').doc(OWNER_A).set({ role: 'owner' });
+      await ctx.firestore().collection('verifications').doc(OWNER_A).set({ status: 'draft' });
+    });
+
+    const asOwnerA = testEnv.authenticatedContext(OWNER_A).firestore();
+    await assertSucceeds(
+      asOwnerA
+        .collection('verifications')
+        .doc(OWNER_A)
+        .update({ status: 'pending', submittedAt: new Date() })
+    );
   });
 });

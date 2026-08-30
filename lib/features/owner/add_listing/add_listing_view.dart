@@ -1,7 +1,8 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'add_listing_controller.dart';
-import 'widgets/image_upload_section.dart';
+import '../../../shared/widgets/media/image_upload_section.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
@@ -11,8 +12,10 @@ import '../../../shared/widgets/navigation/app_top_bar.dart';
 import '../../../shared/widgets/layout/keyboard_dismiss_wrapper.dart';
 import '../../../shared/widgets/layout/form_section_header.dart';
 import '../../../shared/widgets/feedback/confirm_dialog.dart';
-import '../../../shared/widgets/inputs/app_text_field.dart';
+import '../../../shared/widgets/feedback/instruction_box.dart';
+import '../../../shared/widgets/inputs/dotted_upload_box.dart';
 import '../../../shared/widgets/inputs/field_label.dart';
+import '../../../shared/widgets/inputs/validated_text_field.dart';
 import '../../../shared/widgets/inputs/amenity_selector.dart';
 import '../../../shared/widgets/inputs/app_switch.dart';
 import '../../../core/enums/availability_status.dart';
@@ -20,25 +23,7 @@ import '../../../shared/widgets/buttons/primary_button.dart';
 import '../../../shared/widgets/buttons/secondary_button.dart';
 import '../../../shared/widgets/media/map_panel.dart';
 
-class AddListingView extends GetView<AddListingController> {
-  // Distinguishes the Owner Shell's long-lived "Add" tab instance (untagged,
-  // registered once by OwnerShellBinding, alive for the whole shell session)
-  // from a one-off Edit session (tagged 'edit', registered fresh per push at
-  // Routes.ownerEdit). Both used to share one untagged AddListingController
-  // singleton — since IndexedStack builds all shell tabs eagerly, the blank
-  // Add tab claimed it first, so opening Edit reused that same
-  // already-initialized instance instead of a fresh one populated from the
-  // real HostelModel, and any location/form state set in one bled into the
-  // other. See app_pages.dart's Routes.ownerEdit registration.
-  //
-  // This is GetX's own documented pattern for a tagged GetView (see
-  // get_view.dart's doc comment); GetView.controller already does
-  // `GetInstance().find<T>(tag: tag)`, so overriding this field is how the
-  // tag reaches it, not a mistake. NOTE: `super.tag` does NOT work here —
-  // GetView's constructor (installed version 4.7.3) only accepts `key`,
-  // not `tag`, so that shorthand is a real compile error.
-  @override
-  // ignore: overridden_fields
+class AddListingView extends StatelessWidget {
   final String? tag;
 
   const AddListingView({super.key, this.tag});
@@ -47,11 +32,11 @@ class AddListingView extends GetView<AddListingController> {
   Widget build(BuildContext context) {
     return GetBuilder<AddListingController>(
       tag: tag,
-      builder: (_) => PopScope(
+      builder: (controller) => PopScope(
         canPop: !controller.hasUnsavedChanges,
         onPopInvokedWithResult: (didPop, result) {
           if (didPop) return;
-          _confirmDiscard();
+          _confirmDiscard(controller);
         },
         child: Scaffold(
           appBar: AppTopBar(
@@ -82,21 +67,21 @@ class AddListingView extends GetView<AddListingController> {
                           const FormSectionHeader(
                               title: AppStrings.identityLocationSection),
                           SizedBox(height: AppSpacing.md),
-                          _buildValidatedField(
+                          ValidatedTextField(
                             label: AppStrings.hostelNameLabel,
                             controller: controller.nameController,
                             hintText: AppStrings.hostelNameHint,
                             validator: Validators.required,
                           ),
                           SizedBox(height: AppSpacing.md),
-                          _buildValidatedField(
+                          ValidatedTextField(
                             label: AppStrings.fullAddressLabel,
                             controller: controller.addressController,
                             hintText: AppStrings.fullAddressHint,
                             validator: Validators.required,
                           ),
                           SizedBox(height: AppSpacing.md),
-                          _buildValidatedField(
+                          ValidatedTextField(
                             label: AppStrings.descriptionLabel,
                             controller: controller.descriptionController,
                             hintText: AppStrings.descriptionHint,
@@ -132,7 +117,11 @@ class AddListingView extends GetView<AddListingController> {
                                 .copyWith(color: AppColors.textTertiary),
                           ),
                           SizedBox(height: AppSpacing.md),
-                          ImageUploadSection(tag: tag),
+                          Obx(() => ImageUploadSection(
+                                photos: controller.photos.toList(),
+                                onPickImages: controller.pickImages,
+                                onRemovePhoto: (photo) => controller.photos.remove(photo),
+                              )),
                           SizedBox(height: AppSpacing.xl),
 
                           // 3. Rooms & Pricing
@@ -143,7 +132,7 @@ class AddListingView extends GetView<AddListingController> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Expanded(
-                                child: _buildValidatedField(
+                                child: ValidatedTextField(
                                   label: AppStrings.monthlyPriceLabel,
                                   controller: controller.priceController,
                                   hintText: AppStrings.monthlyPriceLabel,
@@ -154,7 +143,7 @@ class AddListingView extends GetView<AddListingController> {
                               ),
                               SizedBox(width: AppSpacing.md),
                               Expanded(
-                                child: _buildValidatedField(
+                                child: ValidatedTextField(
                                   label: AppStrings.totalRoomsLabel,
                                   controller: controller.roomsController,
                                   hintText: AppStrings.roomsExample,
@@ -212,7 +201,7 @@ class AddListingView extends GetView<AddListingController> {
                           const FormSectionHeader(
                               title: AppStrings.ownerConnectivitySection),
                           SizedBox(height: AppSpacing.md),
-                          _buildValidatedField(
+                          ValidatedTextField(
                             label: AppStrings.phoneNoLabel,
                             controller: controller.phoneController,
                             hintText: AppStrings.phoneHint,
@@ -246,7 +235,7 @@ class AddListingView extends GetView<AddListingController> {
                                 ),
                               )),
                           SizedBox(height: AppSpacing.md),
-                          Obx(() => _buildValidatedField(
+                          Obx(() => ValidatedTextField(
                                 label: AppStrings.whatsappNumberLabel,
                                 controller: controller.whatsappController,
                                 hintText: AppStrings.phoneHint,
@@ -255,11 +244,46 @@ class AddListingView extends GetView<AddListingController> {
                                 validator: Validators.phone,
                                 enabled: !controller.sameAsPhone.value,
                               )),
+                          SizedBox(height: AppSpacing.xl),
+
+                          // 5. Property Ownership Document — the gap this
+                          // feature fills. Every brand-new listing needs
+                          // proof of ownership/management for THIS specific
+                          // property, even though a returning verified owner
+                          // rightly skips redoing CNIC/selfie identity
+                          // checks (a one-time check, not per-listing).
+                          const FormSectionHeader(
+                              title: AppStrings.ownershipDocumentSection),
+                          SizedBox(height: AppSpacing.xs),
+                          Text(
+                            AppStrings.ownershipDocumentSectionNote,
+                            style: AppTextStyles.caption
+                                .copyWith(color: AppColors.textTertiary),
+                          ),
+                          SizedBox(height: AppSpacing.md),
+                          Obx(() => DottedUploadBox(
+                                title: AppStrings.uploadOwnershipDocumentTitle,
+                                subtitle:
+                                    AppStrings.uploadOwnershipDocumentSubtitle,
+                                icon: Icons.upload_file,
+                                uploadedFile: controller
+                                        .ownershipDocPath.value.isNotEmpty
+                                    ? File(controller.ownershipDocPath.value)
+                                    : (controller.ownershipDocUploaded.value
+                                        ? File('')
+                                        : null),
+                                onTap: controller.pickOwnershipDocument,
+                              )),
+                          SizedBox(height: AppSpacing.md),
+                          const InstructionBox(
+                            instructions:
+                                AppStrings.ownershipDocumentInstructions,
+                          ),
                         ],
                       ),
                     ),
                   ),
-                  _buildActionRow(),
+                  _buildActionRow(controller),
                 ],
               ),
             ),
@@ -269,45 +293,8 @@ class AddListingView extends GetView<AddListingController> {
     );
   }
 
-  /// FieldLabel + FormField-wrapped AppTextField, matching the pattern
-  /// established by EditProfileView: the FormField owns validation state
-  /// and feeds errorText back into the (otherwise dumb) AppTextField.
-  Widget _buildValidatedField({
-    required String label,
-    required TextEditingController controller,
-    required String hintText,
-    required String? Function(String?) validator,
-    TextInputType? keyboardType,
-    IconData? leadingIcon,
-    bool enabled = true,
-    int maxLines = 1,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        FieldLabel(label),
-        SizedBox(height: AppSpacing.xs),
-        FormField<String>(
-          validator: (_) => validator(controller.text),
-          builder: (state) => AppTextField(
-            controller: controller,
-            hintText: hintText,
-            keyboardType: keyboardType,
-            leadingIcon: leadingIcon,
-            enabled: enabled,
-            maxLines: maxLines,
-            errorText: state.errorText,
-            onChanged: (val) {
-              state.didChange(val);
-              if (state.hasError) state.validate();
-            },
-          ),
-        ),
-      ],
-    );
-  }
 
-  void _confirmDiscard() {
+  void _confirmDiscard(AddListingController controller) {
     Get.dialog(
       ConfirmDialog(
         title: AppStrings.unsavedChangesTitle,
@@ -323,7 +310,7 @@ class AddListingView extends GetView<AddListingController> {
     );
   }
 
-  Widget _buildActionRow() {
+  Widget _buildActionRow(AddListingController controller) {
     return Container(
       padding: EdgeInsets.all(AppSpacing.gutter),
       decoration: BoxDecoration(
@@ -358,9 +345,14 @@ class AddListingView extends GetView<AddListingController> {
                 child: GetBuilder<AddListingController>(
                   tag: tag,
                   builder: (c) => PrimaryButton(
+                    // 2.A: a brand-new listing is submitted for review, not
+                    // published immediately — "Submit for Review" doesn't
+                    // imply the immediacy "Publish Listing" would. Editing
+                    // (draft or already-published) keeps the original labels
+                    // since an edit's publish action still applies directly.
                     text: c.isEditMode
                         ? AppStrings.updateListingButton
-                        : AppStrings.publishListing,
+                        : AppStrings.submitForReviewButton,
                     isLoading: isSaving,
                     isDisabled: isSaving,
                     onPressed: controller.publishListing,

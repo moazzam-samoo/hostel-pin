@@ -1,0 +1,12 @@
+name = "hostelpin-verification-signer"
+main = "src/index.js"
+compatibility_date = "2024-11-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Non-secret config — safe to commit. CLOUDINARY_API_SECRET is set
+# separately via `wrangler secret put CLOUDINARY_API_SECRET` and never
+# appears in this file or anywhere else in the repo.
+[vars]
+CLOUDINARY_CLOUD_NAME = "xaqsbqf7"   # matches core/config/cloudinary_config.dart — public, not secret
+CLOUDINARY_API_KEY = "969517867114197"   # find in Cloudinary console -> Settings -> API Keys
+FIREBASE_PROJECT_ID = "hostel-finder-ece09"

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/constants/app_strings.dart';
+import '../../../core/enums/listing_status.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/app_spacing.dart';
@@ -14,6 +15,15 @@ class PublishSuccessView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 2.A: a brand-new listing now arrives here with `status: pending`
+    // (awaiting admin review), not `published` — AddListingController
+    // passes the resulting status as this route's argument so the copy
+    // here never claims a submitted-for-review listing is already live.
+    // Any other/missing argument (e.g. an edit that published directly)
+    // falls back to the original "published" copy.
+    final status = Get.arguments;
+    final isPending = status == ListingStatus.pending;
+
     return AppScaffold(
       topBar: const AppTopBar(
         variant: AppTopBarVariant.none,
@@ -30,13 +40,13 @@ class PublishSuccessView extends StatelessWidget {
             ),
             SizedBox(height: AppSpacing.xl),
             Text(
-              AppStrings.listingPublishedTitle,
+              isPending ? AppStrings.listingSubmittedTitle : AppStrings.listingPublishedTitle,
               style: AppTextStyles.successTitle,
               textAlign: TextAlign.center,
             ),
             SizedBox(height: AppSpacing.md),
             Text(
-              AppStrings.listingPublishedBody,
+              isPending ? AppStrings.listingSubmittedBody : AppStrings.listingPublishedBody,
               style: AppTextStyles.body.copyWith(
                 color: AppColors.textSecondary,
               ),

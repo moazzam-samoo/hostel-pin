@@ -6,9 +6,11 @@ import '../../data/repositories/auth_repository.dart';
 import '../../data/repositories/hostel_repository.dart';
 import '../../data/repositories/saved_repository.dart';
 import '../../data/repositories/activity_repository.dart';
+import '../../data/repositories/verification_repository.dart';
 import '../../data/services/session_service.dart';
 import '../../data/services/storage_service.dart';
 import '../../data/services/location_service.dart';
+import '../../data/services/cloudinary_service.dart';
 
 class InitialBinding extends Bindings {
   @override
@@ -32,7 +34,16 @@ class InitialBinding extends Bindings {
     Get.put(HostelRepository(), permanent: true);
     Get.put(SavedRepository(), permanent: true);
     Get.put(ActivityRepository(), permanent: true);
+    // Registered as its own singleton (not just the private instance
+    // StorageService constructs for itself) because Phase 8's
+    // VerificationController calls Get.find<CloudinaryService>() directly
+    // for the signed-upload path (uploadSignedDocument) — StorageService's
+    // unsigned-preset pipeline doesn't cover that. Without this line the
+    // wizard's document-upload step throws "CloudinaryService not found"
+    // the first time an owner reaches it.
+    Get.put(CloudinaryService(), permanent: true);
     Get.put(StorageService(), permanent: true);
     Get.put(LocationService(), permanent: true);
+    Get.put(VerificationRepository(), permanent: true);
   }
 }

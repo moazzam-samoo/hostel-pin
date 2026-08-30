@@ -76,4 +76,32 @@ class Validators {
     }
     return null;
   }
+
+  static String? beds(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return AppStrings.errorRequired;
+    }
+    if (int.tryParse(value) == null) {
+      return AppStrings.errorBedsInvalid;
+    }
+    return null;
+  }
+
+  static String? cnic(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return AppStrings.errorRequired;
+    }
+    final digits = value.replaceAll(RegExp(r'\D'), '');
+    if (digits.length != 13) {
+      return AppStrings.errorCnicInvalid;
+    }
+    return null;
+  }
+
+  static String? dateOfBirth(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return AppStrings.errorDobRequired;
+    }
+    return null;
+  }
 }

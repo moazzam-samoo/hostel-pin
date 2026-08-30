@@ -49,6 +49,7 @@ class HostelRepository {
   Stream<List<HostelModel>> streamAllPublished({int limit = kHostelPageSize}) {
     return _hostelsRef
         .where('status', isEqualTo: ListingStatus.published.name)
+        .orderBy('createdAt', descending: true)
         .limit(limit)
         .snapshots()
         .map((snapshot) => snapshot.docs.map((doc) => doc.data()).toList());
@@ -76,7 +77,13 @@ class HostelRepository {
     return _hostelsRef
         .where('ownerId', isEqualTo: ownerId)
         .snapshots()
-        .map((snapshot) => snapshot.docs.map((doc) => doc.data()).toList());
+        .map((snapshot) {
+      final list = snapshot.docs.map((doc) => doc.data()).toList();
+      // Sort client-side by document ID (which is epoch time) descending
+      // so newest hostels appear at the top.
+      list.sort((a, b) => b.id.compareTo(a.id));
+      return list;
+    });
   }
 
   Future<HostelModel?> getById(String id) async {
