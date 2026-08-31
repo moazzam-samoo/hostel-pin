@@ -5,6 +5,8 @@ import '../../features/splash/splash_view.dart';
 import '../../features/splash/splash_binding.dart';
 import '../../features/welcome/welcome_view.dart';
 import '../../features/welcome/welcome_binding.dart';
+import '../../features/welcome/dept_welcome_view.dart';
+import '../../features/welcome/dept_welcome_binding.dart';
 import '../../features/auth/view/login_view.dart';
 import '../../features/auth/view/signup_view.dart';
 import '../../features/auth/view/forgot_password_view.dart';
@@ -57,6 +59,11 @@ class AppPages {
       name: Routes.welcome,
       page: () => const WelcomeView(),
       binding: WelcomeBinding(),
+    ),
+    GetPage(
+      name: Routes.deptWelcome,
+      page: () => const DeptWelcomeView(),
+      binding: DeptWelcomeBinding(),
     ),
     GetPage(
       name: Routes.roleSelection,

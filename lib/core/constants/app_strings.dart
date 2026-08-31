@@ -6,6 +6,9 @@ class AppStrings {
   static const String welcome = 'Welcome!';
   static const String welcomeTo = 'To HostelPin App';
   static const String continueButton = 'Continue';
+  static const String hostelPinApp = 'HostelPin App';
+  static const String developedBy = 'Developed By ';
+  static const String imcsStudents = 'IMCS Students';
 
   // Role Selection
 

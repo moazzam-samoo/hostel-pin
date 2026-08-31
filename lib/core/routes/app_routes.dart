@@ -2,6 +2,7 @@ class Routes {
   static const String splash = '/splash';
   static const String widgetGallery = '/widget-gallery';
   static const String welcome = '/welcome';
+  static const String deptWelcome = '/dept-welcome';
   static const String roleSelection = '/role-selection';
 
   static const String login = '/login';

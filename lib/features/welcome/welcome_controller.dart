@@ -15,6 +15,6 @@ class WelcomeController extends GetxController {
   }
 
   void onContinue() {
-    Get.toNamed(Routes.roleSelection);
+    Get.toNamed(Routes.deptWelcome);
   }
 }

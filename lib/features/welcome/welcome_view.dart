@@ -76,7 +76,7 @@ class WelcomeView extends GetView<WelcomeController> {
                       Text(
                         AppStrings.appName,
                         style: AppTextStyles.authTitle.copyWith(
-                            color: AppColors.textPrimary,
+                            color: AppColors.secondary,
                             fontWeight: FontWeight.bold),
                         textAlign: TextAlign.center,
                       ),
