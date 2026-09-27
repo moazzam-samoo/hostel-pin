@@ -40,6 +40,11 @@ import '../../features/owner/profile/owner_edit_profile_controller.dart';
 import '../../features/owner/add_listing/widgets/location_picker_view.dart';
 import '../../features/owner/add_listing/publish_success_view.dart';
 import '../../shared/widget_gallery/widget_gallery_view.dart';
+import '../../features/admin/auth/admin_login_view.dart';
+import '../../features/admin/auth/admin_login_binding.dart';
+import '../../features/admin/shell/admin_shell_view.dart';
+import '../../features/admin/shell/admin_shell_binding.dart';
+import '../middleware/admin_middleware.dart';
 import '../middleware/auth_middleware.dart';
 import '../middleware/role_middleware.dart';
 import 'app_routes.dart';
@@ -226,5 +231,84 @@ class AppPages {
       page: () => const AccountSettingsView(),
       middlewares: [AuthMiddleware()],
     ),
+    // Admin — login route has NO middleware (it IS the guard target)
+    GetPage(
+      name: Routes.adminLogin,
+      page: () => const AdminLoginView(),
+      binding: AdminLoginBinding(),
+    ),
+    // Every /admin/* route below (including adminShell itself) uses ONLY
+    // AdminMiddleware, not AuthMiddleware too. AdminMiddleware's own
+    // redirect already covers "not signed in at all" (SessionService's
+    // currentUser is null, which fails the role == UserRole.admin check the
+    // same as any wrong role would) and sends unauthenticated visitors to
+    // /admin/login. Stacking AuthMiddleware() in front of it was a real bug:
+    // GetX evaluates middlewares in order and stops at the first non-null
+    // redirect, so an unauthenticated admin-route visit was being bounced to
+    // the mobile /login screen instead of /admin/login, before
+    // AdminMiddleware ever ran.
+    GetPage(
+      name: Routes.adminShell,
+      page: () => const AdminShellView(),
+      binding: AdminShellBinding(),
+      middlewares: [AdminMiddleware()],
+    ),
+    // These 7 used to be dead placeholder Scaffolds ("Admin Dashboard" etc.
+    // literal text) even after the real section views existed — harmless on
+    // mobile, where the equivalent studentHome/ownerDashboard-style
+    // sub-routes are genuinely unused, but a real bug on the web: this is a
+    // real deployed web app, so a bookmarked or refreshed /admin/users URL
+    // must render actual content, not a fake label. All 7 now resolve to
+    // the same shared shell; AdminShellController reads Get.currentRoute to
+    // land on the matching tab instead of always defaulting to Dashboard.
+    GetPage(
+      name: Routes.adminDashboard,
+      page: () => const AdminShellView(),
+      binding: AdminShellBinding(),
+      middlewares: [AdminMiddleware()],
+    ),
+    GetPage(
+      name: Routes.adminUsers,
+      page: () => const AdminShellView(),
+      binding: AdminShellBinding(),
+      middlewares: [AdminMiddleware()],
+    ),
+    GetPage(
+      name: Routes.adminOwners,
+      page: () => const AdminShellView(),
+      binding: AdminShellBinding(),
+      middlewares: [AdminMiddleware()],
+    ),
+    GetPage(
+      name: Routes.adminHostels,
+      page: () => const AdminShellView(),
+      binding: AdminShellBinding(),
+      middlewares: [AdminMiddleware()],
+    ),
+    GetPage(
+      name: Routes.adminNotifications,
+      page: () => const AdminShellView(),
+      binding: AdminShellBinding(),
+      middlewares: [AdminMiddleware()],
+    ),
+    GetPage(
+      name: Routes.adminVerification,
+      page: () => const AdminShellView(),
+      binding: AdminShellBinding(),
+      middlewares: [AdminMiddleware()],
+    ),
+    GetPage(
+      name: Routes.adminReview,
+      page: () => const AdminShellView(),
+      binding: AdminShellBinding(),
+      middlewares: [AdminMiddleware()],
+    ),
+    GetPage(
+      name: Routes.adminSettings,
+      page: () => const AdminShellView(),
+      binding: AdminShellBinding(),
+      middlewares: [AdminMiddleware()],
+    ),
   ];
 }
+

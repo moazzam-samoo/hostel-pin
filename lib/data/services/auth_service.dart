@@ -1,10 +1,21 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:get/get.dart';
 
 class AuthService extends GetxService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
+
+  // Lazy, and never touched on web: this app's web build only ever serves
+  // the admin panel (email/password sign-in only, no Google button
+  // anywhere in features/admin/), and google_sign_in_web's plugin fails an
+  // internal assertion at construction time without a configured web OAuth
+  // client ID — never set up in this project since it isn't needed there.
+  // Building this eagerly as a field initializer crashed app boot on every
+  // web load, before InitialBinding even finished. Both call sites below
+  // guard on kIsWeb so the getter is simply never reached on web.
+  GoogleSignIn? _googleSignInInstance;
+  GoogleSignIn get _googleSignIn => _googleSignInInstance ??= GoogleSignIn();
 
   Stream<User?> get authStateChanges => _auth.authStateChanges();
   User? get currentUser => _auth.currentUser;
@@ -30,6 +41,11 @@ class AuthService extends GetxService {
   }
 
   Future<UserCredential?> signInWithGoogle() async {
+    if (kIsWeb) {
+      throw UnsupportedError(
+        'Google Sign-In is not available on web in this app.',
+      );
+    }
     final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
     if (googleUser == null) return null; // user canceled
 
@@ -80,7 +96,9 @@ class AuthService extends GetxService {
   }
 
   Future<void> signOut() async {
-    await _googleSignIn.signOut();
+    if (!kIsWeb) {
+      await _googleSignIn.signOut();
+    }
     await _auth.signOut();
   }
 }

@@ -74,6 +74,7 @@ class UserModel {
   final List<String> savedHostelIds;
   final UserPrefs prefs;
   final VerificationStatus verificationStatus;
+  final String status;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -87,6 +88,7 @@ class UserModel {
     this.savedHostelIds = const [],
     this.prefs = const UserPrefs(),
     this.verificationStatus = VerificationStatus.unverified,
+    this.status = 'active',
     this.createdAt,
     this.updatedAt,
   });
@@ -101,6 +103,7 @@ class UserModel {
     List<String>? savedHostelIds,
     UserPrefs? prefs,
     VerificationStatus? verificationStatus,
+    String? status,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -114,6 +117,7 @@ class UserModel {
       savedHostelIds: savedHostelIds ?? this.savedHostelIds,
       prefs: prefs ?? this.prefs,
       verificationStatus: verificationStatus ?? this.verificationStatus,
+      status: status ?? this.status,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -136,6 +140,7 @@ class UserModel {
         (e) => e.name == (data['verificationStatus'] as String?),
         orElse: () => VerificationStatus.unverified,
       ),
+      status: data['status'] as String? ?? 'active',
       createdAt: (data['createdAt'] as Timestamp?)?.toDate(),
       updatedAt: (data['updatedAt'] as Timestamp?)?.toDate(),
     );
@@ -155,6 +160,7 @@ class UserModel {
       'savedHostelIds': savedHostelIds,
       'prefs': prefs.toMap(),
       'verificationStatus': verificationStatus.name,
+      'status': status,
     };
   }
 
@@ -172,6 +178,7 @@ class UserModel {
         listEquals(other.savedHostelIds, savedHostelIds) &&
         other.prefs == prefs &&
         other.verificationStatus == verificationStatus &&
+        other.status == status &&
         other.createdAt == createdAt &&
         other.updatedAt == updatedAt;
   }
@@ -188,6 +195,7 @@ class UserModel {
         Object.hashAll(savedHostelIds),
         prefs,
         verificationStatus,
+        status,
         createdAt,
         updatedAt);
   }

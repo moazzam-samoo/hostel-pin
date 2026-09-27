@@ -51,6 +51,8 @@ class SplashController extends GetxController {
 
     if (role == null) {
       Get.offAllNamed(Routes.roleSelection);
+    } else if (role == UserRole.admin) {
+      Get.offAllNamed(Routes.adminShell);
     } else if (role == UserRole.owner) {
       Get.offAllNamed(Routes.ownerShell);
     } else {

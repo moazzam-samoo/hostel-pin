@@ -17,10 +17,7 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -56,7 +53,6 @@ class DefaultFirebaseOptions {
     projectId: 'hostel-finder-ece09',
     storageBucket: 'hostel-finder-ece09.firebasestorage.app',
   );
-
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyBwdJIODV36BdJH5i-gsf_eKL2rVFXVEy0',
     appId: '1:672317431571:ios:32397449e7f13f348344e6',
@@ -65,5 +61,15 @@ class DefaultFirebaseOptions {
     storageBucket: 'hostel-finder-ece09.firebasestorage.app',
     iosClientId: '672317431571-psivg011b1j49tlih5280crkaotb7go1.apps.googleusercontent.com',
     iosBundleId: 'com.hostelfinder.hostelFinderApp',
+  );
+
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyBBlYpaJjPj9DB2NzBraGTrhnYZ-WdFRWE',
+    appId: '1:672317431571:web:44657d65ba4058e08344e6',
+    messagingSenderId: '672317431571',
+    projectId: 'hostel-finder-ece09',
+    authDomain: 'hostel-finder-ece09.firebaseapp.com',
+    storageBucket: 'hostel-finder-ece09.firebasestorage.app',
+    measurementId: 'G-T6NLCFXFBW',
   );
 }

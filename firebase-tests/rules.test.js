@@ -1,14 +1,29 @@
 /**
- * Firestore security-rules emulator tests — TASK-Phase-7.md Block D.7.
+ * Firestore security-rules emulator tests — TASK-Phase-7.md Block D.7,
+ * extended by TASK-Phase-9.md Block A.7 (the `describe('isAdmin() — Phase 9
+ * admin-broad rules', ...)` block near the bottom of this file).
  *
  * These were written as part of the Phase 7 audit because D.7 lists rules
  * unit tests as a GATE for the phase, not a follow-up, and none existed.
- * They are NOT run as part of this pass — running them needs the Firebase
- * emulator suite, which this environment cannot start. A human must run:
+ * The Phase 9 admin-rules block was added for the same reason — Block A.7
+ * treats this suite passing as a completion gate for Block A itself, and
+ * this pass found a genuine bug hiding behind that gap: isAdmin() only ever
+ * granted READ access on users/*, hostels/*, verifications/* — there was no
+ * admin WRITE rule anywhere, so Block G.5's Approve batch (which updates
+ * all three collections) would have failed with permission-denied on every
+ * field against real deployed rules, despite the Dart code compiling fine.
+ * The admin-only, narrowly-scoped update/delete rules these new tests cover
+ * were added in the same pass as the tests themselves.
+ *
+ * Confirmed NOT run as part of this pass — this sandboxed environment has
+ * no Java runtime (`java -version` → command not found), and the Firestore
+ * emulator requires one to start at all; this isn't a "didn't get to it"
+ * gap, it's a hard environment limitation. A human (or CI, which likely has
+ * Java) must run:
  *
  *   cd hostel_finder_app/firebase-tests
  *   npm install
- *   firebase emulators:exec --project demo-hostel-finder --only firestore "npm test"
+ *   firebase emulators:exec --project demo-hostel-finder-rules-test --only firestore "npm test"
  *
  * (run from firebase-tests/, with a firebase.json alongside it — or from
  * the app root by pointing --config/firestore rules paths at
@@ -40,6 +55,7 @@ let testEnv;
 const OWNER_A = 'owner_a_uid';
 const OWNER_B = 'owner_b_uid';
 const STUDENT = 'student_uid';
+const ADMIN = 'admin_uid';
 
 const publishedHostel = {
   ownerId: OWNER_A,
@@ -440,5 +456,206 @@ describe('verifications/{uid}', () => {
 
     const asGuest = testEnv.unauthenticatedContext().firestore();
     await assertFails(asGuest.collection('verifications').doc(OWNER_A).get());
+  });
+});
+
+/**
+ * Phase 9 Block A.7/G.5 — isAdmin()'s admin-broad rules. This project's own
+ * highest-blast-radius rule change so far (every prior rule was "a user can
+ * read/write their own doc only"); TASK-Phase-9.md's own exit criteria treat
+ * this suite passing as a completion GATE for Block A, not a follow-up.
+ *
+ * Also covers the admin-write rules added alongside isAdmin() itself
+ * (users/{uid}, hostels/{id}, verifications/{uid}) — without these, Block
+ * G.5's 3-document batched Approve write fails with permission-denied on
+ * every field, since the pre-existing owner-scoped update rules never
+ * granted an admin session write access at all (a real bug this pass found
+ * and fixed, not a hypothetical).
+ */
+describe('isAdmin() — Phase 9 admin-broad rules', () => {
+  it('an admin can read any user doc', async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await ctx.firestore().collection('users').doc(ADMIN).set({ role: 'admin' });
+      await ctx.firestore().collection('users').doc(STUDENT).set({ role: 'student' });
+    });
+
+    const asAdmin = testEnv.authenticatedContext(ADMIN).firestore();
+    await assertSucceeds(asAdmin.collection('users').doc(STUDENT).get());
+  });
+
+  it('a non-admin (owner) cannot read another user doc', async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await ctx.firestore().collection('users').doc(OWNER_A).set({ role: 'owner' });
+      await ctx.firestore().collection('users').doc(STUDENT).set({ role: 'student' });
+    });
+
+    const asOwnerA = testEnv.authenticatedContext(OWNER_A).firestore();
+    await assertFails(asOwnerA.collection('users').doc(STUDENT).get());
+  });
+
+  it('an admin can block a user (users/{uid}.status) without touching role', async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await ctx.firestore().collection('users').doc(ADMIN).set({ role: 'admin' });
+      await ctx.firestore().collection('users').doc(STUDENT).set({
+        role: 'student',
+        status: 'active',
+        verificationStatus: 'unverified',
+      });
+    });
+
+    const asAdmin = testEnv.authenticatedContext(ADMIN).firestore();
+    await assertSucceeds(
+      asAdmin.collection('users').doc(STUDENT).update({ status: 'blocked' })
+    );
+  });
+
+  it("an admin cannot change a user's role or displayName via the admin update rule", async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await ctx.firestore().collection('users').doc(ADMIN).set({ role: 'admin' });
+      await ctx.firestore().collection('users').doc(STUDENT).set({
+        role: 'student',
+        displayName: 'Ali',
+        status: 'active',
+      });
+    });
+
+    const asAdmin = testEnv.authenticatedContext(ADMIN).firestore();
+    await assertFails(
+      asAdmin.collection('users').doc(STUDENT).update({ role: 'owner' })
+    );
+    await assertFails(
+      asAdmin.collection('users').doc(STUDENT).update({ displayName: 'Hijacked' })
+    );
+  });
+
+  it('an admin can delete a user doc; a plain user cannot', async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await ctx.firestore().collection('users').doc(ADMIN).set({ role: 'admin' });
+      await ctx.firestore().collection('users').doc(STUDENT).set({ role: 'student' });
+    });
+
+    const asStudent = testEnv.authenticatedContext(STUDENT).firestore();
+    await assertFails(asStudent.collection('users').doc(STUDENT).delete());
+
+    const asAdmin = testEnv.authenticatedContext(ADMIN).firestore();
+    await assertSucceeds(asAdmin.collection('users').doc(STUDENT).delete());
+  });
+
+  it('an admin can read any hostel regardless of status', async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await ctx.firestore().collection('users').doc(ADMIN).set({ role: 'admin' });
+      await ctx.firestore().collection('hostels').doc('h1').set(draftHostel);
+    });
+
+    const asAdmin = testEnv.authenticatedContext(ADMIN).firestore();
+    await assertSucceeds(asAdmin.collection('hostels').doc('h1').get());
+  });
+
+  it('an admin can flip a pending hostel to published (Approve); an owner cannot', async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await ctx.firestore().collection('users').doc(ADMIN).set({ role: 'admin' });
+      await ctx.firestore().collection('users').doc(OWNER_A).set({ role: 'owner' });
+      await ctx
+        .firestore()
+        .collection('hostels')
+        .doc('h1')
+        .set({ ...publishedHostel, status: 'pending' });
+    });
+
+    const asAdmin = testEnv.authenticatedContext(ADMIN).firestore();
+    await assertSucceeds(
+      asAdmin.collection('hostels').doc('h1').update({ status: 'published' })
+    );
+  });
+
+  it('an admin cannot touch other hostel fields via the admin-only status rule', async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await ctx.firestore().collection('users').doc(ADMIN).set({ role: 'admin' });
+      await ctx.firestore().collection('hostels').doc('h1').set(publishedHostel);
+    });
+
+    const asAdmin = testEnv.authenticatedContext(ADMIN).firestore();
+    await assertFails(
+      asAdmin.collection('hostels').doc('h1').update({ status: 'published', pricePerMonth: 1 })
+    );
+  });
+
+  it('an admin can delete any hostel', async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await ctx.firestore().collection('users').doc(ADMIN).set({ role: 'admin' });
+      await ctx.firestore().collection('users').doc(OWNER_A).set({ role: 'owner' });
+      await ctx.firestore().collection('hostels').doc('h1').set(publishedHostel);
+    });
+
+    const asAdmin = testEnv.authenticatedContext(ADMIN).firestore();
+    await assertSucceeds(asAdmin.collection('hostels').doc('h1').delete());
+  });
+
+  it('an admin can read and approve another owner verification doc', async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await ctx.firestore().collection('users').doc(ADMIN).set({ role: 'admin' });
+      await ctx.firestore().collection('users').doc(OWNER_A).set({ role: 'owner' });
+      await ctx.firestore().collection('verifications').doc(OWNER_A).set({ status: 'pending' });
+    });
+
+    const asAdmin = testEnv.authenticatedContext(ADMIN).firestore();
+    await assertSucceeds(asAdmin.collection('verifications').doc(OWNER_A).get());
+    await assertSucceeds(
+      asAdmin.collection('verifications').doc(OWNER_A).update({
+        status: 'approved',
+        reviewedBy: ADMIN,
+      })
+    );
+  });
+
+  it('a non-admin owner still cannot approve their own verification doc', async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await ctx.firestore().collection('users').doc(OWNER_A).set({ role: 'owner' });
+      await ctx.firestore().collection('verifications').doc(OWNER_A).set({ status: 'pending' });
+    });
+
+    const asOwnerA = testEnv.authenticatedContext(OWNER_A).firestore();
+    await assertFails(
+      asOwnerA.collection('verifications').doc(OWNER_A).update({ status: 'approved' })
+    );
+  });
+
+  it('an admin can read and resolve reports; a non-admin cannot', async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await ctx.firestore().collection('users').doc(ADMIN).set({ role: 'admin' });
+      await ctx.firestore().collection('users').doc(STUDENT).set({ role: 'student' });
+      await ctx.firestore().collection('reports').doc('r1').set({
+        hostelId: 'h1',
+        reportedBy: STUDENT,
+        reason: 'spam',
+        status: 'open',
+      });
+    });
+
+    const asStudent = testEnv.authenticatedContext(STUDENT).firestore();
+    await assertFails(asStudent.collection('reports').doc('r1').get());
+
+    const asAdmin = testEnv.authenticatedContext(ADMIN).firestore();
+    await assertSucceeds(asAdmin.collection('reports').doc('r1').get());
+    await assertSucceeds(
+      asAdmin.collection('reports').doc('r1').update({ status: 'resolved' })
+    );
+  });
+
+  it('anyone can read config/appSettings; only an admin can write it', async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await ctx.firestore().collection('users').doc(ADMIN).set({ role: 'admin' });
+    });
+
+    const asGuest = testEnv.unauthenticatedContext().firestore();
+    await assertSucceeds(asGuest.collection('config').doc('appSettings').get());
+    await assertFails(
+      asGuest.collection('config').doc('appSettings').set({ maintenanceMode: true })
+    );
+
+    const asAdmin = testEnv.authenticatedContext(ADMIN).firestore();
+    await assertSucceeds(
+      asAdmin.collection('config').doc('appSettings').set({ maintenanceMode: true }, { merge: true })
+    );
   });
 });

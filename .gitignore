@@ -1,66 +1,195 @@
-# Miscellaneous
-*.class
-*.log
-*.pyc
-*.swp
-.DS_Store
-.atom/
-.build/
-.buildlog/
-.history
-.svn/
-.swiftpm/
-migrate_working_dir/
-
-# IntelliJ related
-*.iml
-*.ipr
-*.iws
-.idea/
-
-# The .vscode folder contains launch configuration and tasks you configure in
-# VS Code which you may wish to be included in version control, so this line
-# is commented out by default.
-.vscode/
-
-# Flutter/Dart/Pub related
-**/doc/api/
-**/ios/Flutter/.last_build_id
+# ==============================================================================
+# Flutter / Dart / Pub
+# ==============================================================================
 .dart_tool/
+**/.dart_tool/
 .flutter-plugins
 .flutter-plugins-dependencies
+.packages
 .pub-cache/
 .pub/
-/build/
-/coverage/
+build/
+**/build/
+coverage/
+**/coverage/
+**/doc/api/
+**/ios/Flutter/.last_build_id
 
-# Symbolication related
+# Symbolication & Obfuscation
 app.*.symbols
-
-# Obfuscation related
 app.*.map.json
 
-# Android Studio will place build artifacts here
-/android/app/debug
-/android/app/profile
-/android/app/release
+# ==============================================================================
+# Test & Golden Test Artifacts
+# ==============================================================================
+**/failures/
+test/**/failures/
+*.isolatedDiff.png
+*.maskedDiff.png
+*.testImage.png
+*.masterImage.png
+.test_runtime/
 
-# Sensitive and Config files
+# ==============================================================================
+# Node / NPM / Cloudflare Wrangler / Serverless
+# ==============================================================================
+node_modules/
+**/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.wrangler/
+**/.wrangler/
+.dev.vars
+.dev.vars.*
+
+# ==============================================================================
+# Firebase CLI, Emulators & Cloud Functions
+# ==============================================================================
+.firebase/
+**/.firebase/
+firebase-debug.log*
+firestore-debug.log*
+ui-debug.log*
+pubsub-debug.log*
+functions/.runtimeconfig.json
+**/functions/.runtimeconfig.json
+
+# ==============================================================================
+# Confidential / Sensitive Files & Credentials
+# ==============================================================================
+# Environment variable files
 .env
 .env.*
 *.env
+*.env.json
+
+# General secrets
+secrets.json
+*secret*.json
+
+# Signing properties & keys
+key.properties
+**/key.properties
 *.pem
 *.key
 *.cert
-key.properties
-android/key.properties
-ios/key.properties
-secrets.json
+*.crt
+*.der
+*.p12
+*.pfx
+*.bks
+*.jks
+*.keystore
 
-# Firebase configuration
+# Service accounts & Cloud API credentials
+*serviceAccountKey*.json
+*service-account*.json
+*-adminsdk-*.json
+*firebase-adminsdk*.json
+*credentials*.json
+client_secret*.json
+
+# Firebase client configurations (contain project API keys/sender IDs)
 google-services.json
+**/google-services.json
 GoogleService-Info.plist
+**/GoogleService-Info.plist
 
-# Mac / Windows system files
+# ==============================================================================
+# Android
+# ==============================================================================
+.gradle/
+**/.gradle/
+.kotlin/
+**/.kotlin/
+local.properties
+**/local.properties
+android/app/debug/
+android/app/profile/
+android/app/release/
+captures/
+**/captures/
+.cxx/
+**/.cxx/
+GeneratedPluginRegistrant.java
+gradle-wrapper.jar
+android/gradle/wrapper/gradle-wrapper.jar
+android/gradlew
+android/gradlew.bat
+
+# ==============================================================================
+# iOS & macOS
+# ==============================================================================
+**/DerivedData/
+**/xcuserdata/
+*.xcworkspace/xcuserdata/
+*.xcuserdatad/
+**/Pods/
+**/.symlinks/
+ios/Flutter/App.framework
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+ios/Flutter/Generated.xcconfig
+ios/Flutter/flutter_export_environment.sh
+ios/Flutter/app.flx
+ios/Flutter/app.zip
+ios/Flutter/flutter_assets/
+ios/Flutter/ephemeral/
+ios/ServiceDefinitions.json
+Runner/GeneratedPluginRegistrant.*
+ios/Runner/GeneratedPluginRegistrant.*
+*.mobileprovision
+*.provisionprofile
+
+# ==============================================================================
+# Web Build Artifacts
+# ==============================================================================
+web/build/
+**/web/build/
+
+# ==============================================================================
+# IDEs & Editors
+# ==============================================================================
+.idea/
+**/.idea/
+*.iml
+**/*.iml
+*.ipr
+*.iws
+.vscode/
+**/.vscode/
+*.sublime-project
+*.sublime-workspace
+.atom/
+.history
+.buildlog/
+
+# ==============================================================================
+# OS Files, Archives & Ephemeral Dumps
+# ==============================================================================
+.DS_Store
+**/.DS_Store
 Thumbs.db
+**/Thumbs.db
 Desktop.ini
+**/Desktop.ini
+*.swp
+*.swo
+*~
+*.class
+*.pyc
+*.log
+*.bak
+*.tmp
+*.temp
+migrate_working_dir/
+
+# Compression & Archive formats
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.rar
+*.7z

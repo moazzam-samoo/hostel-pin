@@ -16,6 +16,15 @@ service cloud.firestore {
       return isAuthenticated() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'owner';
     }
 
+    // Phase 9 — admin role validation, same shape as isOwner().
+    // Grants admin-only broad read access on users/*, hostels/*,
+    // verifications/*, reports/*. Highest blast-radius rule in this
+    // project — every prior rule was "a user can read/write their own
+    // doc only"; this is the first genuinely broad grant.
+    function isAdmin() {
+      return isAuthenticated() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
     // D.6 — server-side backstop mirroring Validators.required/Validators.price
     // client-side checks. Applied on create; update re-checks the fields an
     // owner edit can actually change (name/price/city/etc.), while rating/
@@ -47,7 +56,8 @@ service cloud.firestore {
       // another user's doc (see UserRepository.getUserDoc call sites, all
       // self-uid only); ownerName/etc. shown on cards is denormalized
       // onto the hostel/activity/saved docs instead.
-      allow read: if request.auth.uid == userId;
+      // Phase 9: admin can read ANY user doc (admin panel Users/Owners tables).
+      allow read: if request.auth.uid == userId || isAdmin();
 
       allow create: if request.auth.uid == userId &&
                     request.resource.data.role in ['student', 'owner'];
@@ -64,7 +74,25 @@ service cloud.firestore {
                     request.resource.data.role == resource.data.role &&
                     request.resource.data.verificationStatus == resource.data.verificationStatus;
 
-      allow delete: if false;
+      // Phase 9 Block G.5/E.5 — admin-only, narrowly scoped update. Without
+      // this, isAdmin()'s read grant above is useless for the two write
+      // paths that actually need it: Verification Queue's Approve/Reject
+      // (flips verificationStatus) and the Users/Owners tables' Block/
+      // Unblock action (flips status). Scoped by affectedKeys() the same
+      // way the hostels' viewCount-only increment rule below is — an admin
+      // session can never touch displayName/email/role/etc. through this
+      // rule, only these two fields plus their timestamp.
+      allow update: if isAdmin() &&
+                    request.resource.data.diff(resource.data).affectedKeys()
+                      .hasOnly(['verificationStatus', 'status', 'updatedAt']);
+
+      // Phase 9 Block E.5 — v1 user delete is admin-only, Firestore-doc-only
+      // (no Cloud Function exists in this project to also delete the
+      // underlying Firebase Auth account — every function here is
+      // Blaze-blocked; same accepted-gap shape as Phase 7's orphaned
+      // Cloudinary assets on listing delete, Block A.10). Never
+      // self-deletable — `isOwner()`/a plain user is not granted this.
+      allow delete: if isAdmin();
 
       // Saved Subcollection — owner-only (the signed-in student who owns
       // this saved-list subcollection, not a hostel owner; same field
@@ -79,8 +107,11 @@ service cloud.firestore {
       // Public read when published — signed-out students can browse the
       // catalog; an owner can always read their own doc regardless of
       // status (draft/pending/rejected included).
+      // Phase 9: admin can read ANY hostel regardless of status (admin panel
+      // All Hostels table needs draft/pending/rejected visible too).
       allow read: if resource.data.status == 'published' ||
-                  (isAuthenticated() && resource.data.ownerId == request.auth.uid);
+                  (isAuthenticated() && resource.data.ownerId == request.auth.uid) ||
+                  isAdmin();
 
       // Only owners can create, and only for themselves. `status` may
       // never be 'published' on create (2.A — every brand-new listing goes
@@ -124,7 +155,21 @@ service cloud.firestore {
                     request.resource.data.diff(resource.data).affectedKeys().hasOnly(['viewCount']) &&
                     request.resource.data.viewCount == resource.data.viewCount + 1;
 
-      allow delete: if isOwner() && resource.data.ownerId == request.auth.uid;
+      // Phase 9 Block G.5 — admin-only, narrowly scoped to `status`. This is
+      // the ONLY path allowed to move a hostel pending/draft -> published
+      // (the owner-scoped update rule above deliberately blocks that
+      // transition, per its own comment) — Verification Queue's Approve
+      // action is the sole legitimate caller. Also covers Reject, which
+      // never needs to touch a hostel's status but is scoped the same way
+      // for symmetry with the users/{uid} admin rule above.
+      allow update: if isAdmin() &&
+                    request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']);
+
+      // Phase 9 Block E.5 — Hostels table's Delete action reuses the
+      // already-real HostelRepository.delete() (row 12); admin needs to be
+      // able to call it, same orphaned-Cloudinary-assets accepted gap as
+      // the owner's own delete path (Phase 7 Block A.10).
+      allow delete: if (isOwner() && resource.data.ownerId == request.auth.uid) || isAdmin();
     }
 
     // Activities Collection — owner-facing only (Dashboard's own feed),
@@ -164,7 +209,8 @@ service cloud.firestore {
     // read fragments of.
     match /verifications/{userId} {
       // Owners can read their own verification doc only.
-      allow read: if isOwner() && request.auth.uid == userId;
+      // Phase 9: admin can read ANY verification doc (Verification Queue).
+      allow read: if (isOwner() && request.auth.uid == userId) || isAdmin();
 
       // An owner never creates a doc that's already approved/rejected/
       // changesRequested — only 'draft' or 'pending' are legal starting
@@ -190,7 +236,35 @@ service cloud.firestore {
                     request.resource.data.get('reviewedBy', null) == resource.data.get('reviewedBy', null) &&
                     request.resource.data.get('rejectionReason', null) == resource.data.get('rejectionReason', null);
 
+      // Phase 9 Block G.5/G.6/G.7 — the admin write side of this doc. Only
+      // path allowed to move status -> approved/rejected/changesRequested
+      // and set reviewedAt/reviewedBy/rejectionReason (the owner-scoped
+      // rule above explicitly forbids all of that for their own doc).
+      // Broad on fields (an admin decision legitimately touches all of
+      // status/reviewedAt/reviewedBy/rejectionReason together) but scoped
+      // to isAdmin() callers only — this is the one write this whole rules
+      // file has the least per-field narrowing on, matching the plan's own
+      // "highest blast-radius" framing for this exact action.
+      allow update: if isAdmin();
+
       allow delete: if false;
+    }
+
+    // Phase 9 — Reports collection (Notification Center's Reports tab).
+    // No student-facing "report this listing" UI exists yet — this
+    // collection has a reader/resolver (admin panel) but no real writer
+    // today. See TASK-Phase-9 Block F.2.
+    match /reports/{reportId} {
+      allow read: if isAdmin();
+      allow create: if isAuthenticated();
+      allow update: if isAdmin();
+      allow delete: if false;
+    }
+
+    // Phase 9 — App config singleton (admin Settings feature-flag toggles).
+    match /config/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
     }
   }
 }

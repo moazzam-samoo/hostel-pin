@@ -1,11 +1,1 @@
-{
-  "flutter": {"platforms": {"android": {"default": {"projectId": "hostel-finder-ece09", "appId": "1:672317431571:android:c1f7e5bb9da0a1bc8344e6", "fileOutput": "android/app/google-services.json"}}, "dart": {"lib/firebase_options.dart": {"projectId": "hostel-finder-ece09", "configurations": {"android": "1:672317431571:android:c1f7e5bb9da0a1bc8344e6", "ios": "1:672317431571:ios:32397449e7f13f348344e6"}}}}},
-  "firestore": {
-    "rules": "firestore.rules",
-    "indexes": "firestore.indexes.json"
-  },
-  "functions": {
-    "source": "functions",
-    "ignore": ["node_modules", ".git", "*.log"]
-  }
-}
+{"flutter":{"platforms":{"android":{"default":{"projectId":"hostel-finder-ece09","appId":"1:672317431571:android:c1f7e5bb9da0a1bc8344e6","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"hostel-finder-ece09","configurations":{"android":"1:672317431571:android:c1f7e5bb9da0a1bc8344e6","web":"1:672317431571:web:44657d65ba4058e08344e6"}}}}},"firestore":{"rules":"firestore.rules","indexes":"firestore.indexes.json"},"functions":{"source":"functions","ignore":["node_modules",".git","*.log"]},"hosting":{"public":"build/web","ignore":["firebase.json","**/.*","**/node_modules/**"],"rewrites":[{"source":"**","destination":"/index.html"}]}}

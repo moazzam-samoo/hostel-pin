@@ -7,6 +7,8 @@ import '../../data/repositories/hostel_repository.dart';
 import '../../data/repositories/saved_repository.dart';
 import '../../data/repositories/activity_repository.dart';
 import '../../data/repositories/verification_repository.dart';
+import '../../data/repositories/report_repository.dart';
+import '../../data/repositories/app_config_repository.dart';
 import '../../data/services/session_service.dart';
 import '../../data/services/storage_service.dart';
 import '../../data/services/location_service.dart';
@@ -45,5 +47,13 @@ class InitialBinding extends Bindings {
     Get.put(StorageService(), permanent: true);
     Get.put(LocationService(), permanent: true);
     Get.put(VerificationRepository(), permanent: true);
+    // Phase 9 — admin panel repositories. Registered app-wide (same
+    // permanent-in-InitialBinding pattern as everything else above) since
+    // AdminNotificationsController/AdminSettingsController reach for these
+    // via Get.find<...>() directly, not Get.put(), avoiding the
+    // double-registration footgun of a controller re-`Get.put`-ing a
+    // repository that should be a single shared singleton.
+    Get.put(ReportRepository(), permanent: true);
+    Get.put(AppConfigRepository(), permanent: true);
   }
 }

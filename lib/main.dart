@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -24,7 +25,7 @@ void main() async {
 
   runApp(
     ScreenUtilInit(
-      designSize: const Size(375, 812),
+      designSize: kIsWeb ? const Size(1440, 900) : const Size(375, 812),
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (context, child) {

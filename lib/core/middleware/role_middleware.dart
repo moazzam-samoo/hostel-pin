@@ -27,6 +27,12 @@ class RoleMiddleware extends GetMiddleware {
       return null;
     }
 
+    // Admin users accessing student/owner shells should be redirected to admin shell.
+    if (user.role == UserRole.admin &&
+        (route == Routes.studentShell || route == Routes.ownerShell)) {
+      return const RouteSettings(name: Routes.adminShell);
+    }
+
     if (route == Routes.studentShell && user.role == UserRole.owner) {
       return const RouteSettings(name: Routes.ownerShell);
     }

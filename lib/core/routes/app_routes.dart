@@ -37,4 +37,16 @@ class Routes {
   static const String ownerPublishSuccess = '/owner/publish-success';
   static const String ownerEditProfile = '/owner/edit-profile';
   static const String ownerAccountSettings = '/owner/account-settings';
+
+  // Admin
+  static const String adminLogin = '/admin/login';
+  static const String adminShell = '/admin';
+  static const String adminDashboard = '/admin/dashboard';
+  static const String adminUsers = '/admin/users';
+  static const String adminOwners = '/admin/owners';
+  static const String adminHostels = '/admin/hostels';
+  static const String adminNotifications = '/admin/notifications';
+  static const String adminVerification = '/admin/verification';
+  static const String adminReview = '/admin/review';
+  static const String adminSettings = '/admin/settings';
 }

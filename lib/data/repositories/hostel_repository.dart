@@ -60,6 +60,19 @@ class HostelRepository {
     });
   }
 
+  /// Admin-facing stream for all listings regardless of status (E.4)
+  Stream<List<HostelModel>> streamAllAdmin({int limit = kHostelPageSize}) {
+    return _hostelsRef
+        .limit(limit)
+        .snapshots()
+        .map((snapshot) {
+      final list = snapshot.docs.map((doc) => doc.data()).toList();
+      // Sort client-side by document ID descending
+      list.sort((a, b) => b.id.compareTo(a.id));
+      return list;
+    });
+  }
+
   Stream<List<HostelModel>> streamNearbyHostels(double latitude, double longitude, double radiusInKm) {
     return GeoCollectionReference(_hostelsRef)
         .subscribeWithin(
@@ -147,6 +160,45 @@ class HostelRepository {
       });
     } catch (e) {
       Logger.e('Error incrementing views for $id: $e');
+    }
+  }
+
+  Future<int> countAll() async {
+    try {
+      final aggregateQuery = await _hostelsRef.count().get();
+      return aggregateQuery.count ?? 0;
+    } catch (e) {
+      Logger.e('Error counting all hostels: $e');
+      throw Exception('Failed to count hostels: $e');
+    }
+  }
+
+  Future<int> countByStatus(ListingStatus status) async {
+    try {
+      final aggregateQuery = await _hostelsRef.where('status', isEqualTo: status.name).count().get();
+      return aggregateQuery.count ?? 0;
+    } catch (e) {
+      Logger.e('Error counting hostels by status: $e');
+      throw Exception('Failed to count hostels: $e');
+    }
+  }
+
+  /// Phase 9 Block E.3 — the Owners table's "Total Listing" column. A cheap
+  /// server-side count() rather than fetching every listing to count them
+  /// client-side. Still a genuine per-row read when the table calls this
+  /// once per visible owner (recorded as a known perf question, per Block
+  /// E.3's own instruction, not silently solved) — but it now goes through
+  /// this repository instead of a controller reaching for
+  /// FirebaseFirestore.instance directly, keeping the "repositories are the
+  /// only things that touch a data source" MVVM boundary this app follows
+  /// everywhere else.
+  Future<int> countByOwner(String ownerId) async {
+    try {
+      final aggregateQuery = await _hostelsRef.where('ownerId', isEqualTo: ownerId).count().get();
+      return aggregateQuery.count ?? 0;
+    } catch (e) {
+      Logger.e('Error counting hostels for owner $ownerId: $e');
+      return 0;
     }
   }
 }

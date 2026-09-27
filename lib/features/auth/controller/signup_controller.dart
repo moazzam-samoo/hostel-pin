@@ -64,8 +64,15 @@ class SignupController extends GetxController {
         );
         await _userRepo.createUserDoc(newUserDoc);
 
-        Get.offAllNamed(
-            role == UserRole.student ? Routes.studentShell : Routes.ownerShell);
+        String shellRoute;
+        if (role == UserRole.admin) {
+          shellRoute = Routes.adminShell;
+        } else if (role == UserRole.student) {
+          shellRoute = Routes.studentShell;
+        } else {
+          shellRoute = Routes.ownerShell;
+        }
+        Get.offAllNamed(shellRoute);
       }
     } on Failure catch (f) {
       AppSnackbar.showGlobal(message: f.message, type: SnackbarType.error);
@@ -84,9 +91,13 @@ class SignupController extends GetxController {
         fallbackRole: authController.selectedRole.value ?? UserRole.student,
       );
       if (result != null) {
-        Get.offAllNamed(result.role == UserRole.student
-            ? Routes.studentShell
-            : Routes.ownerShell);
+        if (result.role == UserRole.admin) {
+          Get.offAllNamed(Routes.adminShell);
+        } else {
+          Get.offAllNamed(result.role == UserRole.student
+              ? Routes.studentShell
+              : Routes.ownerShell);
+        }
       }
     } on Failure catch (f) {
       AppSnackbar.showGlobal(message: f.message, type: SnackbarType.error);

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'core/bindings/initial_binding.dart';
@@ -17,7 +18,11 @@ class HostelFinderApp extends StatelessWidget {
       theme: AppTheme.light,
       themeMode: ThemeMode.light, // Default to light theme as requested
       initialBinding: InitialBinding(),
-      initialRoute: Routes.splash,
+      // The web build only ever serves the admin panel — nothing else
+      // under features/ is designed for desktop web, so skip the mobile
+      // splash/onboarding flow entirely on web and go straight to the
+      // admin login gate. AdminMiddleware handles the signed-in-already case.
+      initialRoute: kIsWeb ? Routes.adminLogin : Routes.splash,
       getPages: AppPages.pages,
       builder: (context, child) {
         final mediaQueryData = MediaQuery.of(context);

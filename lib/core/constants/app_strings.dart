@@ -464,4 +464,192 @@ class AppStrings {
   static String amenitiesSelectedCount(int count) => '$count selected';
   static String roomsAndBeds(String rooms, String beds) => '$rooms rooms, $beds beds';
   static const String notAvailableDash = '—';
+
+  // ── Phase 9 — Admin Web Panel ─────────────────────────────────────────
+  // Admin login
+  static const String adminAppTitle = 'HostelPin Admin';
+  static const String adminDefaultDisplayName = 'Admin';
+  static const String adminLoginSubtitle = 'Sign in to the admin dashboard';
+  static const String adminSignInButton = 'Sign In';
+  static const String adminAccessDenied =
+      'Access denied. This account does not have admin privileges.';
+
+  // Shell / sidebar / top bar
+  static const String adminNavDashboard = 'Dashboard';
+  static const String adminNavUsers = 'Users';
+  static const String adminNavOwners = 'Owners';
+  static const String adminNavHostels = 'Hostels';
+  static const String adminNavNotifications = 'Notification';
+  static const String adminNavVerificationQueue = 'Verification Queue';
+  static const String adminNavSettings = 'Settings';
+  static const String adminSignOut = 'Logout';
+  static const String adminLogoutConfirmTitle = 'Log Out';
+  static const String adminLogoutConfirmMessage =
+      'Are you sure you want to sign out of the admin panel?';
+  static const String adminTopBarSearchHint = 'Search...';
+
+  // Dashboard
+  static const String adminDashboardOverview = 'Overview';
+  static String adminDashboardWelcome(String name) =>
+      "Welcome back, $name. Here's what's happening today.";
+  static const String adminStatTotalStudents = 'Total Students';
+  static const String adminStatTotalOwners = 'Total Owners';
+  static const String adminStatTotalHostels = 'Total hostels';
+  static const String adminStatActiveListings = 'Active listing';
+  static const String adminUserGrowthTitle = 'User Growth';
+  static const String adminUserGrowthSubtitle = 'Monthly student registrations';
+  static const String adminUserDistributionTitle = 'User Distribution';
+  static const String adminNoData = 'No Data';
+  static const String adminLegendStudents = 'Students';
+  static const String adminLegendOwners = 'Owners';
+  static const String adminLegendBoth = 'Both';
+  static const String adminDashboardLoadError = 'Failed to load dashboard data.';
+
+  // Users / Owners / Hostels tables
+  static const String adminManageUsersTitle = 'Manage Users';
+  static const String adminManageOwnersTitle = 'Manage Owners';
+  static const String adminManageHostelsTitle = 'Manage Hostels';
+  static const String adminNoUsersFound = 'No users found.';
+  static const String adminNoOwnersFound = 'No owners found.';
+  static const String adminNoHostelsFound = 'No hostels found.';
+  static const String adminStudentsDirectory = 'Students Directory';
+  static const String adminOwnersDirectory = 'Owners Directory';
+  static const String adminHostelsDirectory = 'Hostels Directory';
+  static const String adminColName = 'Name';
+  static const String adminColEmail = 'Email';
+  static const String adminColJoined = 'Joined';
+  static const String adminColStatus = 'Status';
+  static const String adminColActions = 'Actions';
+  static const String adminColListings = 'Listings';
+  static const String adminColVerification = 'Verification';
+  static const String adminColCity = 'City';
+  static const String adminColPrice = 'Price';
+  static const String adminLoadingLabel = 'Loading…';
+  static const String adminBlockUserTooltip = 'Block User';
+  static const String adminUnblockUserTooltip = 'Unblock User';
+  static const String adminBlockOwnerTooltip = 'Block Owner';
+  static const String adminUnblockOwnerTooltip = 'Unblock Owner';
+  static const String adminDeleteUserTooltip = 'Delete User';
+  static const String adminDeleteOwnerTooltip = 'Delete Owner';
+  static const String adminDeleteHostelTooltip = 'Delete Hostel';
+  static const String adminConfirmDeleteTitle = 'Confirm Delete';
+  static String adminConfirmDeleteMessage(String name) =>
+      'Are you sure you want to delete $name? This action cannot be undone.';
+  static const String adminDeleteButton = 'Delete';
+  static const String adminCancelButton = 'Cancel';
+  static String adminUserStatusUpdated(String name, String status) =>
+      '$name is now $status.';
+  static String adminUserDeleted(String name) => '$name deleted.';
+  static const String adminGenericLoadError = 'Failed to load data.';
+  static const String adminGenericUpdateError = 'Failed to update. Please try again.';
+  static const String adminGenericDeleteError = 'Failed to delete. Please try again.';
+
+  // Notification Center
+  static const String adminNotificationsTitle = 'Notifications';
+  static const String adminMarkAllAsRead = 'Mark all as read';
+  static const String adminClearAll = 'Clear All';
+  static const String adminTabAll = 'All';
+  static const String adminTabVerifications = 'Verifications';
+  static const String adminTabReports = 'Reports';
+  static const String adminTabSystem = 'System';
+  static const String adminNoNotifications = 'No notifications here.';
+  static const String adminMarkAsReadTooltip = 'Mark as read';
+  static const String adminAllNotificationsCleared = 'All notifications cleared.';
+  static const String adminNotificationLoadError = 'Failed to load notifications.';
+  static String adminPendingVerificationNotifTitle(String name) =>
+      '$name submitted KYC documents.';
+  static const String adminPendingVerificationNotifHeading = 'Pending Verification';
+  static const String adminHostelReportedNotifHeading = 'Hostel Reported';
+  static String adminReportReasonMessage(String reason) => 'Reason: $reason';
+  // Notification Center's System tab is a stub/manually-seeded category
+  // (Block F.3) — this project has no deployed scheduled Cloud Functions
+  // (Blaze-blocked), so "System" copy is decorative, not live automation.
+  static const String adminSystemNotifStubTitle = 'System Update';
+  static const String adminSystemNotifStubMessage =
+      'Weekly system backup completed successfully.';
+
+  // Verification Queue + Review
+  static const String adminVerificationQueueTitle = 'Verification Queue';
+  static const String adminVerificationQueueSubtitle =
+      'Review and process new hostel and owner registrations.';
+  static String adminPendingCountBadge(int count) => '$count PENDING';
+  static const String adminTabIdentityPending = 'Identity Pending';
+  static const String adminTabHostelPending = 'Hostel Pending';
+  static const String adminTabChangesRequired = 'Changes Required';
+  static const String adminColSubmissionDate = 'Submission Date';
+  static const String adminColOwnerName = 'Owner Name';
+  static const String adminColHostelName = 'Hostel Name';
+  static const String adminColType = 'Type';
+  static const String adminTypeHostel = 'Hostel';
+  static const String adminTypeIdentity = 'Identity';
+  static const String adminReviewButton = 'Review';
+  static const String adminNoSubmissionsFound = 'No submissions in this category.';
+  static const String adminBackToQueue = 'Back to queue';
+  static String adminReviewHeading(String ownerName) => 'Review: $ownerName';
+  static const String adminOwnerDetailsSection = 'Owner Details';
+  static const String adminIdentityDocumentsSection = 'Identity Documents';
+  static const String adminPropertyDetailsSection = 'Property Details';
+  static const String adminOwnershipProofSection = 'Ownership Proof';
+  static const String adminPropertyPhotosSection = 'Property Photos';
+  static const String adminFullNameLabel = 'Full Name';
+  static const String adminCnicNumberLabel = 'CNIC Number';
+  static const String adminPhoneNumberLabel = 'Phone Number';
+  static const String adminDobLabel = 'Date of Birth';
+  static const String adminHostelNameFieldLabel = 'Hostel Name';
+  static const String adminAddressLabel = 'Address';
+  static const String adminCityLabel = 'City';
+  static const String adminCapacityLabel = 'Capacity';
+  static String adminCapacityValue(int rooms, int beds) => '$rooms Rooms / $beds Beds';
+  static const String adminCnicFrontLabel = 'CNIC Front';
+  static const String adminCnicBackLabel = 'CNIC Back';
+  static const String adminLiveSelfieCheckLabel = 'Live Selfie Check';
+  static const String adminAiMatchedBadge = 'AI Matched';
+  // Per IMPLEMENTATION_PLAN.md §9.A/D1 and TASK-Phase-9 Block G.2: identity
+  // verification stays manual. This match figure is NOT wired to any real
+  // computation — it is static, decorative copy that echoes the mockup's
+  // layout only. Never compute or persist a real percentage here.
+  static const String adminAiMatchDecorativeValue = '92% Match';
+  static const String adminAiMatchDecorativeCaption =
+      'Facial recognition indicates a high probability match between the live selfie and the provided CNIC photo.';
+  static const String adminViewFullDocumentButton = 'View Full Document';
+  static const String adminDocumentNotProvided = 'Not provided';
+  static const String adminDocumentLoadError = 'Could not load this document.';
+  static const String adminRequestChangesButton = 'Request Changes';
+  static const String adminRejectButton = 'Reject';
+  static const String adminApproveButton = 'Approve Verification';
+  static const String adminReviewFooterNote = 'Please verify all documents before making a decision.';
+  static const String adminRejectDialogTitle = 'Reject Submission';
+  static const String adminRequestChangesDialogTitle = 'Request Changes';
+  static const String adminReasonFieldLabel = 'Reason';
+  static const String adminReasonRequiredError = 'Please provide a reason.';
+  static const String adminSubmissionApproved = 'Submission approved.';
+  static const String adminSubmissionRejected = 'Submission rejected.';
+  static const String adminChangesRequested = 'Changes requested.';
+  static const String adminReviewActionError = 'Failed to update submission. Please try again.';
+  // Identity Pending / Hostel Pending currently resolve to the same
+  // `pending` filter — this app's verification wizard produces ONE combined
+  // submission (identity + hostel info together), so there is no real data
+  // distinguishing an "identity-only" pending state from a "hostel-only"
+  // one. Documented here rather than fabricating a split the data can't
+  // support (same discipline as the Dashboard's "Both" donut slice).
+
+  // Settings
+  static const String adminSettingsTitle = 'Settings';
+  static const String adminSettingsSubtitle =
+      'Update your personal information and security credentials to maintain account safety.';
+  static const String adminEditProfileButton = 'Edit Profile';
+  static const String adminEditProfileDialogTitle = 'Edit Profile';
+  static const String adminSaveButton = 'Save';
+  static const String adminFeatureControlsTitle = 'Feature Controls';
+  static const String adminAllowNewSignupsTitle = 'Allow New Signups';
+  static const String adminAllowNewSignupsSubtitle = 'Enable public registration for students';
+  static const String adminWhatsappIntegrationTitle = 'WhatsApp Integration';
+  static const String adminWhatsappIntegrationSubtitle = 'Direct chat between owners and students';
+  static const String adminAutoApproveOwnersTitle = 'Auto-approve Owners';
+  static const String adminAutoApproveOwnersSubtitle = 'Skip verification for premium partners';
+  static const String adminMaintenanceModeTitle = 'Maintenance Mode';
+  static const String adminMaintenanceModeSubtitle = 'Take all hostel listings offline';
+  static const String adminSettingsSaved = 'Settings updated.';
+  static const String adminSettingsSaveError = 'Failed to save settings. Please try again.';
+  static const String adminProfileUpdated = 'Profile updated.';
 }

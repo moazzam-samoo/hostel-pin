@@ -1,0 +1,47 @@
+import 'package:get/get.dart';
+import '../../../../data/repositories/hostel_repository.dart';
+import '../../../../data/models/hostel_model.dart';
+import '../../../../core/constants/app_strings.dart';
+import '../../../../shared/widgets/feedback/app_snackbar.dart';
+
+class AdminHostelsController extends GetxController {
+  final HostelRepository _hostelRepository = Get.find<HostelRepository>();
+
+  final RxList<HostelModel> hostels = <HostelModel>[].obs;
+  final RxBool isLoading = true.obs;
+  final RxInt currentLimit = 10.obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    _subscribeToHostels();
+  }
+
+  void _subscribeToHostels() {
+    isLoading.value = true;
+    _hostelRepository.streamAllAdmin(limit: currentLimit.value).listen((data) {
+      hostels.assignAll(data);
+      isLoading.value = false;
+    }, onError: (e) {
+      isLoading.value = false;
+      AppSnackbar.showGlobal(message: AppStrings.adminGenericLoadError, type: SnackbarType.error);
+    });
+  }
+
+  void loadMore() {
+    currentLimit.value += 10;
+    _subscribeToHostels();
+  }
+
+  Future<void> deleteHostel(HostelModel hostel) async {
+    try {
+      await _hostelRepository.delete(hostel.id);
+      AppSnackbar.showGlobal(
+        message: AppStrings.adminUserDeleted(hostel.name),
+        type: SnackbarType.success,
+      );
+    } catch (e) {
+      AppSnackbar.showGlobal(message: AppStrings.adminGenericDeleteError, type: SnackbarType.error);
+    }
+  }
+}
