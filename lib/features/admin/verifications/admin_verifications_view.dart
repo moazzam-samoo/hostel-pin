@@ -10,6 +10,7 @@ import '../../../../shared/widgets/buttons/primary_button.dart';
 import '../../../../shared/widgets/buttons/secondary_button.dart';
 import '../../../../shared/widgets/feedback/confirm_dialog.dart';
 import '../../../../shared/widgets/inputs/app_text_field.dart';
+import '../../../../core/utils/responsive.dart';
 
 /// Phase 9 Block G — Verification Queue + Review, the highest-consequence
 /// screen in this phase. One controller, two states: the queue list (tabs +
@@ -580,54 +581,80 @@ class _ReviewDetail extends GetView<AdminVerificationsController> {
   }
 
   Widget _actionBar(BuildContext context) {
+    final infoWidget = Row(
+      children: [
+        const Icon(Icons.info_outline, size: 16, color: AppColors.textSecondary),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            AppStrings.adminReviewFooterNote,
+            style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary),
+          ),
+        ),
+      ],
+    );
+
+    final isDesktop = Responsive.isDesktop(context);
+
+    final actionsWidget = Wrap(
+      spacing: 12,
+      runSpacing: 12,
+      alignment: WrapAlignment.end,
+      children: [
+        Obx(() => SecondaryButton(
+              text: AppStrings.adminRequestChangesButton,
+              intent: ButtonIntent.primary,
+              width: isDesktop ? 180 : null,
+              isLoading: controller.isSubmittingDecision.value,
+              onPressed: () => _showReasonDialog(
+                title: AppStrings.adminRequestChangesDialogTitle,
+                onSubmit: controller.requestChanges,
+              ),
+            )),
+        Obx(() => SecondaryButton(
+              text: AppStrings.adminRejectButton,
+              intent: ButtonIntent.secondary,
+              width: isDesktop ? 140 : null,
+              isLoading: controller.isSubmittingDecision.value,
+              onPressed: () => _showReasonDialog(
+                title: AppStrings.adminRejectDialogTitle,
+                onSubmit: controller.reject,
+              ),
+            )),
+        Obx(() => SizedBox(
+              width: isDesktop ? 220 : double.infinity,
+              child: PrimaryButton(
+                text: AppStrings.adminApproveButton,
+                isLoading: controller.isSubmittingDecision.value,
+                onPressed: () => _confirmApprove(context),
+              ),
+            )),
+      ],
+    );
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      padding: EdgeInsets.symmetric(
+          horizontal: isDesktop ? 24 : 16, vertical: 16),
       decoration: const BoxDecoration(
         color: Colors.white,
         border: Border(top: BorderSide(color: AppColors.border)),
       ),
-      child: Row(
-        children: [
-          const Icon(Icons.info_outline, size: 16, color: AppColors.textSecondary),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              AppStrings.adminReviewFooterNote,
-              style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary),
+      child: isDesktop
+          ? Row(
+              children: [
+                Expanded(child: infoWidget),
+                const SizedBox(width: 24),
+                actionsWidget,
+              ],
+            )
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                infoWidget,
+                const SizedBox(height: 16),
+                actionsWidget,
+              ],
             ),
-          ),
-          Obx(() => SecondaryButton(
-                text: AppStrings.adminRequestChangesButton,
-                intent: ButtonIntent.primary,
-                width: 180,
-                isLoading: controller.isSubmittingDecision.value,
-                onPressed: () => _showReasonDialog(
-                  title: AppStrings.adminRequestChangesDialogTitle,
-                  onSubmit: controller.requestChanges,
-                ),
-              )),
-          const SizedBox(width: 12),
-          Obx(() => SecondaryButton(
-                text: AppStrings.adminRejectButton,
-                intent: ButtonIntent.secondary,
-                width: 140,
-                isLoading: controller.isSubmittingDecision.value,
-                onPressed: () => _showReasonDialog(
-                  title: AppStrings.adminRejectDialogTitle,
-                  onSubmit: controller.reject,
-                ),
-              )),
-          const SizedBox(width: 12),
-          Obx(() => SizedBox(
-                width: 220,
-                child: PrimaryButton(
-                  text: AppStrings.adminApproveButton,
-                  isLoading: controller.isSubmittingDecision.value,
-                  onPressed: () => _confirmApprove(context),
-                ),
-              )),
-        ],
-      ),
     );
   }
 
