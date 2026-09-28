@@ -28,6 +28,15 @@ import 'package:hostel_finder_app/features/owner/listings/listings_view.dart';
 import 'package:hostel_finder_app/features/student/search/search_controller.dart'
     as app_search;
 import 'package:hostel_finder_app/features/student/search/search_view.dart';
+import 'package:hostel_finder_app/features/admin/auth/admin_login_controller.dart';
+import 'package:hostel_finder_app/features/admin/auth/admin_login_view.dart';
+import 'package:hostel_finder_app/features/admin/users/admin_users_controller.dart';
+import 'package:hostel_finder_app/features/admin/users/admin_users_view.dart';
+import 'package:hostel_finder_app/data/repositories/user_repository.dart';
+import 'package:hostel_finder_app/data/repositories/auth_repository.dart';
+import 'package:hostel_finder_app/data/services/auth_service.dart';
+
+late FakeFirebaseFirestore fakeFirestore;
 
 /// The 6 explicit device sizes TASK-Phase-5.md's D.5 names, plus a 7th
 /// (landscape rotation of the 375x812 baseline) to cover the "+ landscape"
@@ -87,7 +96,7 @@ void main() {
     // Phase 7: these screens' controllers now call Get.find<HostelRepository>()
     // (and friends) directly in a field initializer — a FakeFirebaseFirestore
     // avoids ever touching the real Firebase singleton in a plain widget test.
-    final fakeFirestore = FakeFirebaseFirestore();
+    fakeFirestore = FakeFirebaseFirestore();
     Get.put(HostelRepository(firestore: fakeFirestore));
     Get.put(SavedRepository(firestore: fakeFirestore));
     Get.put(ActivityRepository(firestore: fakeFirestore));
@@ -205,6 +214,34 @@ void main() {
         await tester.pumpAndSettle();
         expect(tester.takeException(), isNull,
             reason: 'Overflow/exception at textScale=$scale');
+      });
+    }
+  });
+
+  group('D.5 — Admin Login View', () {
+    for (final entry in _sizes.entries) {
+      testWidgets('renders with no RenderFlex overflow at ${entry.key}',
+          (tester) async {
+        Get.put(AuthService());
+        Get.put(UserRepository(firestore: fakeFirestore));
+        Get.put(AuthRepository());
+        Get.put(AdminLoginController());
+        await _pumpAtSize(tester, entry.value, const AdminLoginView());
+        expect(tester.takeException(), isNull,
+            reason: 'Overflow/exception at ${entry.key}');
+      });
+    }
+  });
+
+  group('D.5 — Admin Users View', () {
+    for (final entry in _sizes.entries) {
+      testWidgets('renders with no RenderFlex overflow at ${entry.key}',
+          (tester) async {
+        Get.put(UserRepository(firestore: fakeFirestore));
+        Get.put(AdminUsersController());
+        await _pumpAtSize(tester, entry.value, const AdminUsersView());
+        expect(tester.takeException(), isNull,
+            reason: 'Overflow/exception at ${entry.key}');
       });
     }
   });

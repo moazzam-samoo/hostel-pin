@@ -3,7 +3,9 @@ import '../models/user_model.dart';
 import '../../core/errors/error_mapper.dart';
 import '../../core/enums/user_role.dart';
 class UserRepository {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseFirestore _firestore;
+  UserRepository({FirebaseFirestore? firestore})
+      : _firestore = firestore ?? FirebaseFirestore.instance;
 
   CollectionReference get _users => _firestore.collection('users');
 

@@ -4,7 +4,11 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:get/get.dart';
 
 class AuthService extends GetxService {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  FirebaseAuth? _injectedAuth;
+  
+  AuthService({FirebaseAuth? auth}) : _injectedAuth = auth;
+
+  FirebaseAuth get _auth => _injectedAuth ?? FirebaseAuth.instance;
 
   // Lazy, and never touched on web: this app's web build only ever serves
   // the admin panel (email/password sign-in only, no Google button
