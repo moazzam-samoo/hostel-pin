@@ -7,6 +7,7 @@ import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/enums/listing_status.dart';
 import '../../../../data/models/hostel_model.dart';
 import '../../../../core/utils/formatters.dart';
+import '../../../../core/utils/responsive.dart';
 import '../../../../shared/widgets/feedback/confirm_dialog.dart';
 
 class AdminHostelsView extends GetView<AdminHostelsController> {
@@ -36,25 +37,32 @@ class AdminHostelsView extends GetView<AdminHostelsController> {
             }
 
             return SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
-              child: Theme(
-                data: Theme.of(context).copyWith(
-                  dataTableTheme: DataTableThemeData(
-                    headingRowColor: WidgetStateProperty.all(AppColors.background),
-                    dataRowColor: WidgetStateProperty.resolveWith<Color?>((Set<WidgetState> states) => Colors.white),
+              padding: EdgeInsets.symmetric(
+                  horizontal: Responsive.isDesktop(context) ? 24.0 : 12.0),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(minWidth: 720),
+                  child: Theme(
+                    data: Theme.of(context).copyWith(
+                      dataTableTheme: DataTableThemeData(
+                        headingRowColor: WidgetStateProperty.all(AppColors.background),
+                        dataRowColor: WidgetStateProperty.resolveWith<Color?>((Set<WidgetState> states) => Colors.white),
+                      ),
+                    ),
+                    child: PaginatedDataTable(
+                      header: Text(AppStrings.adminHostelsDirectory, style: AppTextStyles.cardTitle),
+                      rowsPerPage: controller.hostels.length > 10 ? 10 : (controller.hostels.isNotEmpty ? controller.hostels.length : 1),
+                      columns: [
+                        DataColumn(label: Text(AppStrings.adminColName, style: AppTextStyles.labelMicro)),
+                        DataColumn(label: Text(AppStrings.adminColCity, style: AppTextStyles.labelMicro)),
+                        DataColumn(label: Text(AppStrings.adminColStatus, style: AppTextStyles.labelMicro)),
+                        DataColumn(label: Text(AppStrings.adminColPrice, style: AppTextStyles.labelMicro)),
+                        DataColumn(label: Text(AppStrings.adminColActions, style: AppTextStyles.labelMicro)),
+                      ],
+                      source: _HostelDataString(controller.hostels, controller),
+                    ),
                   ),
-                ),
-                child: PaginatedDataTable(
-                  header: Text(AppStrings.adminHostelsDirectory, style: AppTextStyles.cardTitle),
-                  rowsPerPage: controller.hostels.length > 10 ? 10 : (controller.hostels.isNotEmpty ? controller.hostels.length : 1),
-                  columns: [
-                    DataColumn(label: Text(AppStrings.adminColName, style: AppTextStyles.labelMicro)),
-                    DataColumn(label: Text(AppStrings.adminColCity, style: AppTextStyles.labelMicro)),
-                    DataColumn(label: Text(AppStrings.adminColStatus, style: AppTextStyles.labelMicro)),
-                    DataColumn(label: Text(AppStrings.adminColPrice, style: AppTextStyles.labelMicro)),
-                    DataColumn(label: Text(AppStrings.adminColActions, style: AppTextStyles.labelMicro)),
-                  ],
-                  source: _HostelDataString(controller.hostels, controller),
                 ),
               ),
             );
