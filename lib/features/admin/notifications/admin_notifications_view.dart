@@ -4,6 +4,7 @@ import 'admin_notifications_controller.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
+import '../../../../core/utils/responsive.dart';
 import '../../../../data/models/admin_notification_model.dart';
 
 class AdminNotificationsView extends GetView<AdminNotificationsController> {
@@ -11,6 +12,30 @@ class AdminNotificationsView extends GetView<AdminNotificationsController> {
 
   @override
   Widget build(BuildContext context) {
+    final actionsRow = Row(
+      children: [
+        Obx(() => controller.notifications.any((n) => !controller.isRead(n.id))
+            ? TextButton.icon(
+                onPressed: controller.markAllAsRead,
+                icon: const Icon(Icons.done_all, color: AppColors.primary),
+                label: Text(
+                  AppStrings.adminMarkAllAsRead,
+                  style: AppTextStyles.body.copyWith(color: AppColors.primary),
+                ),
+              )
+            : const SizedBox.shrink()),
+        const SizedBox(width: 8),
+        TextButton.icon(
+          onPressed: controller.clearAll,
+          icon: const Icon(Icons.clear_all, color: AppColors.error),
+          label: Text(
+            AppStrings.adminClearAll,
+            style: AppTextStyles.body.copyWith(color: AppColors.error),
+          ),
+        ),
+      ],
+    );
+
     return DefaultTabController(
       length: 4,
       child: Column(
@@ -18,35 +43,22 @@ class AdminNotificationsView extends GetView<AdminNotificationsController> {
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(AppStrings.adminNotificationsTitle, style: AppTextStyles.screenTitle),
-                Row(
-                  children: [
-                    Obx(() => controller.notifications.any((n) => !controller.isRead(n.id))
-                        ? TextButton.icon(
-                            onPressed: controller.markAllAsRead,
-                            icon: const Icon(Icons.done_all, color: AppColors.primary),
-                            label: Text(
-                              AppStrings.adminMarkAllAsRead,
-                              style: AppTextStyles.body.copyWith(color: AppColors.primary),
-                            ),
-                          )
-                        : const SizedBox.shrink()),
-                    const SizedBox(width: 8),
-                    TextButton.icon(
-                      onPressed: controller.clearAll,
-                      icon: const Icon(Icons.clear_all, color: AppColors.error),
-                      label: Text(
-                        AppStrings.adminClearAll,
-                        style: AppTextStyles.body.copyWith(color: AppColors.error),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+            child: Responsive.isDesktop(context)
+                ? Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(AppStrings.adminNotificationsTitle, style: AppTextStyles.screenTitle),
+                      actionsRow,
+                    ],
+                  )
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(AppStrings.adminNotificationsTitle, style: AppTextStyles.screenTitle),
+                      const SizedBox(height: 8),
+                      actionsRow,
+                    ],
+                  ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
