@@ -24,12 +24,28 @@ void main() async {
   );
 
   runApp(
-    ScreenUtilInit(
-      designSize: kIsWeb ? const Size(1440, 900) : const Size(375, 812),
-      minTextAdapt: true,
-      splitScreenMode: true,
-      builder: (context, child) {
-        return const HostelFinderApp();
+    LayoutBuilder(
+      builder: (context, constraints) {
+        final Size designSize;
+        if (kIsWeb) {
+          final width = constraints.maxWidth;
+          if (width < 600) {
+            designSize = const Size(375, 812);
+          } else if (width < 1024) {
+            designSize = const Size(768, 1024);
+          } else {
+            designSize = const Size(1440, 900);
+          }
+        } else {
+          designSize = const Size(375, 812);
+        }
+
+        return ScreenUtilInit(
+          designSize: designSize,
+          minTextAdapt: true,
+          splitScreenMode: true,
+          builder: (context, child) => const HostelFinderApp(),
+        );
       },
     ),
   );
