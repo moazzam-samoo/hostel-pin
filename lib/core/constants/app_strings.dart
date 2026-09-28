@@ -469,6 +469,9 @@ class AppStrings {
   // Admin login
   static const String adminAppTitle = 'HostelPin Admin';
   static const String adminDefaultDisplayName = 'Admin';
+  static const String adminPortalBadge = 'HOSTELPIN MANAGEMENT';
+  static const String adminLoginWelcome = 'Welcome back to Admin Portal';
+  static const String adminLoginHelp = 'Protected portal for authorized administrators only.';
   static const String adminLoginSubtitle = 'Sign in to the admin dashboard';
   static const String adminSignInButton = 'Sign In';
   static const String adminAccessDenied =
