@@ -62,12 +62,12 @@ class AdminLoginView extends GetView<AdminLoginController> {
                   constraints: BoxConstraints(maxWidth: isDesktop ? 460 : double.infinity),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.95),
+                      color: Colors.white.withAlpha(242), // 0.95
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: Colors.white.withOpacity(0.3)),
+                      border: Border.all(color: Colors.white.withAlpha(77)), // 0.3
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.2),
+                          color: Colors.black.withAlpha(51), // 0.2
                           blurRadius: 24,
                           offset: const Offset(0, 12),
                         ),
@@ -86,12 +86,12 @@ class AdminLoginView extends GetView<AdminLoginController> {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                             decoration: BoxDecoration(
-                              color: AppColors.primary.withOpacity(0.1),
+                              color: AppColors.primary.withAlpha(26), // 0.1
                               borderRadius: BorderRadius.circular(16),
                             ),
                             child: Text(
                               AppStrings.adminPortalBadge,
-                              style: AppTextStyles.labelSmall.copyWith(
+                              style: AppTextStyles.labelMicro.copyWith(
                                 color: AppColors.primary,
                                 fontWeight: FontWeight.w700,
                                 letterSpacing: 0.5,
@@ -179,7 +179,7 @@ class AdminLoginView extends GetView<AdminLoginController> {
                           // Footer note
                           Text(
                             AppStrings.adminLoginHelp,
-                            style: AppTextStyles.bodySmall.copyWith(
+                            style: AppTextStyles.caption.copyWith(
                               color: AppColors.textSecondary,
                             ),
                             textAlign: TextAlign.center,

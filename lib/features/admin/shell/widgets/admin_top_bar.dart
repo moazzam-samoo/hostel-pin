@@ -35,6 +35,17 @@ class AdminTopBar extends StatelessWidget implements PreferredSizeWidget {
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Row(
         children: [
+          if (!Responsive.isDesktop(context)) ...[
+            Builder(
+              builder: (ctx) => IconButton(
+                padding: EdgeInsets.zero,
+                icon: const Icon(Icons.menu, color: Colors.white, size: 26),
+                onPressed: () => Scaffold.of(ctx).openDrawer(),
+                tooltip: 'Open Navigation',
+              ),
+            ),
+            const SizedBox(width: 8),
+          ],
           const Icon(Icons.home_rounded, color: Colors.white, size: 26),
           const SizedBox(width: 10),
           Text(
