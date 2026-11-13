@@ -165,7 +165,12 @@ class AddListingController extends GetxController {
   /// (isEditMode true, but never actually published) is a genuinely new
   /// go-live exactly like a from-scratch create, so it still needs one.
   bool get _requiresOwnershipDocument =>
-      _editingHostel?.status != ListingStatus.published;
+      _editingHostel?.status != ListingStatus.published &&
+      // A listing already submitted for review necessarily carried its
+      // ownership proof then (Add Listing's own upload, or the verification
+      // wizard's step 4, which keeps it on verifications/{uid}); asking again
+      // just to fix a typo would force a pointless re-upload.
+      _editingHostel?.status != ListingStatus.pending;
 
   bool get _hasOwnershipDocument =>
       ownershipDocPath.value.isNotEmpty || ownershipDocUploaded.value;
@@ -452,7 +457,16 @@ class AddListingController extends GetxController {
   }
 
   Future<void> _saveListing(ListingStatus status) async {
-    final uid = _sessionService.currentUser.value?.uid ?? 'mock_owner_id';
+    final uid = _sessionService.currentUser.value?.uid;
+    if (uid == null) {
+      // Never stamp a real listing with a made-up owner id; the server would
+      // reject it anyway (ownerId must equal the signed-in uid).
+      AppSnackbar.showGlobal(
+        message: AppStrings.errorGeneric,
+        type: SnackbarType.error,
+      );
+      return;
+    }
     final ownerName =
         _sessionService.currentUser.value?.displayName ?? 'Anonymous';
 
@@ -606,7 +620,7 @@ class AddListingController extends GetxController {
 
       if (status == ListingStatus.draft) {
         if (_editingHostel == null && Get.isRegistered<OwnerShellController>()) {
-          Get.find<OwnerShellController>().onTabSelected(3); // Switch to Listings tab
+          Get.find<OwnerShellController>().onTabSelected(1); // Switch to Listings tab
           _resetForm();
         } else {
           Get.back();
@@ -679,7 +693,7 @@ class AddListingController extends GetxController {
   }
 
   String _extractCity(String address) {
-    if (address.isEmpty) return 'Hyderabad';
+    if (address.isEmpty) return AppStrings.defaultCityFallback;
     final parts = address
         .split(',')
         .map((p) => p.trim())
@@ -711,7 +725,7 @@ class AddListingController extends GetxController {
     if (words.isNotEmpty && words.last.length > 2) {
       return words.last;
     }
-    return 'Hyderabad';
+    return AppStrings.defaultCityFallback;
   }
 
   void _resetForm() {

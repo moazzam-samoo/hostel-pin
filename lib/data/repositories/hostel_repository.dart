@@ -37,40 +37,36 @@ class HostelRepository {
         .map((snapshot) => snapshot.docs.map((doc) => doc.data()).toList());
   }
 
-  /// Published listings, capped at [limit] (FIX-7.5).
+  /// Published listings, newest first, capped at [limit] (FIX-7.5).
   ///
-  /// NOT ordered by `createdAt`, deliberately. `HostelModel` has never had a
-  /// `createdAt` field, and Firestore silently drops documents missing the
-  /// field you order by — adding `orderBy('createdAt')` here would empty the
-  /// Home feed for every listing already in the database. The field is now
-  /// written on create (see `toFirestore`), so once the FIX-7.2 backfill has
-  /// stamped the existing documents this can become an ordered query and the
-  /// plan's `status` + `createdAt` index starts earning its keep.
+  /// Ordered by document ID, descending. Listing IDs are the creation time in
+  /// epoch milliseconds (see AddListingController/VerificationController), so
+  /// this is "newest first" for every document, including the ones that
+  /// predate `createdAt` — ordering by `createdAt` would silently drop those.
+  ///
+  /// The order MUST be applied on the server, before `limit`. Firestore's
+  /// default order is ascending document ID, so the previous
+  /// `.limit(n)` + client-side sort returned the n OLDEST listings and only
+  /// re-sorted them, hiding every new listing past the first page.
+  /// Requires the composite index `status ASC, __name__ DESC`
+  /// (firestore.indexes.json) — deploy it with the app.
   Stream<List<HostelModel>> streamAllPublished({int limit = kHostelPageSize}) {
     return _hostelsRef
         .where('status', isEqualTo: ListingStatus.published.name)
+        .orderBy(FieldPath.documentId, descending: true)
         .limit(limit)
         .snapshots()
-        .map((snapshot) {
-      final list = snapshot.docs.map((doc) => doc.data()).toList();
-      // Sort client-side by document ID (which is epoch time) descending
-      // so newest hostels appear at the top without dropping unmigrated docs.
-      list.sort((a, b) => b.id.compareTo(a.id));
-      return list;
-    });
+        .map((snapshot) => snapshot.docs.map((doc) => doc.data()).toList());
   }
 
-  /// Admin-facing stream for all listings regardless of status (E.4)
+  /// Admin-facing stream for all listings regardless of status (E.4),
+  /// newest first (same server-side ordering rationale as above).
   Stream<List<HostelModel>> streamAllAdmin({int limit = kHostelPageSize}) {
     return _hostelsRef
+        .orderBy(FieldPath.documentId, descending: true)
         .limit(limit)
         .snapshots()
-        .map((snapshot) {
-      final list = snapshot.docs.map((doc) => doc.data()).toList();
-      // Sort client-side by document ID descending
-      list.sort((a, b) => b.id.compareTo(a.id));
-      return list;
-    });
+        .map((snapshot) => snapshot.docs.map((doc) => doc.data()).toList());
   }
 
   Stream<List<HostelModel>> streamNearbyHostels(double latitude, double longitude, double radiusInKm) {

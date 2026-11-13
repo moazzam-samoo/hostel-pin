@@ -59,8 +59,14 @@ service cloud.firestore {
       // Phase 9: admin can read ANY user doc (admin panel Users/Owners tables).
       allow read: if request.auth.uid == userId || isAdmin();
 
+      // A new profile can never start out verified or suspended-then-cleared:
+      // verificationStatus/status are only ever moved by an admin afterwards
+      // (see the admin rule below), so creation must pin them to their
+      // initial values. Without this a client could self-verify at signup.
       allow create: if request.auth.uid == userId &&
-                    request.resource.data.role in ['student', 'owner'];
+                    request.resource.data.role in ['student', 'owner'] &&
+                    request.resource.data.get('verificationStatus', 'unverified') == 'unverified' &&
+                    request.resource.data.get('status', 'active') == 'active';
 
       // `role` is known and written at doc creation (Role Selection runs
       // pre-auth — see Appendix C's corrected header) — there is no
@@ -70,9 +76,13 @@ service cloud.firestore {
       // user self-verify; only its *presence unchanged* is required here,
       // not who/what sets it, since no verification-granting flow exists
       // yet.
+      // `status` (admin block/unblock) is likewise never self-editable — a
+      // blocked user must not be able to write `status: 'active'` back.
+      // `.get(..., default)` so profiles that predate these fields still pass.
       allow update: if request.auth.uid == userId &&
                     request.resource.data.role == resource.data.role &&
-                    request.resource.data.verificationStatus == resource.data.verificationStatus;
+                    request.resource.data.get('verificationStatus', 'unverified') == resource.data.get('verificationStatus', 'unverified') &&
+                    request.resource.data.get('status', 'active') == resource.data.get('status', 'active');
 
       // Phase 9 Block G.5/E.5 — admin-only, narrowly scoped update. Without
       // this, isAdmin()'s read grant above is useless for the two write
@@ -86,13 +96,12 @@ service cloud.firestore {
                     request.resource.data.diff(resource.data).affectedKeys()
                       .hasOnly(['verificationStatus', 'status', 'updatedAt']);
 
-      // Phase 9 Block E.5 — v1 user delete is admin-only, Firestore-doc-only
-      // (no Cloud Function exists in this project to also delete the
-      // underlying Firebase Auth account — every function here is
-      // Blaze-blocked; same accepted-gap shape as Phase 7's orphaned
-      // Cloudinary assets on listing delete, Block A.10). Never
-      // self-deletable — `isOwner()`/a plain user is not granted this.
-      allow delete: if isAdmin();
+      // A user may delete their OWN profile (in-app "Delete account", a Google
+      // Play requirement); an admin may delete any profile. The admin path is
+      // Firestore-doc-only (no Cloud Function deletes the Auth account — every
+      // function here is Blaze-blocked); the self-service path is followed by
+      // the client deleting the Auth user itself.
+      allow delete: if request.auth.uid == userId || isAdmin();
 
       // Saved Subcollection — owner-only (the signed-in student who owns
       // this saved-list subcollection, not a hostel owner; same field
@@ -117,9 +126,16 @@ service cloud.firestore {
       // never be 'published' on create (2.A — every brand-new listing goes
       // through admin review first; nothing in this app ever legitimately
       // originates a hostel doc as already-published, only draft/pending).
+      // rating/reviewCount/viewCount/isFeatured are server-owned: a new
+      // listing must start at their zero values, so an owner cannot create
+      // a pre-rated, pre-viewed or self-featured listing.
       allow create: if isOwner() &&
                     request.resource.data.ownerId == request.auth.uid &&
                     request.resource.data.status != 'published' &&
+                    request.resource.data.get('rating', 0) == 0 &&
+                    request.resource.data.get('reviewCount', 0) == 0 &&
+                    request.resource.data.get('viewCount', 0) == 0 &&
+                    request.resource.data.get('isFeatured', false) == false &&
                     isValidHostelData();
 
       // Owner's own full-document update — verificationStatus/rating/
@@ -142,6 +158,8 @@ service cloud.firestore {
                     request.resource.data.ownerId == resource.data.ownerId &&
                     request.resource.data.rating == resource.data.rating &&
                     request.resource.data.viewCount == resource.data.viewCount &&
+                    request.resource.data.get('reviewCount', 0) == resource.data.get('reviewCount', 0) &&
+                    request.resource.data.get('isFeatured', false) == resource.data.get('isFeatured', false) &&
                     (request.resource.data.status != 'published' ||
                      resource.data.status == 'published') &&
                     isValidHostelData();
@@ -178,6 +196,8 @@ service cloud.firestore {
     match /activities/{activityId} {
       allow read: if isOwner() && resource.data.ownerId == request.auth.uid;
       allow create: if isOwner() && request.resource.data.ownerId == request.auth.uid;
+      // Owners may delete their own feed entries (account deletion cleanup).
+      allow delete: if isAuthenticated() && resource.data.ownerId == request.auth.uid;
     }
 
     // Cloudinary orphan sweep queue (FIX-7.8). When a multi-photo publish
@@ -247,7 +267,10 @@ service cloud.firestore {
       // "highest blast-radius" framing for this exact action.
       allow update: if isAdmin();
 
-      allow delete: if false;
+      // An owner may delete their own verification record (account deletion
+      // — it holds CNIC/selfie references). Must run before the profile doc
+      // is removed, since isOwner() reads that doc.
+      allow delete: if isOwner() && request.auth.uid == userId;
     }
 
     // Phase 9 — Reports collection (Notification Center's Reports tab).
@@ -256,7 +279,13 @@ service cloud.firestore {
     // today. See TASK-Phase-9 Block F.2.
     match /reports/{reportId} {
       allow read: if isAdmin();
-      allow create: if isAuthenticated();
+      allow create: if isAuthenticated() &&
+                    request.resource.data.reportedBy == request.auth.uid &&
+                    request.resource.data.status == 'open' &&
+                    request.resource.data.reason is string &&
+                    request.resource.data.reason.size() <= 200 &&
+                    request.resource.data.get('details', '') is string &&
+                    request.resource.data.get('details', '').size() <= 2000;
       allow update: if isAdmin();
       allow delete: if false;
     }

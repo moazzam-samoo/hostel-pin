@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'owner_shell_controller.dart';
 import 'widgets/add_listing_gate_view.dart';
@@ -25,7 +26,7 @@ class OwnerShellView extends GetView<OwnerShellController> {
         if (controller.currentIndex.value != 0) {
           controller.onTabSelected(0);
         } else {
-          Navigator.of(context).pop();
+          SystemNavigator.pop();
         }
       },
       child: Scaffold(

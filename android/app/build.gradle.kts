@@ -23,6 +23,17 @@ if (localPropertiesFile.exists()) {
 }
 val mapsApiKey: String = localProperties.getProperty("MAPS_API_KEY") ?: "YOUR_GOOGLE_MAPS_API_KEY_HERE"
 
+// Release signing. Reads android/key.properties (git-ignored) — see
+// RELEASE_CHECKLIST.md section A for how to create the keystore. Expected keys:
+//   storeFile=<path to upload-keystore.jks>   storePassword=...
+//   keyAlias=upload                           keyPassword=...
+val keystoreProperties = Properties()
+val keystorePropertiesFile = rootProject.file("key.properties")
+val hasReleaseKeystore = keystorePropertiesFile.exists()
+if (hasReleaseKeystore) {
+    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+}
+
 android {
     namespace = "com.hostelfinder.hostel_finder_app"
     compileSdk = 36
@@ -50,11 +61,28 @@ android {
         manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
     }
 
+    signingConfigs {
+        if (hasReleaseKeystore) {
+            create("release") {
+                keyAlias = keystoreProperties.getProperty("keyAlias")
+                keyPassword = keystoreProperties.getProperty("keyPassword")
+                storeFile = file(keystoreProperties.getProperty("storeFile"))
+                storePassword = keystoreProperties.getProperty("storePassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            if (hasReleaseKeystore) {
+                signingConfig = signingConfigs.getByName("release")
+            } else {
+                // No android/key.properties on this machine: fall back to the
+                // debug key so `flutter run --release` still works locally.
+                // NEVER upload a bundle built this way — Play rejects it.
+                logger.warn("WARNING: android/key.properties not found; signing release with the DEBUG key.")
+                signingConfig = signingConfigs.getByName("debug")
+            }
         }
     }
 }

@@ -16,7 +16,9 @@ class SearchController extends GetxController {
   final searchController = TextEditingController();
   final searchQuery = ''.obs;
 
-  final recentSearches = ['Ameerpet', 'Boys hostel', 'Under 10k'].obs;
+  // Real, in-memory history of queries the user actually ran this session
+  // (previously hardcoded demo values). Newest first, capped at 5.
+  final recentSearches = <String>[].obs;
   
   final RxList<HostelModel> _allPublished = <HostelModel>[].obs;
   final RxSet<String> savedHostelIds = <String>{}.obs;
@@ -39,6 +41,8 @@ class SearchController extends GetxController {
     searchController.addListener(() {
       searchQuery.value = searchController.text;
     });
+    debounce(searchQuery, (String q) => _rememberSearch(q),
+        time: const Duration(seconds: 2));
     
     // Deliberately NOT paginated (FIX-7.5). Every filter on this screen —
     // query text, price range, amenities — is applied client-side over
@@ -105,6 +109,16 @@ class SearchController extends GetxController {
     }
 
     return results;
+  }
+
+  void _rememberSearch(String query) {
+    final q = query.trim();
+    if (q.length < 3) return;
+    recentSearches.removeWhere((s) => s.toLowerCase() == q.toLowerCase());
+    recentSearches.insert(0, q);
+    if (recentSearches.length > 5) {
+      recentSearches.removeRange(5, recentSearches.length);
+    }
   }
 
   bool isSaved(String id) => savedHostelIds.contains(id);

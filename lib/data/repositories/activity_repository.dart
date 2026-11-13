@@ -18,12 +18,13 @@ class ActivityRepository {
   Stream<List<ActivityModel>> streamByOwner(String ownerId) {
     return _activitiesRef
         .where('ownerId', isEqualTo: ownerId)
+        // Newest 10 straight from the server (index: ownerId ASC, createdAt
+        // DESC in firestore.indexes.json) instead of downloading the owner's
+        // whole history just to keep ten rows.
+        .orderBy('createdAt', descending: true)
+        .limit(10)
         .snapshots()
-        .map((snapshot) {
-          final list = snapshot.docs.map((doc) => doc.data()).toList();
-          list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-          return list.take(10).toList();
-        });
+        .map((snapshot) => snapshot.docs.map((doc) => doc.data()).toList());
   }
 
   Future<void> create(ActivityModel activity) async {

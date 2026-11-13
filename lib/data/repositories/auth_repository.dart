@@ -116,6 +116,17 @@ class AuthRepository {
     }
   }
 
+  bool get usesPasswordProvider => _authService.usesPasswordProvider;
+
+  /// Returns false when the user cancelled the Google account picker.
+  Future<bool> reauthenticateWithGoogle() async {
+    try {
+      return await _authService.reauthenticateWithGoogle();
+    } catch (e) {
+      throw ErrorMapper.fromException(e);
+    }
+  }
+
   Future<void> updatePassword(String newPassword) async {
     try {
       await _authService.updatePassword(newPassword);

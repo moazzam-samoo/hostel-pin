@@ -10,6 +10,7 @@ import '../../../core/theme/app_text_styles.dart';
 import '../../../shared/widgets/navigation/app_top_bar.dart';
 import '../../../shared/widgets/buttons/primary_button.dart';
 import '../../../shared/widgets/cards/verification_task_card.dart';
+import '../../../shared/widgets/feedback/instruction_box.dart';
 import 'verification_wizard_view.dart';
 
 class VerificationCenterView extends GetView<VerificationController> {
@@ -50,7 +51,11 @@ class VerificationCenterView extends GetView<VerificationController> {
                       ),
                     ),
                     SizedBox(height: AppSpacing.lg),
-                    
+
+                    // Reviewer feedback — shown when an admin rejected the
+                    // submission or asked for changes, so the owner knows why.
+                    ..._buildReviewFeedback(),
+
                     // Progress Card
                     Container(
                       padding: EdgeInsets.all(AppSpacing.md),
@@ -202,5 +207,26 @@ class VerificationCenterView extends GetView<VerificationController> {
         );
       }),
     );
+  }
+
+  List<Widget> _buildReviewFeedback() {
+    final data = controller.verificationData.value;
+    final status = data?.status;
+    if (status != 'rejected' && status != 'changesRequested') {
+      return const [];
+    }
+    final reason = (data?.rejectionReason ?? '').trim();
+    final headline = status == 'rejected'
+        ? AppStrings.verificationRejectedNotice
+        : AppStrings.verificationChangesNotice;
+    return [
+      StatusBox(
+        isError: true,
+        text: reason.isEmpty
+            ? headline
+            : '$headline\n${AppStrings.rejectionReasonTitle}: $reason',
+      ),
+      SizedBox(height: AppSpacing.lg),
+    ];
   }
 }

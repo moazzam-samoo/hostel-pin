@@ -5,7 +5,10 @@ import '../../../core/theme/app_spacing.dart';
 import '../../../core/constants/app_strings.dart';
 
 class AuthDivider extends StatelessWidget {
-  const AuthDivider({super.key});
+  /// Text between the two rules; defaults to "or Continue with" (Signup).
+  final String label;
+
+  const AuthDivider({super.key, this.label = AppStrings.orContinueWith});
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +23,7 @@ class AuthDivider extends StatelessWidget {
         Padding(
           padding: EdgeInsets.symmetric(horizontal: AppSpacing.md),
           child: Text(
-            AppStrings.orContinueWith,
+            label,
             style: AppTextStyles.body.copyWith(
               color: AppColors.textSecondary,
             ),

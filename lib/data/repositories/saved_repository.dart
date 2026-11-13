@@ -72,7 +72,14 @@ class SavedRepository {
     HostelModel? hostel,
   }) {
     if (currentlySaved) return unsave(uid, hostelId);
-    assert(hostel != null, 'hostel is required to save (denormalizes the summary at write time)');
-    return save(uid, hostel!);
+    if (hostel == null) {
+      // A real runtime check (an assert is stripped from release builds and
+      // would surface as an uncatchable null-check error). Returned as a
+      // failed Future so callers' catchError rolls the optimistic UI back.
+      return Future<void>.error(
+        Exception('Cannot save a hostel that has not loaded yet'),
+      );
+    }
+    return save(uid, hostel);
   }
 }

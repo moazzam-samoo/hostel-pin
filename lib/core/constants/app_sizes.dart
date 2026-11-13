@@ -11,6 +11,8 @@ class AppSizes {
   static double get iconCircle => 36.r;
   static double get roleIcon => 100.r;
   static double get authLogo => 145.r;
+  static double get authLogoSmall => 56.r;
+  static double get segment => 40.h;
 
   static double get iconSmall => 16.r;
   static double get iconMedium => 24.r;

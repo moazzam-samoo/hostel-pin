@@ -21,8 +21,11 @@ class ListingsController extends GetxController {
   void onInit() {
     super.onInit();
     
+    // Only (re)subscribe when the signed-in uid actually changes — the
+    // user doc re-emits on every profile/prefs/verification update, which
+    // used to tear down and rebuild both Firestore listeners each time.
     ever(_sessionService.currentUser, (user) {
-      if (user != null) {
+      if (user != null && user.uid != _subscribedUid) {
         _loadData(user.uid);
       }
     });
@@ -33,7 +36,10 @@ class ListingsController extends GetxController {
     }
   }
 
+  String? _subscribedUid;
+
   void _loadData(String uid) {
+    _subscribedUid = uid;
     _listingsSub?.cancel();
     _listingsSub = _hostelRepo.streamByOwner(uid).listen(
       (hostels) {

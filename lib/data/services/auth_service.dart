@@ -4,8 +4,8 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:get/get.dart';
 
 class AuthService extends GetxService {
-  FirebaseAuth? _injectedAuth;
-  
+  final FirebaseAuth? _injectedAuth;
+
   AuthService({FirebaseAuth? auth}) : _injectedAuth = auth;
 
   FirebaseAuth get _auth => _injectedAuth ?? FirebaseAuth.instance;
@@ -87,6 +87,31 @@ class AuthService extends GetxService {
       password: currentPassword,
     );
     return user.reauthenticateWithCredential(credential);
+  }
+
+  /// True when the signed-in account has an email/password credential (as
+  /// opposed to Google-only), i.e. when re-authentication means typing a
+  /// password rather than picking a Google account again.
+  bool get usesPasswordProvider =>
+      currentUser?.providerData.any((p) => p.providerId == 'password') ?? false;
+
+  /// Re-authenticates a Google-signed-in user (required before deleting the
+  /// account when the session is no longer recent). Returns false if the user
+  /// cancelled the Google picker.
+  Future<bool> reauthenticateWithGoogle() async {
+    if (kIsWeb) {
+      throw UnsupportedError('Google re-authentication is not available on web.');
+    }
+    final user = currentUser;
+    if (user == null) throw Exception('No user signed in');
+    final googleUser = await _googleSignIn.signIn();
+    if (googleUser == null) return false;
+    final googleAuth = await googleUser.authentication;
+    await user.reauthenticateWithCredential(GoogleAuthProvider.credential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    ));
+    return true;
   }
 
   Future<void> updatePassword(String newPassword) {

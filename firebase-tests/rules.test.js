@@ -277,7 +277,10 @@ describe('hostels/{id}', () => {
 
     const asOwnerA = testEnv.authenticatedContext(OWNER_A).firestore();
     await assertSucceeds(
-      asOwnerA.collection('hostels').doc('h1').set({ ...publishedHostel, status: 'pending' })
+      asOwnerA
+        .collection('hostels')
+        .doc('h1')
+        .set({ ...publishedHostel, status: 'pending', rating: 0, reviewCount: 0, viewCount: 0 })
     );
   });
 
@@ -528,14 +531,16 @@ describe('isAdmin() — Phase 9 admin-broad rules', () => {
     );
   });
 
-  it('an admin can delete a user doc; a plain user cannot', async () => {
+  it('an admin can delete a user doc; another user cannot', async () => {
     await testEnv.withSecurityRulesDisabled(async (ctx) => {
       await ctx.firestore().collection('users').doc(ADMIN).set({ role: 'admin' });
       await ctx.firestore().collection('users').doc(STUDENT).set({ role: 'student' });
     });
 
-    const asStudent = testEnv.authenticatedContext(STUDENT).firestore();
-    await assertFails(asStudent.collection('users').doc(STUDENT).delete());
+    // A plain user can no longer delete SOMEONE ELSE's profile (they may
+    // delete their own — covered in the release-hardening block below).
+    const asOwnerOther = testEnv.authenticatedContext(OWNER_B).firestore();
+    await assertFails(asOwnerOther.collection('users').doc(STUDENT).delete());
 
     const asAdmin = testEnv.authenticatedContext(ADMIN).firestore();
     await assertSucceeds(asAdmin.collection('users').doc(STUDENT).delete());
@@ -657,5 +662,98 @@ describe('isAdmin() — Phase 9 admin-broad rules', () => {
     await assertSucceeds(
       asAdmin.collection('config').doc('appSettings').set({ maintenanceMode: true }, { merge: true })
     );
+  });
+});
+
+
+describe('release hardening (self-verification, block bypass, self-featuring, account deletion, reports)', () => {
+  it('a new profile cannot be created already verified or non-active', async () => {
+    const asNew = testEnv.authenticatedContext(OWNER_A).firestore();
+    await assertFails(
+      asNew.collection('users').doc(OWNER_A).set({ role: 'owner', verificationStatus: 'verified', status: 'active' })
+    );
+    await assertFails(
+      asNew.collection('users').doc(OWNER_A).set({ role: 'owner', verificationStatus: 'unverified', status: 'blocked' })
+    );
+    await assertSucceeds(
+      asNew.collection('users').doc(OWNER_A).set({ role: 'owner', verificationStatus: 'unverified', status: 'active' })
+    );
+  });
+
+  it('a blocked user cannot set their own status back to active', async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await ctx.firestore().collection('users').doc(STUDENT).set({
+        role: 'student', verificationStatus: 'unverified', status: 'blocked',
+      });
+    });
+    const asStudent = testEnv.authenticatedContext(STUDENT).firestore();
+    await assertFails(asStudent.collection('users').doc(STUDENT).update({ status: 'active' }));
+  });
+
+  it('a profile that predates verificationStatus/status can still update its name', async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await ctx.firestore().collection('users').doc(STUDENT).set({ role: 'student', displayName: 'Old' });
+    });
+    const asStudent = testEnv.authenticatedContext(STUDENT).firestore();
+    await assertSucceeds(
+      asStudent.collection('users').doc(STUDENT).update({
+        displayName: 'New', verificationStatus: 'unverified', status: 'active',
+      })
+    );
+  });
+
+  it('an owner cannot create a pre-rated / pre-viewed / featured listing', async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await ctx.firestore().collection('users').doc(OWNER_A).set({ role: 'owner' });
+    });
+    const asOwner = testEnv.authenticatedContext(OWNER_A).firestore();
+    const base = { ...publishedHostel, status: 'pending', rating: 0, reviewCount: 0, viewCount: 0 };
+    await assertFails(asOwner.collection('hostels').doc('h1').set({ ...base, rating: 5 }));
+    await assertFails(asOwner.collection('hostels').doc('h2').set({ ...base, viewCount: 999 }));
+    await assertFails(asOwner.collection('hostels').doc('h3').set({ ...base, isFeatured: true }));
+    await assertSucceeds(asOwner.collection('hostels').doc('h4').set(base));
+  });
+
+  it('an owner cannot self-feature an existing listing', async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await ctx.firestore().collection('users').doc(OWNER_A).set({ role: 'owner' });
+      await ctx.firestore().collection('hostels').doc('h1').set(publishedHostel);
+    });
+    const asOwner = testEnv.authenticatedContext(OWNER_A).firestore();
+    await assertFails(
+      asOwner.collection('hostels').doc('h1').set({ ...publishedHostel, isFeatured: true })
+    );
+  });
+
+  it('a user can delete their own profile; an owner can delete own verification and activities', async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await ctx.firestore().collection('users').doc(OWNER_A).set({ role: 'owner' });
+      await ctx.firestore().collection('verifications').doc(OWNER_A).set({ status: 'pending' });
+      await ctx.firestore().collection('activities').doc('a1').set({ ownerId: OWNER_A, type: 'x' });
+    });
+    const asOwner = testEnv.authenticatedContext(OWNER_A).firestore();
+    await assertSucceeds(asOwner.collection('verifications').doc(OWNER_A).delete());
+    await assertSucceeds(asOwner.collection('activities').doc('a1').delete());
+    await assertSucceeds(asOwner.collection('users').doc(OWNER_A).delete());
+  });
+
+  it("an owner cannot delete another owner's verification doc or activities", async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await ctx.firestore().collection('users').doc(OWNER_B).set({ role: 'owner' });
+      await ctx.firestore().collection('verifications').doc(OWNER_A).set({ status: 'pending' });
+      await ctx.firestore().collection('activities').doc('a1').set({ ownerId: OWNER_A, type: 'x' });
+    });
+    const asOtherOwner = testEnv.authenticatedContext(OWNER_B).firestore();
+    await assertFails(asOtherOwner.collection('verifications').doc(OWNER_A).delete());
+    await assertFails(asOtherOwner.collection('activities').doc('a1').delete());
+  });
+
+  it('reports: must be filed as yourself, status open, bounded text', async () => {
+    const asStudent = testEnv.authenticatedContext(STUDENT).firestore();
+    const ok = { hostelId: 'h1', reportedBy: STUDENT, reason: 'spam', details: 'x', status: 'open' };
+    await assertSucceeds(asStudent.collection('reports').doc('r1').set(ok));
+    await assertFails(asStudent.collection('reports').doc('r2').set({ ...ok, reportedBy: 'someone_else' }));
+    await assertFails(asStudent.collection('reports').doc('r3').set({ ...ok, status: 'resolved' }));
+    await assertFails(asStudent.collection('reports').doc('r4').set({ ...ok, details: 'x'.repeat(2001) }));
   });
 });

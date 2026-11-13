@@ -12,7 +12,7 @@ class Validators {
     if (value == null || value.trim().isEmpty) {
       return AppStrings.errorEmailRequired;
     }
-    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    final emailRegex = RegExp(r'^[\w\-.+]+@([\w\-]+\.)+[A-Za-z]{2,24}$');
     if (!emailRegex.hasMatch(value)) {
       return AppStrings.errorEmailInvalid;
     }
@@ -61,7 +61,10 @@ class Validators {
     if (value == null || value.trim().isEmpty) {
       return AppStrings.errorRequired;
     }
-    if (double.tryParse(value) == null) {
+    final parsed = double.tryParse(value.trim());
+    // Server rules require pricePerMonth > 0 — reject zero/negative/absurd
+    // values here instead of after a full photo upload.
+    if (parsed == null || !parsed.isFinite || parsed <= 0 || parsed > 10000000) {
       return AppStrings.errorPriceInvalid;
     }
     return null;
@@ -71,7 +74,8 @@ class Validators {
     if (value == null || value.trim().isEmpty) {
       return AppStrings.errorRequired;
     }
-    if (int.tryParse(value) == null) {
+    final parsed = int.tryParse(value.trim());
+    if (parsed == null || parsed < 1 || parsed > 10000) {
       return AppStrings.errorRoomsInvalid;
     }
     return null;
@@ -81,7 +85,8 @@ class Validators {
     if (value == null || value.trim().isEmpty) {
       return AppStrings.errorRequired;
     }
-    if (int.tryParse(value) == null) {
+    final parsed = int.tryParse(value.trim());
+    if (parsed == null || parsed < 1 || parsed > 100000) {
       return AppStrings.errorBedsInvalid;
     }
     return null;

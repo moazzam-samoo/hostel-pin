@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:get/get.dart';
 import '../../../core/routes/app_routes.dart';
 import '../../../core/enums/availability_status.dart';
@@ -8,6 +9,7 @@ import '../../../data/models/upload_result_model.dart';
 import '../../../data/repositories/hostel_repository.dart';
 import '../../../data/repositories/saved_repository.dart';
 import '../../../data/services/session_service.dart';
+import '../../../core/utils/logger.dart';
 
 class SavedController extends GetxController {
   final HostelRepository _hostelRepo = Get.find<HostelRepository>();
@@ -24,23 +26,39 @@ class SavedController extends GetxController {
   // TASK-Phase-7.md Block E's own note on SavedController.
   final RxList<HostelModel> _allPublished = <HostelModel>[].obs;
 
+  StreamSubscription? _publishedSub;
+  StreamSubscription? _savedSub;
+
   @override
   void onInit() {
     super.onInit();
     _loadData();
   }
 
+  @override
+  void onClose() {
+    _publishedSub?.cancel();
+    _savedSub?.cancel();
+    super.onClose();
+  }
+
   void _loadData() {
-    _hostelRepo.streamAllPublished().listen((hostels) {
-      _allPublished.assignAll(hostels);
-    });
+    _publishedSub = _hostelRepo.streamAllPublished().listen(
+      (hostels) {
+        _allPublished.assignAll(hostels);
+      },
+      onError: (Object e) => Logger.e('Saved: published stream error: $e'),
+    );
 
     final uid = _sessionService.currentUser.value?.uid;
     if (uid != null) {
-      _savedRepo.streamSaved(uid).listen((saved) {
-        savedHostelIds.assignAll(saved.map((s) => s.hostelId));
-        savedHostels.assignAll(saved.map(_toHostelModel));
-      });
+      _savedSub = _savedRepo.streamSaved(uid).listen(
+        (saved) {
+          savedHostelIds.assignAll(saved.map((s) => s.hostelId));
+          savedHostels.assignAll(saved.map(_toHostelModel));
+        },
+        onError: (Object e) => Logger.e('Saved: saved stream error: $e'),
+      );
     }
   }
 

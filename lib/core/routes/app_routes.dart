@@ -14,6 +14,9 @@ class Routes {
   static const String otp =
       '/otp'; // TODO: phone-verification (unreferenced in v1)
 
+  static const String privacyPolicy = '/legal/privacy';
+  static const String termsOfService = '/legal/terms';
+
   static const String studentShell = '/student';
   static const String studentHome = '/student/home';
   static const String studentSearch = '/student/search';

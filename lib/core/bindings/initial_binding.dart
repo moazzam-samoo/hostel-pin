@@ -9,6 +9,7 @@ import '../../data/repositories/activity_repository.dart';
 import '../../data/repositories/verification_repository.dart';
 import '../../data/repositories/report_repository.dart';
 import '../../data/repositories/app_config_repository.dart';
+import '../../data/repositories/account_repository.dart';
 import '../../data/services/session_service.dart';
 import '../../data/services/storage_service.dart';
 import '../../data/services/location_service.dart';
@@ -55,5 +56,7 @@ class InitialBinding extends Bindings {
     // repository that should be a single shared singleton.
     Get.put(ReportRepository(), permanent: true);
     Get.put(AppConfigRepository(), permanent: true);
+    // In-app account deletion (Google Play requirement).
+    Get.put(AccountRepository(), permanent: true);
   }
 }

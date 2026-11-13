@@ -32,8 +32,7 @@ class OwnerProfileView extends GetView<OwnerProfileController> {
               child: Obx(() => ProfileHeaderBlock(
                     name: controller.currentUser.value?.displayName ??
                         'Hostel Owner',
-                    email: controller.currentUser.value?.email ??
-                        'owner@example.com',
+                    email: controller.currentUser.value?.email ?? '',
                     imageUrl: controller.currentUser.value?.photoUrl,
                     onEdit: controller.onEditAvatar,
                   )),

@@ -48,6 +48,26 @@ class LocationService {
     return await Geolocator.getCurrentPosition();
   }
 
+  /// True when location is already usable (service on + permission granted),
+  /// WITHOUT prompting the user. Lets screens centre on the user silently
+  /// when they've already agreed, and ask only on an explicit action.
+  Future<bool> hasPermission() async {
+    if (!await Geolocator.isLocationServiceEnabled()) return false;
+    final permission = await Geolocator.checkPermission();
+    return permission == LocationPermission.always ||
+        permission == LocationPermission.whileInUse;
+  }
+
+  /// Opens the OS screen where the user can re-enable location / permission.
+  Future<void> openSettings() async {
+    final permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.deniedForever) {
+      await Geolocator.openAppSettings();
+    } else {
+      await Geolocator.openLocationSettings();
+    }
+  }
+
   /// Calculates a geohash for a given location.
   String getGeohash(double latitude, double longitude) {
     return GeoFirePoint(GeoPoint(latitude, longitude)).geohash;

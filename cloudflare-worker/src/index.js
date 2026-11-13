@@ -51,9 +51,38 @@ async function verifyFirebaseIdToken(request, env) {
       audience: env.FIREBASE_PROJECT_ID,
     });
     // `sub` is the Firebase Auth uid for a verified ID token.
+    request.firebaseIdToken = idToken;
     return payload.sub;
   } catch (e) {
     throw new HttpError(401, `Invalid or expired ID token: ${e.message}`);
+  }
+}
+
+/**
+ * Confirms the caller is an admin by reading their OWN users/{uid} document
+ * through the Firestore REST API, authenticated with the caller's own
+ * Firebase ID token. Firestore's security rules already let a user read only
+ * their own profile, so no service account/secret is needed and a client
+ * cannot forge the result: the role comes from Firestore, not from the
+ * request. Fails closed — any error, missing doc or non-admin role is a 403.
+ */
+async function assertAdmin(uid, request, env) {
+  const url =
+    `https://firestore.googleapis.com/v1/projects/${env.FIREBASE_PROJECT_ID}` +
+    `/databases/(default)/documents/users/${encodeURIComponent(uid)}`;
+  let role;
+  try {
+    const res = await fetch(url, {
+      headers: { Authorization: `Bearer ${request.firebaseIdToken}` },
+    });
+    if (!res.ok) throw new Error(`status ${res.status}`);
+    const doc = await res.json();
+    role = doc?.fields?.role?.stringValue;
+  } catch (e) {
+    throw new HttpError(403, 'Could not verify admin access.');
+  }
+  if (role !== 'admin') {
+    throw new HttpError(403, 'Admin access required.');
   }
 }
 
@@ -134,11 +163,8 @@ async function handleSignature(request, env) {
  * Mirrors functions/index.js's getVerificationDocumentUrl. That function
  * is not called by anything client-side yet (Phase 8's own UI never
  * resolves a viewable URL — it only uploads) and carries the same
- * deliberately-deferred scoping gap documented there: any authenticated
- * user who already knows another owner's public_id can resolve a URL for
- * it, since there's no isAdmin()-equivalent check yet (that's Phase 9's
- * job). Kept identical here rather than silently tightening or loosening
- * it — this is a straight port, not a redesign.
+ * scoping gap, now CLOSED: the caller must be an admin (checked against
+ * their own users/{uid}.role via assertAdmin below).
  *
  * Uses Cloudinary's documented "Private/Authenticated Download URL"
  * endpoint (/​{resource_type}/​download) rather than attempting to
@@ -149,7 +175,10 @@ async function handleSignature(request, env) {
  * verifies correctly, not a second, riskier one.
  */
 async function handleDocumentUrl(request, env) {
-  await verifyFirebaseIdToken(request, env);
+  const uid = await verifyFirebaseIdToken(request, env);
+  // Identity documents (CNIC, selfie, ownership proof) are only ever viewed
+  // by admins in the review panel — never by another owner or a student.
+  await assertAdmin(uid, request, env);
 
   const body = await request.json().catch(() => ({}));
   const publicId = body.publicId;

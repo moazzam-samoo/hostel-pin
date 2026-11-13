@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show PlatformException;
@@ -60,6 +61,7 @@ class VerificationController extends GetxController {
   /// itself must not stomp whatever the owner is actively typing on a later
   /// step.
   bool _hydrated = false;
+  StreamSubscription<VerificationModel?>? _verificationSub;
 
   /// Set once step 3 creates the `hostels` doc, or restored from a resumed
   /// draft's `hostelId`. Distinguishes "create" from "update" on repeat
@@ -170,6 +172,7 @@ class VerificationController extends GetxController {
 
   @override
   void onClose() {
+    _verificationSub?.cancel();
     fullNameController.dispose();
     guardianNameController.dispose();
     cnicController.dispose();
@@ -192,12 +195,14 @@ class VerificationController extends GetxController {
     final uid = _authService.currentUser?.uid;
     if (uid == null) return;
 
-    _verificationRepo.streamVerification(uid).listen((data) {
+    _verificationSub = _verificationRepo.streamVerification(uid).listen((data) {
       verificationData.value = data;
       if (!_hydrated) {
         _hydrated = true;
         if (data != null) _hydrate(data);
       }
+    }, onError: (Object e) {
+      Logger.e('Verification stream error: $e');
     });
   }
 
@@ -480,6 +485,7 @@ class VerificationController extends GetxController {
         status: ListingStatus.pending,
         location: GeoPoint(latitude.value, longitude.value),
         geohash: geohash,
+        ownershipDocumentId: _ownershipId.isNotEmpty ? _ownershipId : null,
       );
 
       if (_hostelId == null) {
@@ -520,6 +526,18 @@ class VerificationController extends GetxController {
           'ownership',
         );
         ownershipDocUploaded.value = true;
+      }
+      // Back-fill the proof onto the hostel this wizard created in step 3.
+      // Without it, opening that listing later in Add Listing found no
+      // ownership document and forced the owner to upload one again.
+      final hostelId = _hostelId;
+      if (hostelId != null && hostelId.isNotEmpty && _ownershipId.isNotEmpty) {
+        final hostel = await _hostelRepo.getById(hostelId);
+        if (hostel != null && hostel.ownershipDocumentId != _ownershipId) {
+          await _hostelRepo.update(
+            hostel.copyWith(ownershipDocumentId: _ownershipId),
+          );
+        }
       }
       await _verificationRepo.updateVerification(_buildCurrentModel(uid));
       currentStep.value = VerificationStep.review;

@@ -145,7 +145,7 @@ class HostelCard extends StatelessWidget {
               ),
               SizedBox(height: AppSpacing.xs),
               Text(
-                'Owner : ${ownerName ?? "Awais Khokhar"}',
+                'Owner : ${ownerName ?? ""}',
                 style: AppTextStyles.caption
                     .copyWith(color: AppColors.textSecondary),
                 maxLines: 1,
@@ -190,7 +190,7 @@ class HostelCard extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Text(
-                      'Owner : ${ownerName ?? "Awais Khokhar"}',
+                      'Owner : ${ownerName ?? ""}',
                       style: AppTextStyles.caption
                           .copyWith(color: AppColors.textSecondary),
                       maxLines: 1,

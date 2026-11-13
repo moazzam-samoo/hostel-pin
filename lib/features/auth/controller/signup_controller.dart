@@ -62,7 +62,21 @@ class SignupController extends GetxController {
           phone: phoneController.text.trim(),
           role: role,
         );
-        await _userRepo.createUserDoc(newUserDoc);
+        try {
+          await _userRepo.createUserDoc(newUserDoc);
+        } catch (_) {
+          // The Auth account exists but its profile document could not be
+          // written (offline, rules, crash). Leaving it would strand the user:
+          // signup then says "email already in use" and login has no profile
+          // to read. Roll the half-created account back so they can retry.
+          try {
+            await credential.user!.delete();
+          } catch (_) {
+            // Login self-heals a missing profile (LoginController), so a
+            // failed rollback is recoverable.
+          }
+          rethrow;
+        }
 
         String shellRoute;
         if (role == UserRole.admin) {

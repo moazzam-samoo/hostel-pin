@@ -17,12 +17,17 @@ import '../../../shared/widgets/cards/facility_grid.dart';
 import 'widgets/about_section.dart';
 import 'widgets/detail_location_section.dart';
 import 'widgets/photo_viewer_view.dart';
+import '../../../shared/widgets/buttons/text_link_button.dart';
 
 class HostelDetailView extends GetView<HostelDetailController> {
   const HostelDetailView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // Opened without a HostelModel argument (deep link / restored route):
+    // the controller already pops the route; render nothing meanwhile instead
+    // of reading an uninitialised `late` field.
+    if (!controller.hasHostel) return const Scaffold(body: SizedBox.shrink());
     final hostel = controller.hostel;
 
     return Scaffold(
@@ -113,6 +118,13 @@ class HostelDetailView extends GetView<HostelDetailController> {
                     latitude: hostel.latitude,
                     longitude: hostel.longitude,
                     hostelName: hostel.name,
+                  ),
+                  SizedBox(height: AppSpacing.lg),
+                  Center(
+                    child: TextLinkButton(
+                      text: AppStrings.reportListing,
+                      onPressed: controller.showReportSheet,
+                    ),
                   ),
                   SizedBox(height: AppSpacing.xl),
                 ],

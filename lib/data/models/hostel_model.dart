@@ -41,10 +41,10 @@ class HostelModel {
   // selfie/ownership documents.
   //
   // Null for two legitimate reasons, not just "not uploaded yet": (1) a
-  // hostel created by the owner-verification wizard's step 3
-  // (VerificationController._completeHostelInfoStep) — that flow's ownership
-  // proof lives on the separate verifications/{uid} doc instead, never on
-  // this one; (2) any listing created before this field existed.
+  // hostel created by the owner-verification wizard before step 4 has run
+  // (step 4 now back-fills this field once the ownership proof is uploaded,
+  // see VerificationController._completeDocumentsStep); (2) any listing
+  // created before this field existed.
   final String? ownershipDocumentId;
 
   const HostelModel({
@@ -161,7 +161,7 @@ class HostelModel {
     String resolvedCity = rawCity;
     if (resolvedCity.isEmpty || resolvedCity.toLowerCase() == 'unknown city') {
       final parts = rawAddress.split(',').map((p) => p.trim()).where((p) => p.isNotEmpty).toList();
-      resolvedCity = parts.isNotEmpty ? parts.last : 'Hyderabad';
+      resolvedCity = parts.isNotEmpty ? parts.last : 'Unknown city';
     }
 
     return HostelModel(
@@ -175,8 +175,8 @@ class HostelModel {
       longitude: (data['longitude'] as num?)?.toDouble() ?? 0.0,
       description: data['description'] as String? ?? '',
       pricePerMonth: data['pricePerMonth'] as num? ?? 0,
-      totalRooms: data['totalRooms'] as int? ?? 1,
-      totalBeds: data['totalBeds'] as int? ?? 1,
+      totalRooms: (data['totalRooms'] as num?)?.toInt() ?? 1,
+      totalBeds: (data['totalBeds'] as num?)?.toInt() ?? 1,
       photos: (data['photos'] as List<dynamic>?)
               ?.map((e) {
                 if (e is Map<String, dynamic>) {
@@ -205,8 +205,8 @@ class HostelModel {
       contactPhone: data['contactPhone'] as String? ?? '',
       contactWhatsapp: data['contactWhatsapp'] as String? ?? '',
       rating: (data['rating'] as num?)?.toDouble() ?? 0.0,
-      reviewCount: data['reviewCount'] as int? ?? 0,
-      viewCount: data['viewCount'] as int? ?? 0,
+      reviewCount: (data['reviewCount'] as num?)?.toInt() ?? 0,
+      viewCount: (data['viewCount'] as num?)?.toInt() ?? 0,
       isFeatured: data['isFeatured'] as bool? ?? false,
       status: ListingStatus.values.firstWhere(
         (e) => e.name == data['status'],

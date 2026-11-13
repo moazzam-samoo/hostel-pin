@@ -26,17 +26,21 @@ class OwnerProfileController extends GetxController {
   bool get notificationsEnabled =>
       currentUser.value?.prefs.notifications ?? true;
 
-  void toggleNotifications() async {
+  Future<void> toggleNotifications() async {
     final user = currentUser.value;
-    if (user != null) {
-      final newPrefs =
-          user.prefs.copyWith(notifications: !user.prefs.notifications);
-      final updatedUser = user.copyWith(prefs: newPrefs);
-      // Optimistic local update
-      currentUser.value = updatedUser;
-      
-      // Persist to Firestore
+    if (user == null) return;
+    final newPrefs =
+        user.prefs.copyWith(notifications: !user.prefs.notifications);
+    final updatedUser = user.copyWith(prefs: newPrefs);
+    // Optimistic local update, rolled back if the write fails.
+    currentUser.value = updatedUser;
+    try {
       await _userRepo.updateUserDoc(updatedUser);
+    } catch (_) {
+      currentUser.value = user;
+      AppSnackbar.showGlobal(
+          message: AppStrings.adminGenericUpdateError,
+          type: SnackbarType.error);
     }
   }
 

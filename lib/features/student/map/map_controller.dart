@@ -35,6 +35,7 @@ class MapController extends GetxController {
   
   // To manage the stream subscription
   StreamSubscription? _geoSubscription;
+  StreamSubscription? _savedSub;
 
   @override
   void onInit() {
@@ -45,6 +46,7 @@ class MapController extends GetxController {
   @override
   void onClose() {
     _geoSubscription?.cancel();
+    _savedSub?.cancel();
     super.onClose();
   }
 
@@ -54,7 +56,7 @@ class MapController extends GetxController {
 
     final uid = _sessionService.currentUser.value?.uid;
     if (uid != null) {
-      _savedRepo.streamSaved(uid).listen(
+      _savedSub = _savedRepo.streamSaved(uid).listen(
         (saved) {
           savedHostelIds.assignAll(saved.map((s) => s.hostelId));
         },
@@ -129,23 +131,22 @@ class MapController extends GetxController {
 
   void onMapCreated(GoogleMapController controller) {
     mapController = controller;
-    // Proactively ask for location permission and center on the user's
-    // real position as soon as the map is ready, instead of waiting for
-    // an explicit FAB tap.
-    getCurrentLocation();
+    // Centre on the user only if they have already granted location — never
+    // pop a permission prompt the instant the map appears. First-time users
+    // are asked when they tap the "my location" button.
+    _locationService.hasPermission().then((granted) {
+      if (granted) getCurrentLocation();
+    });
   }
 
   Future<void> getCurrentLocation() async {
     final position = await _locationService.getCurrentLocation();
     
     if (position == null) {
-      // It handles its own permissions, but if it fails we might need to show rationale
-      final shouldRequest = await _showLocationRationale();
-      if (shouldRequest != true) return;
-      
-      // Request permission again or show error (simplified here)
-      AppSnackbar.showGlobal(
-          message: 'Location permissions denied or unavailable.', type: SnackbarType.error);
+      // Denied, denied-forever or the device location switch is off: the app
+      // cannot re-prompt, so offer the one thing that can actually fix it.
+      final openIt = await _showLocationRationale();
+      if (openIt == true) await _locationService.openSettings();
       return;
     }
     
@@ -167,17 +168,15 @@ class MapController extends GetxController {
   Future<bool?> _showLocationRationale() {
     return Get.dialog<bool>(
       AlertDialog(
-        title: const Text(AppStrings.allowLocationAccess),
-        content: const Text(
-          'Hostel Finder uses your location to show nearby hostels on the map and center it on you.',
-        ),
+        title: const Text(AppStrings.locationSettingsTitle),
+        content: const Text(AppStrings.locationSettingsMessage),
         actions: [
           TextButton(
               onPressed: () => Get.back(result: false),
               child: const Text(AppStrings.notNow)),
           TextButton(
               onPressed: () => Get.back(result: true),
-              child: const Text(AppStrings.continueText)),
+              child: const Text(AppStrings.openSettings)),
         ],
       ),
     );

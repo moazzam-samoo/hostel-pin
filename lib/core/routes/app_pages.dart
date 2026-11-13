@@ -40,6 +40,10 @@ import '../../features/owner/profile/owner_edit_profile_controller.dart';
 import '../../features/owner/add_listing/widgets/location_picker_view.dart';
 import '../../features/owner/add_listing/publish_success_view.dart';
 import '../../shared/widget_gallery/widget_gallery_view.dart';
+import '../../features/legal/legal_view.dart';
+import '../../core/constants/legal_content.dart';
+import '../../core/constants/app_strings.dart';
+import '../../features/account/account_binding.dart';
 import '../../features/admin/auth/admin_login_view.dart';
 import '../../features/admin/auth/admin_login_binding.dart';
 import '../../features/admin/shell/admin_shell_view.dart';
@@ -59,6 +63,22 @@ class AppPages {
     GetPage(
       name: Routes.widgetGallery,
       page: () => const WidgetGalleryView(),
+    ),
+    // Legal documents are public on purpose: they must be readable before
+    // signup (the Terms checkbox links here) and by Play reviewers.
+    GetPage(
+      name: Routes.privacyPolicy,
+      page: () => const LegalView(
+        title: AppStrings.privacyPolicyTitle,
+        sections: LegalContent.privacyPolicy,
+      ),
+    ),
+    GetPage(
+      name: Routes.termsOfService,
+      page: () => const LegalView(
+        title: AppStrings.termsTitle,
+        sections: LegalContent.termsOfService,
+      ),
     ),
     GetPage(
       name: Routes.welcome,
@@ -157,6 +177,7 @@ class AppPages {
     GetPage(
       name: Routes.studentSettings,
       page: () => const SettingsView(),
+      binding: AccountBinding(),
       middlewares: [AuthMiddleware()],
     ),
     GetPage(
@@ -229,6 +250,7 @@ class AppPages {
     GetPage(
       name: Routes.ownerAccountSettings,
       page: () => const AccountSettingsView(),
+      binding: AccountBinding(),
       middlewares: [AuthMiddleware()],
     ),
     // Admin — login route has NO middleware (it IS the guard target)

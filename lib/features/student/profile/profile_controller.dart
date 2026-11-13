@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -29,10 +30,21 @@ class ProfileController extends GetxController {
     super.onInit();
     final uid = user?.uid;
     if (uid != null) {
-      _savedRepo.streamSaved(uid).listen((saved) {
-        savedCount.value = saved.length;
-      });
+      _savedSub = _savedRepo.streamSaved(uid).listen(
+        (saved) {
+          savedCount.value = saved.length;
+        },
+        onError: (Object _) {},
+      );
     }
+  }
+
+  StreamSubscription? _savedSub;
+
+  @override
+  void onClose() {
+    _savedSub?.cancel();
+    super.onClose();
   }
 
   // Mock preferences. Dark Mode has no real theme yet (I17) — the toggle is

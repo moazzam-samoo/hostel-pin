@@ -71,7 +71,7 @@ class MapView extends GetView<MapController> {
                       location: selected.city,
                       price: selected.pricePerMonth,
                       rating: selected.rating,
-                      imageUrl: selected.photos.first.url,
+                      imageUrl: selected.photos.isNotEmpty ? selected.photos.first.url : '',
                       amenities: selected.amenities,
                       layout: HostelCardLayout.compact,
                       surface: HostelCardSurface.elevated,

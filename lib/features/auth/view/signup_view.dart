@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controller/signup_controller.dart';
+import '../../../core/routes/app_routes.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
@@ -152,6 +153,8 @@ class SignupView extends GetView<SignupController> {
                       value: controller.acceptedTerms.value,
                       onChanged: (val) =>
                           controller.acceptedTerms.value = val ?? false,
+                      onTermsTap: () => Get.toNamed(Routes.termsOfService),
+                      onPrivacyTap: () => Get.toNamed(Routes.privacyPolicy),
                     )),
                 SizedBox(height: AppSpacing.xl),
 

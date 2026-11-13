@@ -229,7 +229,7 @@ class AppStrings {
   // pattern rather than a raw OS permission crash.
   static const String cameraPermissionTitle = 'Camera Access Needed';
   static const String cameraPermissionMessage =
-      'Hostel Finder needs camera access to capture your identity and ownership documents. Please enable it in your device settings and try again.';
+      'HostelPin needs camera access to capture your identity and ownership documents. Please enable it in your device settings and try again.';
   static String photosSelectedCount(int count) =>
       '$count/10 photo${count == 1 ? '' : 's'} selected';
   static String locationCoordinatesLabel(double lat, double lng) =>
@@ -428,7 +428,7 @@ class AppStrings {
       'Please upload a property ownership document.';
   static const String verificationSubmittedMessage =
       'Verification request submitted successfully.';
-  static const String defaultCityFallback = 'Hyderabad';
+  static const String defaultCityFallback = 'Unknown city';
 
   // Owner Verification Wizard — Step 4 (Hostel Documents)
   static const String hostelDocumentsStepTitle = 'Hostel Documents';
@@ -655,4 +655,67 @@ class AppStrings {
   static const String adminSettingsSaved = 'Settings updated.';
   static const String adminSettingsSaveError = 'Failed to save settings. Please try again.';
   static const String adminProfileUpdated = 'Profile updated.';
+
+  // ── Account / legal (release hardening) ─────────────────────────────
+  static const String errorAccountBlocked =
+      'Your account has been suspended. Please contact support.';
+  static const String errorAccountRemoved =
+      'This account is no longer available. Contact support if you think this is a mistake.';
+  static const String errorProfileSetupFailed =
+      'We could not finish setting up your account. Please try again.';
+  static const String privacyPolicyTitle = 'Privacy Policy';
+  static const String termsTitle = 'Terms of Service';
+  static const String termsAgreePrefix = 'I agree to the ';
+  static const String termsAgreeAnd = ' and ';
+  static const String deleteAccountTitle = 'Delete Account';
+  static const String deleteAccountSubtitle =
+      'Permanently delete your account and data';
+  static const String deleteAccountConfirmTitle = 'Delete your account?';
+  static const String deleteAccountConfirmMessage =
+      'This permanently deletes your profile, saved hostels and, for owners, your listings and verification data. This cannot be undone.';
+  static const String deleteAccountConfirmButton = 'Delete';
+  static const String deleteAccountPasswordTitle = 'Confirm your password';
+  static const String deleteAccountPasswordHint = 'Current password';
+  static const String deleteAccountSuccess = 'Your account has been deleted.';
+  static const String deleteAccountFailed =
+      'Could not delete your account. Please try again.';
+  static const String deleteAccountRecentLogin =
+      'For your security, please log in again and then retry deleting your account.';
+  static const String rejectionReasonTitle = 'Message from our review team';
+  static const String verificationRejectedNotice =
+      'Your verification was not approved.';
+  static const String verificationChangesNotice =
+      'Changes are needed before we can approve your verification.';
+  static const String recentSearchesNone = 'No recent searches yet.';
+  static const String locationSettingsTitle = 'Location is off';
+  static const String locationSettingsMessage =
+      'HostelPin needs location access to show hostels near you. You can turn it on in your device settings.';
+  static const String openSettings = 'Open settings';
+
+  // ── Report a listing (Google Play user-generated-content policy) ─────
+  static const String reportListing = 'Report this listing';
+  static const String reportSheetTitle = 'Why are you reporting this listing?';
+  static const List<String> reportReasons = [
+    'Fake or misleading listing',
+    'Wrong price or details',
+    'Inappropriate photos or content',
+    'Scam or fraud',
+    'Other',
+  ];
+  static const String reportSubmitted =
+      'Thanks. Our team will review this listing.';
+  static const String reportAlreadySent =
+      'You have already reported this listing.';
+  static const String reportFailed =
+      'Could not send your report. Please try again.';
+
+  // ── Login redesign ───────────────────────────────────────────────────
+  static const String continueWithGoogle = 'Continue with Google';
+  static const String loginOrDivider = 'or';
+  static const String loginAgreePrefix = 'By logging in, you agree to our ';
+  static const String loginAs = 'Log in as';
+  static String loginRoleMismatch(String existingRole) =>
+      'This email already has an $existingRole account. Log in as $existingRole, or delete that account first if you want to use this email as the other account type.';
+  static const String deleteAccountPermissionDenied =
+      'Could not delete your account because this app version is not allowed to. Please contact support.';
 }

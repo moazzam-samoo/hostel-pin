@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'student_shell_controller.dart';
 import '../../../shared/widgets/navigation/app_bottom_nav.dart';
@@ -24,7 +25,7 @@ class StudentShellView extends GetView<StudentShellController> {
           // If on home, allow normal back/exit behavior by calling Navigator pop
           // Get.back() or SystemNavigator.pop() could be used here depending on requirement
           // Since we are catching the pop, we can force pop.
-          Navigator.of(context).pop();
+          SystemNavigator.pop();
         }
       },
       child: Scaffold(

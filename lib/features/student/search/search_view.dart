@@ -214,6 +214,10 @@ class SearchView extends GetView<SearchController> {
       children: [
         const SectionHeader(title: AppStrings.recentSearches),
         SizedBox(height: AppSpacing.sm),
+        if (controller.recentSearches.isEmpty)
+          Text(AppStrings.recentSearchesNone,
+              style: AppTextStyles.body
+                  .copyWith(color: AppColors.textSecondary)),
         ...controller.recentSearches.map((search) => ListTile(
               leading:
                   const Icon(Icons.history, color: AppColors.textSecondary),
@@ -262,7 +266,7 @@ class SearchView extends GetView<SearchController> {
           location: hostel.city,
           price: hostel.pricePerMonth,
           rating: hostel.rating,
-          imageUrl: hostel.photos.first.url,
+          imageUrl: hostel.photos.isNotEmpty ? hostel.photos.first.url : '',
           amenities: hostel.amenities,
           layout: HostelCardLayout.compact,
           surface: HostelCardSurface.tonal,
