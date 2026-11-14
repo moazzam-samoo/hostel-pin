@@ -476,6 +476,30 @@ describe('verifications/{uid}', () => {
  * and fixed, not a hypothetical).
  */
 describe('isAdmin() — Phase 9 admin-broad rules', () => {
+  it('an admin can reject a hostel with a reason; an owner cannot set the reason', async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await ctx.firestore().collection('users').doc(ADMIN).set({ role: 'admin' });
+      await ctx.firestore().collection('users').doc(OWNER_A).set({ role: 'owner' });
+      await ctx.firestore().collection('hostels').doc('rej1').set({
+        ownerId: OWNER_A, name: 'H', fullAddress: 'a', city: 'c', pricePerMonth: 5,
+        rating: 0, viewCount: 0, status: 'pending',
+      });
+    });
+
+    const asAdmin = testEnv.authenticatedContext(ADMIN).firestore();
+    await assertSucceeds(
+      asAdmin.collection('hostels').doc('rej1').update({ status: 'rejected', rejectionReason: 'Blurry photos' })
+    );
+    await assertFails(
+      asAdmin.collection('hostels').doc('rej1').update({ rejectionReason: 'x'.repeat(501) })
+    );
+
+    const asOwner = testEnv.authenticatedContext(OWNER_A).firestore();
+    await assertFails(
+      asOwner.collection('hostels').doc('rej1').update({ rejectionReason: 'tampered' })
+    );
+  });
+
   it('an admin can read any user doc', async () => {
     await testEnv.withSecurityRulesDisabled(async (ctx) => {
       await ctx.firestore().collection('users').doc(ADMIN).set({ role: 'admin' });

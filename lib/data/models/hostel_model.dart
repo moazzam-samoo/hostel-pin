@@ -51,6 +51,9 @@ class HostelModel {
   /// Boys / Girls hostel; null for listings created before this field.
   final HostelGender? gender;
 
+  /// Why an admin rejected this listing (null unless rejected).
+  final String? rejectionReason;
+
   const HostelModel({
     required this.id,
     required this.ownerId,
@@ -78,6 +81,7 @@ class HostelModel {
     this.geohash,
     this.ownershipDocumentId,
     this.gender,
+    this.rejectionReason,
   });
 
   HostelModel copyWith({
@@ -107,6 +111,7 @@ class HostelModel {
     String? geohash,
     String? ownershipDocumentId,
     HostelGender? gender,
+    String? rejectionReason,
   }) {
     return HostelModel(
       id: id ?? this.id,
@@ -135,6 +140,7 @@ class HostelModel {
       geohash: geohash ?? this.geohash,
       ownershipDocumentId: ownershipDocumentId ?? this.ownershipDocumentId,
       gender: gender ?? this.gender,
+      rejectionReason: rejectionReason ?? this.rejectionReason,
     );
   }
 
@@ -223,6 +229,7 @@ class HostelModel {
       geohash: parsedGeohash,
       ownershipDocumentId: data['ownershipDocumentId'] as String?,
       gender: HostelGender.tryParse(data['gender']),
+      rejectionReason: data['rejectionReason'] as String?,
     );
   }
 
@@ -259,6 +266,7 @@ class HostelModel {
         'location': {'geopoint': location, 'geohash': geohash},
       if (ownershipDocumentId != null) 'ownershipDocumentId': ownershipDocumentId,
       if (gender != null) 'gender': gender!.name,
+      if (rejectionReason != null) 'rejectionReason': rejectionReason,
       // Stamped server-side on create (FIX-7.5/FIX-7.11).
       // `HostelRepository.update` strips this key before merging so an edit
       // never re-dates the listing. Documents created before this field
@@ -299,7 +307,8 @@ class HostelModel {
         other.location == location &&
         other.geohash == geohash &&
         other.ownershipDocumentId == ownershipDocumentId &&
-        other.gender == gender;
+        other.gender == gender &&
+        other.rejectionReason == rejectionReason;
   }
 
   @override
@@ -331,6 +340,7 @@ class HostelModel {
       geohash,
       ownershipDocumentId,
       gender,
+      rejectionReason,
     ]);
   }
 }

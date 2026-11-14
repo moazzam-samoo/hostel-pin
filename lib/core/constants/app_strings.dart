@@ -626,6 +626,15 @@ class AppStrings {
   static const String adminDocumentLoadError = 'Could not load this document.';
   static const String adminRequestChangesButton = 'Request Changes';
   static const String adminRejectButton = 'Reject';
+  static const String adminApproveHostelTooltip = 'Approve hostel';
+  static const String adminRejectHostelTooltip = 'Reject hostel';
+  static const String adminRejectHostelDialogTitle = 'Reject Hostel';
+  static String adminHostelApproved(String name) => '$name approved and published.';
+  static String adminHostelRejected(String name) => '$name rejected.';
+  static String rejectedHostelTitle(String name) => '$name was rejected';
+  static const String rejectedHostelFallbackReason =
+      'No reason was given. Please review your listing details and submit it again.';
+  static const String rejectedHostelFixButton = 'Fix and resubmit';
   static const String adminApproveButton = 'Approve Verification';
   static const String adminReviewFooterNote = 'Please verify all documents before making a decision.';
   static const String adminRejectDialogTitle = 'Reject Submission';

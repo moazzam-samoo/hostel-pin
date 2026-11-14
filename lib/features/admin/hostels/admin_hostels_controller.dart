@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import '../../../../data/repositories/hostel_repository.dart';
 import '../../../../data/models/hostel_model.dart';
 import '../../../../core/constants/app_strings.dart';
+import '../../../../core/enums/listing_status.dart';
 import '../../../../shared/widgets/feedback/app_snackbar.dart';
 
 class AdminHostelsController extends GetxController {
@@ -31,6 +32,37 @@ class AdminHostelsController extends GetxController {
   void loadMore() {
     currentLimit.value += 10;
     _subscribeToHostels();
+  }
+
+  Future<void> approve(HostelModel hostel) async {
+    try {
+      await _hostelRepository.setStatus(hostel.id, ListingStatus.published);
+      AppSnackbar.showGlobal(
+        message: AppStrings.adminHostelApproved(hostel.name),
+        type: SnackbarType.success,
+      );
+    } catch (e) {
+      AppSnackbar.showGlobal(
+          message: AppStrings.adminReviewActionError, type: SnackbarType.error);
+    }
+  }
+
+  Future<void> reject(HostelModel hostel, String reason) async {
+    if (reason.trim().isEmpty) return;
+    try {
+      await _hostelRepository.setStatus(
+        hostel.id,
+        ListingStatus.rejected,
+        rejectionReason: reason,
+      );
+      AppSnackbar.showGlobal(
+        message: AppStrings.adminHostelRejected(hostel.name),
+        type: SnackbarType.success,
+      );
+    } catch (e) {
+      AppSnackbar.showGlobal(
+          message: AppStrings.adminReviewActionError, type: SnackbarType.error);
+    }
   }
 
   Future<void> deleteHostel(HostelModel hostel) async {

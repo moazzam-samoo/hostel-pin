@@ -50,7 +50,11 @@ service cloud.firestore {
              d.ownerId is string && d.ownerId.size() > 0 &&
              // Boys/Girls type: optional (legacy listings have none) but, when
              // present, must be one of the two allowed values.
-             (!('gender' in d) || d.gender in ['boys', 'girls']);
+             (!('gender' in d) || d.gender in ['boys', 'girls']) &&
+             // Rejection reason: optional, short. Only an admin can set it
+             // (the owner rules below pin it to its current value).
+             (!('rejectionReason' in d) ||
+              (d.rejectionReason is string && d.rejectionReason.size() <= 500));
     }
 
     // Users Collection
@@ -163,6 +167,7 @@ service cloud.firestore {
                     request.resource.data.viewCount == resource.data.viewCount &&
                     request.resource.data.get('reviewCount', 0) == resource.data.get('reviewCount', 0) &&
                     request.resource.data.get('isFeatured', false) == resource.data.get('isFeatured', false) &&
+                    request.resource.data.get('rejectionReason', null) == resource.data.get('rejectionReason', null) &&
                     (request.resource.data.status != 'published' ||
                      resource.data.status == 'published') &&
                     isValidHostelData();
@@ -184,7 +189,10 @@ service cloud.firestore {
       // never needs to touch a hostel's status but is scoped the same way
       // for symmetry with the users/{uid} admin rule above.
       allow update: if isAdmin() &&
-                    request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']);
+                    request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'rejectionReason']) &&
+                    (!('rejectionReason' in request.resource.data) ||
+                     (request.resource.data.rejectionReason is string &&
+                      request.resource.data.rejectionReason.size() <= 500));
 
       // Phase 9 Block E.5 — Hostels table's Delete action reuses the
       // already-real HostelRepository.delete() (row 12); admin needs to be

@@ -8,7 +8,9 @@ import '../../../../core/enums/listing_status.dart';
 import '../../../../data/models/hostel_model.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../core/utils/responsive.dart';
+import '../../../../shared/widgets/buttons/primary_button.dart';
 import '../../../../shared/widgets/feedback/confirm_dialog.dart';
+import '../../../../shared/widgets/inputs/app_text_field.dart';
 
 class AdminHostelsView extends GetView<AdminHostelsController> {
   const AdminHostelsView({super.key});
@@ -119,6 +121,18 @@ class _HostelDataString extends DataTableSource {
       DataCell(Row(
         mainAxisSize: MainAxisSize.min,
         children: [
+          if (hostel.status == ListingStatus.pending) ...[
+            IconButton(
+              icon: const Icon(Icons.check_circle_outline, color: AppColors.primary),
+              onPressed: () => controller.approve(hostel),
+              tooltip: AppStrings.adminApproveHostelTooltip,
+            ),
+            IconButton(
+              icon: const Icon(Icons.cancel_outlined, color: AppColors.error),
+              onPressed: () => _showRejectDialog(hostel),
+              tooltip: AppStrings.adminRejectHostelTooltip,
+            ),
+          ],
           IconButton(
             icon: const Icon(Icons.delete_outline, color: AppColors.error),
             onPressed: () => _showDeleteConfirm(hostel),
@@ -127,6 +141,42 @@ class _HostelDataString extends DataTableSource {
         ],
       )),
     ]);
+  }
+
+  void _showRejectDialog(HostelModel hostel) {
+    final reasonController = TextEditingController();
+    Get.dialog(
+      Dialog(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(AppStrings.adminRejectHostelDialogTitle,
+                  style: AppTextStyles.sectionHeader),
+              const SizedBox(height: 16),
+              AppTextField(
+                controller: reasonController,
+                hintText: AppStrings.adminReasonFieldLabel,
+                maxLines: 3,
+              ),
+              const SizedBox(height: 20),
+              PrimaryButton(
+                text: AppStrings.adminRejectButton,
+                onPressed: () {
+                  final reason = reasonController.text.trim();
+                  if (reason.isEmpty) return;
+                  Get.back();
+                  controller.reject(
+                      hostel, reason.length > 500 ? reason.substring(0, 500) : reason);
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   void _showDeleteConfirm(HostelModel hostel) {

@@ -148,6 +148,30 @@ class HostelRepository {
     }
   }
 
+  /// Admin decision on a listing: writes only `status` (and, for a rejection,
+  /// `rejectionReason`; approving clears any earlier reason).
+  Future<void> setStatus(
+    String hostelId,
+    ListingStatus status, {
+    String? rejectionReason,
+  }) async {
+    final reason = rejectionReason?.trim();
+    if (status == ListingStatus.rejected && (reason == null || reason.isEmpty)) {
+      throw ArgumentError('A rejection needs a reason.');
+    }
+    try {
+      await _hostelsRef.doc(hostelId).update({
+        'status': status.name,
+        'rejectionReason': status == ListingStatus.rejected
+            ? reason
+            : FieldValue.delete(),
+      });
+    } catch (e) {
+      Logger.e('Error setting hostel status: $e');
+      rethrow;
+    }
+  }
+
   Future<void> delete(String id) async {
     try {
       // TODO(cloud-functions): signed Cloudinary destroy on listing delete.
