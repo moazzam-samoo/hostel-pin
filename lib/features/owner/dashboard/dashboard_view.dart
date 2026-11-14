@@ -50,12 +50,12 @@ class DashboardView extends GetView<DashboardController> {
 
   Widget _buildGreetingHeader() {
     return Obx(() {
-      final name = controller.currentUser?.displayName ?? '';
+      final name = controller.welcomeName;
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            AppStrings.dashboardGreeting(name),
+            AppStrings.dashboardWelcome(name),
             style: AppTextStyles.screenTitle,
           ),
           SizedBox(height: AppSpacing.xs),

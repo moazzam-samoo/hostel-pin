@@ -80,7 +80,8 @@ class AppStrings {
   static const String profile = 'Profile';
   static const String controlProfile = 'Control your profile';
   static const String roomsExample = 'e.g. 50 rooms';
-  static String dashboardGreeting(String name) => 'Hello, $name 👋';
+  static String dashboardWelcome(String name) =>
+      name.isEmpty ? 'Welcome' : 'Welcome, $name';
   static const String dashboardSubtitle =
       'Manage your listings and student inquiries from one place.';
   static const String totalListingLabel = 'Total Listing';

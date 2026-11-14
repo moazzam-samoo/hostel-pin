@@ -22,6 +22,16 @@ class DashboardController extends GetxController {
 
   UserModel? get currentUser => _sessionService.currentUser.value;
 
+  /// Name shown in "Welcome, {name}": the display name, else the part of the
+  /// email before the @, else empty.
+  String get welcomeName {
+    final user = currentUser;
+    if (user == null) return '';
+    final name = user.displayName.trim();
+    if (name.isNotEmpty) return name;
+    return user.email.split('@').first.trim();
+  }
+
   int get totalViews =>
       ownerListings.fold(0, (sum, hostel) => sum + hostel.viewCount);
 
