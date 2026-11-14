@@ -1,3 +1,7 @@
+import '../../../../core/enums/listing_status.dart';
+import 'dart:async';
+import '../../../../core/utils/error_code.dart';
+import '../../../../core/utils/logger.dart';
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 import '../../../../core/config/edge_signer_config.dart';
@@ -56,9 +60,12 @@ class AdminVerificationsController extends GetxController {
           selected.value = refreshed.first;
         }
       }
-    }, onError: (_) {
+    }, onError: (Object e) {
       isLoading.value = false;
-      AppSnackbar.showGlobal(message: AppStrings.adminGenericLoadError, type: SnackbarType.error);
+      Logger.e('Admin verifications load failed: $e');
+      AppSnackbar.showGlobal(
+          message: '${AppStrings.adminGenericLoadError} (${errorCode(e)})',
+          type: SnackbarType.error);
     });
   }
 
@@ -73,6 +80,61 @@ class AdminVerificationsController extends GetxController {
   List<VerificationModel> get identityPendingTab => all.where((v) => v.status == 'pending').toList();
   List<VerificationModel> get hostelPendingTab => all.where((v) => v.status == 'pending').toList();
   List<VerificationModel> get changesRequiredTab => all.where((v) => v.status == 'changesRequested').toList();
+
+  /// Every hostel this owner has sent for review (not just the one linked to
+  /// the identity submission), live so a decision updates the list at once.
+  final RxList<HostelModel> ownerHostels = <HostelModel>[].obs;
+  StreamSubscription<List<HostelModel>>? _ownerHostelsSub;
+
+  void _watchOwnerHostels(String ownerId) {
+    _ownerHostelsSub?.cancel();
+    ownerHostels.clear();
+    _ownerHostelsSub = _hostelRepo.streamByOwner(ownerId).listen(
+      (list) => ownerHostels.assignAll(
+        list.where((h) => h.status != ListingStatus.draft),
+      ),
+      onError: (Object e) => Logger.e('Admin owner hostels load failed: $e'),
+    );
+  }
+
+  Future<void> approveHostel(HostelModel hostel) async {
+    try {
+      await _hostelRepo.setStatus(hostel.id, ListingStatus.published);
+      AppSnackbar.showGlobal(
+        message: AppStrings.adminHostelApproved(hostel.name),
+        type: SnackbarType.success,
+      );
+    } catch (e) {
+      Logger.e('Admin approve hostel failed: $e');
+      AppSnackbar.showGlobal(
+          message: AppStrings.adminReviewActionError, type: SnackbarType.error);
+    }
+  }
+
+  Future<void> rejectHostel(HostelModel hostel, String reason) async {
+    if (reason.trim().isEmpty) return;
+    try {
+      await _hostelRepo.setStatus(
+        hostel.id,
+        ListingStatus.rejected,
+        rejectionReason: reason.length > 500 ? reason.substring(0, 500) : reason,
+      );
+      AppSnackbar.showGlobal(
+        message: AppStrings.adminHostelRejected(hostel.name),
+        type: SnackbarType.success,
+      );
+    } catch (e) {
+      Logger.e('Admin reject hostel failed: $e');
+      AppSnackbar.showGlobal(
+          message: AppStrings.adminReviewActionError, type: SnackbarType.error);
+    }
+  }
+
+  @override
+  void onClose() {
+    _ownerHostelsSub?.cancel();
+    super.onClose();
+  }
 
   void _fetchMissingHostels(List<VerificationModel> submissions) {
     for (final s in submissions) {
@@ -89,6 +151,7 @@ class AdminVerificationsController extends GetxController {
   Future<void> selectSubmission(VerificationModel submission) async {
     selected.value = submission;
     selectedHostel.value = null;
+    _watchOwnerHostels(submission.uid);
     resolvedDocUrls.clear();
     isLoadingDetail.value = true;
 
@@ -113,6 +176,8 @@ class AdminVerificationsController extends GetxController {
   }
 
   void clearSelection() {
+    _ownerHostelsSub?.cancel();
+    ownerHostels.clear();
     selected.value = null;
     selectedHostel.value = null;
     resolvedDocUrls.clear();

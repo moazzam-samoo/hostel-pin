@@ -21,6 +21,9 @@ class FakeAuthService extends GetxService implements AuthService {
 }
 
 void main() {
+  tearDown(() => Get.reset());
+  adminMultiHostelTests();
+
   testWidgets('AdminVerificationsView smoke test', (tester) async {
     final fakeFirestore = FakeFirebaseFirestore();
     
@@ -51,5 +54,53 @@ void main() {
     
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
+  });
+}
+
+void _setUpRepos(FakeFirebaseFirestore db) {
+  Get.reset();
+  Get.put(VerificationRepository(firestore: db));
+  Get.put(HostelRepository(firestore: db));
+  Get.put<AuthService>(FakeAuthService());
+}
+
+void adminMultiHostelTests() {
+  test('review shows ALL of the owner\'s hostels in review, not only the linked one',
+      () async {
+    final db = FakeFirebaseFirestore();
+    _setUpRepos(db);
+    await db.collection('verifications').doc('o1').set({
+      'uid': 'o1',
+      'status': 'pending',
+      'hostelId': 'h1',
+      'personalInfo': {'fullName': 'Ali'},
+      'submittedAt': Timestamp.now(),
+    });
+    for (final e in {'h1': 'pending', 'h2': 'pending', 'h3': 'pending', 'h4': 'draft'}.entries) {
+      await db.collection('hostels').doc(e.key).set({
+        'ownerId': 'o1', 'name': 'Hostel ${e.key}', 'status': e.value,
+        'city': 'C', 'pricePerMonth': 10,
+      });
+    }
+    await db.collection('hostels').doc('other').set({
+      'ownerId': 'o2', 'name': 'Other', 'status': 'pending', 'city': 'C', 'pricePerMonth': 10,
+    });
+
+    final c = Get.put(AdminVerificationsController());
+    await Future<void>.delayed(const Duration(milliseconds: 50));
+    await c.selectSubmission(c.all.first);
+    await Future<void>.delayed(const Duration(milliseconds: 50));
+
+    expect(c.ownerHostels.map((h) => h.id).toSet(), {'h1', 'h2', 'h3'});
+
+    await c.approveHostel(c.ownerHostels.firstWhere((h) => h.id == 'h2'));
+    await c.rejectHostel(c.ownerHostels.firstWhere((h) => h.id == 'h3'), 'Bad photos');
+    await Future<void>.delayed(const Duration(milliseconds: 50));
+
+    expect((await db.collection('hostels').doc('h2').get())['status'], 'published');
+    final h3 = (await db.collection('hostels').doc('h3').get()).data()!;
+    expect(h3['status'], 'rejected');
+    expect(h3['rejectionReason'], 'Bad photos');
+    expect((await db.collection('hostels').doc('h1').get())['status'], 'pending');
   });
 }

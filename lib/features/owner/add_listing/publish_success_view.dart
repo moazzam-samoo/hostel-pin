@@ -6,6 +6,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/routes/app_routes.dart';
+import '../shell/owner_shell_controller.dart';
 import '../../../shared/widgets/layout/app_scaffold.dart';
 import '../../../shared/widgets/navigation/app_top_bar.dart';
 import '../../../shared/widgets/buttons/primary_button.dart';
@@ -56,15 +57,16 @@ class PublishSuccessView extends StatelessWidget {
             PrimaryButton(
               text: AppStrings.backToDashboardButton,
               onPressed: () {
-                // Reset to a fresh Owner Shell (defaults to the Dashboard
-                // tab, index 0). A plain pop-back-to-shell isn't reliable
-                // here: when Add Listing was reached via the shell's Add
-                // tab (not a pushed route), publishing replaces the shell
-                // route itself rather than leaving it on the stack below,
-                // so there'd be nothing left to pop back to. offAllNamed
-                // handles both that case and the Edit-listing (pushed
-                // route) case uniformly.
-                Get.offAllNamed(Routes.ownerShell);
+                // Pop back to the Owner Shell that is already open underneath and
+                // show its Dashboard tab. Rebuilding the shell (a second copy of
+                // its route) made the old route's cleanup dispose the new shell
+                // controller, which left the bottom nav bar dead after adding a
+                // hostel.
+                Get.until((route) =>
+                    route.settings.name == Routes.ownerShell || route.isFirst);
+                if (Get.isRegistered<OwnerShellController>()) {
+                  Get.find<OwnerShellController>().onTabSelected(0);
+                }
               },
               expand: true,
             ),

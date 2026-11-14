@@ -5,6 +5,8 @@ import '../../../../core/constants/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_text_styles.dart';
+import '../../../../core/enums/listing_status.dart';
+import '../../../../data/models/hostel_model.dart';
 import '../../../../data/models/verification_model.dart';
 import '../../../../shared/widgets/buttons/primary_button.dart';
 import '../../../../shared/widgets/buttons/secondary_button.dart';
@@ -372,22 +374,75 @@ class _ReviewDetail extends GetView<AdminVerificationsController> {
 
   Widget _propertyDetails() {
     return Obx(() {
-      final hostel = controller.selectedHostel.value;
-      if (controller.isLoadingDetail.value && hostel == null) {
+      final hostels = controller.ownerHostels;
+      if (controller.isLoadingDetail.value && hostels.isEmpty) {
         return const Center(child: Padding(padding: EdgeInsets.all(16), child: CircularProgressIndicator(color: AppColors.primary)));
       }
-      if (hostel == null) {
+      if (hostels.isEmpty) {
         return Text(AppStrings.notAvailableDash, style: AppTextStyles.body);
       }
-      return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        _field(AppStrings.adminHostelNameFieldLabel, hostel.name),
-        _field(AppStrings.adminAddressLabel, hostel.fullAddress),
-        Row(children: [
-          Expanded(child: _field(AppStrings.adminCityLabel, hostel.city)),
-          Expanded(child: _field(AppStrings.adminCapacityLabel, AppStrings.adminCapacityValue(hostel.totalRooms, hostel.totalBeds))),
-        ]),
-      ]);
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          for (final hostel in hostels) _hostelReviewCard(hostel),
+        ],
+      );
     });
+  }
+
+  /// One card per hostel the owner sent for review, each with its own
+  /// Approve / Reject (an owner can have up to 3 in review at once).
+  Widget _hostelReviewCard(HostelModel hostel) {
+    final isPending = hostel.status == ListingStatus.pending;
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceTonal,
+        borderRadius: BorderRadius.circular(AppRadius.field),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(child: Text(hostel.name, style: AppTextStyles.cardTitle)),
+              Text(hostel.status.name.toUpperCase(), style: AppTextStyles.labelMicro),
+            ],
+          ),
+          const SizedBox(height: 8),
+          _field(AppStrings.adminAddressLabel, hostel.fullAddress),
+          Row(children: [
+            Expanded(child: _field(AppStrings.adminCityLabel, hostel.city)),
+            Expanded(child: _field(AppStrings.adminCapacityLabel, AppStrings.adminCapacityValue(hostel.totalRooms, hostel.totalBeds))),
+          ]),
+          if (hostel.status == ListingStatus.rejected &&
+              (hostel.rejectionReason ?? '').isNotEmpty)
+            _field(AppStrings.adminReasonFieldLabel, hostel.rejectionReason!),
+          if (isPending) ...[
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                SecondaryButton(
+                  text: AppStrings.adminRejectButton,
+                  intent: ButtonIntent.secondary,
+                  onPressed: () => _showReasonDialog(
+                    title: AppStrings.adminRejectHostelDialogTitle,
+                    onSubmit: (reason) => controller.rejectHostel(hostel, reason),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                PrimaryButton(
+                  text: AppStrings.adminApproveHostelTooltip,
+                  onPressed: () => controller.approveHostel(hostel),
+                ),
+              ],
+            ),
+          ],
+        ],
+      ),
+    );
   }
 
   Widget _docThumb(String? publicId, String label) {

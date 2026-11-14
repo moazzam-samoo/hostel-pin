@@ -1,3 +1,5 @@
+import '../../../../core/utils/error_code.dart';
+import '../../../../core/utils/logger.dart';
 import 'package:get/get.dart';
 import '../../../../data/repositories/hostel_repository.dart';
 import '../../../../data/models/hostel_model.dart';
@@ -23,9 +25,12 @@ class AdminHostelsController extends GetxController {
     _hostelRepository.streamAllAdmin(limit: currentLimit.value).listen((data) {
       hostels.assignAll(data);
       isLoading.value = false;
-    }, onError: (e) {
+    }, onError: (Object e) {
       isLoading.value = false;
-      AppSnackbar.showGlobal(message: AppStrings.adminGenericLoadError, type: SnackbarType.error);
+      Logger.e('Admin hostels load failed: $e');
+      AppSnackbar.showGlobal(
+          message: '${AppStrings.adminGenericLoadError} (${errorCode(e)})',
+          type: SnackbarType.error);
     });
   }
 

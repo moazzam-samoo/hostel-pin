@@ -671,6 +671,9 @@ class AddListingController extends GetxController {
         // screen; it reads its copy from `status` (see PublishSuccessView)
         // so a submission-for-review doesn't claim to already be live.
         if (_editingHostel == null && Get.isRegistered<OwnerShellController>()) {
+          // The shell (and this controller) stay alive underneath, so clear the
+          // form now; otherwise the Add tab would still show the old hostel.
+          _resetForm();
           Get.toNamed(Routes.ownerPublishSuccess, arguments: status);
         } else {
           Get.offNamed(Routes.ownerPublishSuccess, arguments: status);

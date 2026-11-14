@@ -1,3 +1,5 @@
+import '../../../../core/utils/error_code.dart';
+import '../../../../core/utils/logger.dart';
 import 'package:get/get.dart';
 import '../../../../data/repositories/user_repository.dart';
 import '../../../../data/models/user_model.dart';
@@ -23,9 +25,12 @@ class AdminUsersController extends GetxController {
     _userRepository.streamAllUsers(limit: currentLimit.value, roleFilter: UserRole.student).listen((data) {
       users.assignAll(data);
       isLoading.value = false;
-    }, onError: (e) {
+    }, onError: (Object e) {
       isLoading.value = false;
-      AppSnackbar.showGlobal(message: AppStrings.adminGenericLoadError, type: SnackbarType.error);
+      Logger.e('Admin users load failed: $e');
+      AppSnackbar.showGlobal(
+          message: '${AppStrings.adminGenericLoadError} (${errorCode(e)})',
+          type: SnackbarType.error);
     });
   }
 

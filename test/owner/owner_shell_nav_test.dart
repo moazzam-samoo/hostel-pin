@@ -21,6 +21,8 @@ import 'package:hostel_finder_app/data/services/session_service.dart';
 import 'package:hostel_finder_app/data/services/storage_service.dart';
 import 'package:hostel_finder_app/core/constants/app_strings.dart';
 import 'package:hostel_finder_app/features/owner/add_listing/add_listing_view.dart';
+import 'package:hostel_finder_app/features/owner/add_listing/publish_success_view.dart';
+import 'package:hostel_finder_app/core/enums/listing_status.dart';
 import 'package:hostel_finder_app/features/owner/shell/owner_add_access.dart';
 import 'package:hostel_finder_app/features/owner/shell/owner_shell_binding.dart';
 import 'package:hostel_finder_app/features/owner/shell/owner_shell_controller.dart';
@@ -55,6 +57,7 @@ Future<void> _pumpApp(WidgetTester tester) async {
         initialRoute: '/start',
         getPages: [
           GetPage(name: '/start', page: () => const Scaffold(body: Text('START'))),
+          GetPage(name: '/owner/publish-success', page: () => const PublishSuccessView()),
           GetPage(name: '/wizard', page: () => const Scaffold(body: Text('WIZARD'))),
           GetPage(
             name: '/shell',
@@ -196,6 +199,19 @@ void main() {
     );
     await _settle(tester);
     expect(find.text(AppStrings.addTabGateMessage), findsOneWidget);
+  });
+
+  testWidgets('tabs change pages after publishing a hostel and pressing Back to Dashboard',
+      (tester) async {
+    await _pumpApp(tester);
+    Get.offAllNamed('/shell');
+    await _settle(tester);
+    // What AddListingController does after a successful new listing.
+    Get.toNamed('/owner/publish-success', arguments: ListingStatus.pending);
+    await _settle(tester);
+    await tester.tap(find.text(AppStrings.backToDashboardButton));
+    await _settle(tester);
+    await _expectEveryTabWorks(tester);
   });
 
   // Documents the bug: building the shell widget directly (no binding) leaves
