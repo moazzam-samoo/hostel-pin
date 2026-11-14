@@ -32,6 +32,7 @@ class DashboardView extends GetView<DashboardController> {
           children: [
             _buildGreetingHeader(),
             SizedBox(height: AppSpacing.lg),
+            _buildRejectedAlerts(),
             _buildStatRow(),
             SizedBox(height: AppSpacing.lg),
             _buildActionRow(),
@@ -135,6 +136,32 @@ class DashboardView extends GetView<DashboardController> {
         ),
       ],
     );
+  }
+
+  /// One alert per rejected hostel with the admin's reason, so the owner knows
+  /// exactly what to fix before resubmitting.
+  Widget _buildRejectedAlerts() {
+    return Obx(() {
+      final rejected = controller.rejectedListings;
+      if (rejected.isEmpty) return const SizedBox.shrink();
+      return Column(
+        children: [
+          for (final hostel in rejected)
+            Padding(
+              padding: EdgeInsets.only(bottom: AppSpacing.md),
+              child: AlertCard(
+                title: AppStrings.rejectedHostelTitle(hostel.name),
+                message: (hostel.rejectionReason ?? '').trim().isEmpty
+                    ? AppStrings.rejectedHostelFallbackReason
+                    : hostel.rejectionReason!,
+                actionLabel: AppStrings.rejectedHostelFixButton,
+                onAction: () => controller.editListing(hostel),
+              ),
+            ),
+          SizedBox(height: AppSpacing.xs),
+        ],
+      );
+    });
   }
 
   Widget _buildVerificationAlert() {

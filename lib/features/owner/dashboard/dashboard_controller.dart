@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:get/get.dart';
+import '../../../core/enums/listing_status.dart';
+import '../../../core/routes/app_routes.dart';
 import '../../../data/models/hostel_model.dart';
 import '../../../data/models/user_model.dart';
 import '../../../data/models/activity_model.dart';
@@ -21,6 +23,14 @@ class DashboardController extends GetxController {
   StreamSubscription? _activitiesSub;
 
   UserModel? get currentUser => _sessionService.currentUser.value;
+
+  /// Hostels an admin rejected, newest first (ownerListings is newest first).
+  List<HostelModel> get rejectedListings => ownerListings
+      .where((h) => h.status == ListingStatus.rejected)
+      .toList();
+
+  void editListing(HostelModel hostel) =>
+      Get.toNamed(Routes.ownerEdit, arguments: hostel);
 
   /// Name shown in "Welcome, {name}": the display name, else the part of the
   /// email before the @, else empty.

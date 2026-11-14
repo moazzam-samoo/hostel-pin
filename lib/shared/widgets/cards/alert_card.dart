@@ -3,17 +3,24 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_radius.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../buttons/text_link_button.dart';
 
 class AlertCard extends StatelessWidget {
   final String title;
   final String message;
   final IconData icon;
 
+  /// Optional call to action shown under the message.
+  final String? actionLabel;
+  final VoidCallback? onAction;
+
   const AlertCard({
     super.key,
     required this.title,
     required this.message,
     this.icon = Icons.error_outline,
+    this.actionLabel,
+    this.onAction,
   });
 
   @override
@@ -53,6 +60,8 @@ class AlertCard extends StatelessWidget {
                   style: AppTextStyles.body
                       .copyWith(color: AppColors.textSecondary),
                 ),
+                if (actionLabel != null && onAction != null)
+                  TextLinkButton(text: actionLabel!, onPressed: onAction!),
               ],
             ),
           ),
