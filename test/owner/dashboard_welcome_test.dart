@@ -21,7 +21,7 @@ class _FakeSessionService extends SessionService {
 UserModel _user(String name, {String email = 'a.b@x.com'}) =>
     UserModel(uid: 'o1', displayName: name, email: email, role: UserRole.owner);
 
-late _FakeSessionService session;
+late SessionService session;
 
 void main() {
   setUp(() {
