@@ -6,7 +6,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../shared/widgets/buttons/primary_button.dart';
-import '../../shell/owner_shell_view.dart';
+import '../../../../core/routes/app_routes.dart';
 
 class Step6Submission extends GetView<VerificationController> {
   const Step6Submission({super.key});
@@ -68,8 +68,12 @@ class Step6Submission extends GetView<VerificationController> {
             child: PrimaryButton(
               text: 'Done',
               onPressed: () {
-                // Clear the wizard stack and return to owner shell
-                Get.offAll(() => const OwnerShellView());
+                // Pop back to the owner shell that is already open underneath the
+                // wizard. Rebuilding the shell made the
+                // old route's cleanup dispose the NEW shell controller, which left
+                // the bottom nav bar dead (tabs never changed).
+                Get.until((route) =>
+                    route.settings.name == Routes.ownerShell || route.isFirst);
               },
             ),
           ),
