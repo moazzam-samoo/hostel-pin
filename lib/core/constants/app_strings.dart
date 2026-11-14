@@ -206,6 +206,12 @@ class AppStrings {
   static const String addTabGatePendingMessage =
       'Your verification is under review by our team. You\'ll be able to list a hostel as soon as it\'s approved — this usually takes 24 hours.';
   static const String addTabGateViewStatusButton = 'View Verification Status';
+  static const String addTabLimitReachedTitle = 'Review Limit Reached';
+  static const String addTabLimitReachedMessage =
+      'You already have 3 hostels waiting for review. You can add more as soon as our team reviews them.';
+  static const String addTabLimitReachedButton = 'View My Listings';
+  static const String addTabRejectedMessage =
+      'Your verification was not approved. Open the Verification Center to see why and submit it again.';
 
   // Owner Add Listing — location picker & publish success
   static const String pickLocationTitle = 'Pick Location';

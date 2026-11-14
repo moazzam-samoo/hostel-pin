@@ -19,6 +19,9 @@ import 'package:hostel_finder_app/data/services/cloudinary_service.dart';
 import 'package:hostel_finder_app/data/services/location_service.dart';
 import 'package:hostel_finder_app/data/services/session_service.dart';
 import 'package:hostel_finder_app/data/services/storage_service.dart';
+import 'package:hostel_finder_app/core/constants/app_strings.dart';
+import 'package:hostel_finder_app/features/owner/add_listing/add_listing_view.dart';
+import 'package:hostel_finder_app/features/owner/shell/owner_add_access.dart';
 import 'package:hostel_finder_app/features/owner/shell/owner_shell_binding.dart';
 import 'package:hostel_finder_app/features/owner/shell/owner_shell_controller.dart';
 import 'package:hostel_finder_app/features/owner/shell/owner_shell_view.dart';
@@ -127,6 +130,72 @@ void main() {
     Get.until((route) => route.settings.name == '/shell' || route.isFirst);
     await _settle(tester);
     await _expectEveryTabWorks(tester);
+  });
+
+  Future<void> seedPending(int n) async {
+    for (var i = 0; i < n; i++) {
+      await db.collection('hostels').doc('${1000 + i}').set({
+        'ownerId': 'o1',
+        'status': 'pending',
+        'name': 'H$i',
+      });
+    }
+  }
+
+  Future<void> openAddTab(WidgetTester tester) async {
+    await _pumpApp(tester);
+    Get.offAllNamed('/shell');
+    await _settle(tester);
+    await tester.tap(find.byIcon(Icons.add_circle_outline_rounded).last);
+    await _settle(tester);
+  }
+
+  testWidgets('identity submitted + 2 hostels in review: Add tab shows the form',
+      (tester) async {
+    await seedPending(2);
+    await openAddTab(tester);
+    expect(Get.find<OwnerShellController>().addAccess.value, OwnerAddAccess.allowed);
+    expect(find.byType(AddListingView), findsOneWidget);
+  });
+
+  testWidgets('3 hostels in review: Add tab shows the limit message',
+      (tester) async {
+    await seedPending(3);
+    await openAddTab(tester);
+    expect(find.text(AppStrings.addTabLimitReachedMessage), findsOneWidget);
+    expect(find.byType(AddListingView), findsNothing);
+  });
+
+  testWidgets('deleting one pending hostel re-opens the Add tab without restart',
+      (tester) async {
+    await seedPending(3);
+    await openAddTab(tester);
+    expect(find.byType(AddListingView), findsNothing);
+    await db.collection('hostels').doc('1000').delete();
+    await _settle(tester);
+    expect(find.byType(AddListingView), findsOneWidget);
+  });
+
+  testWidgets('no verification submitted: Add tab shows the verification gate',
+      (tester) async {
+    await db.collection('verifications').doc('o1').delete();
+    await openAddTab(tester);
+    expect(find.text(AppStrings.addTabGateMessage), findsOneWidget);
+    expect(find.byType(AddListingView), findsNothing);
+  });
+
+  testWidgets('another owner signing in gets their own state', (tester) async {
+    await seedPending(3);
+    await openAddTab(tester);
+    expect(find.text(AppStrings.addTabLimitReachedMessage), findsOneWidget);
+    Get.find<SessionService>().currentUser.value = const UserModel(
+      uid: 'o2',
+      displayName: 'Other',
+      email: 'o2@example.com',
+      role: UserRole.owner,
+    );
+    await _settle(tester);
+    expect(find.text(AppStrings.addTabGateMessage), findsOneWidget);
   });
 
   // Documents the bug: building the shell widget directly (no binding) leaves

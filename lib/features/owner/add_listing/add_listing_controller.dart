@@ -26,6 +26,7 @@ import '../../../core/utils/logger.dart';
 import '../../../core/utils/cloudinary_thumbnail.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../shared/widgets/feedback/app_snackbar.dart';
+import '../shell/owner_add_access.dart';
 import '../shell/owner_shell_controller.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -470,6 +471,23 @@ class AddListingController extends GetxController {
     // differently-scoped seam.
     final wasAlreadyPublished = _editingHostel?.status == ListingStatus.published;
     final targetStatus = wasAlreadyPublished ? ListingStatus.published : ListingStatus.pending;
+    // A new go-live needs the owner to be allowed to add one right now
+    // (verified, or identity submitted with fewer than 3 hostels in review).
+    // Re-publishing a hostel that is already in review is not a new request.
+    if (targetStatus == ListingStatus.pending &&
+        _editingHostel?.status != ListingStatus.pending &&
+        Get.isRegistered<OwnerShellController>()) {
+      final access = Get.find<OwnerShellController>().addAccess.value;
+      if (access != OwnerAddAccess.allowed) {
+        AppSnackbar.showGlobal(
+          message: access == OwnerAddAccess.limitReached
+              ? AppStrings.addTabLimitReachedMessage
+              : AppStrings.addTabGateMessage,
+          type: SnackbarType.error,
+        );
+        return;
+      }
+    }
     _saveListing(targetStatus);
   }
 

@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'owner_add_access.dart';
 import 'owner_shell_controller.dart';
 import 'widgets/add_listing_gate_view.dart';
-import '../../../core/enums/verification_status.dart';
-import '../../../data/services/session_service.dart';
 import '../../../shared/widgets/navigation/app_bottom_nav.dart';
 import '../../../shared/widgets/navigation/nav_item.dart';
 import '../dashboard/dashboard_view.dart';
@@ -17,8 +16,6 @@ class OwnerShellView extends GetView<OwnerShellController> {
 
   @override
   Widget build(BuildContext context) {
-    final sessionService = Get.find<SessionService>();
-
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) {
@@ -38,14 +35,12 @@ class OwnerShellView extends GetView<OwnerShellController> {
           children: [
             const DashboardView(),
             const ListingsView(),
-            // 2.B — the Add tab is gated behind full identity verification.
-            // Obx here (not a one-time check) so an owner approved while the
-            // app is open sees the gate lift immediately, without a restart.
-            Obx(() {
-              final isVerified = sessionService.currentUser.value?.verificationStatus ==
-                  VerificationStatus.verified;
-              return isVerified ? const AddListingView() : const AddListingGateView();
-            }),
+            // The Add tab follows OwnerShellController.addAccess: the real form
+            // while the owner may add a hostel (verified, or identity submitted
+            // with fewer than kMaxPendingHostels in review), the gate otherwise.
+            Obx(() => controller.addAccess.value == OwnerAddAccess.allowed
+                ? const AddListingView()
+                : AddListingGateView(access: controller.addAccess.value)),
             const OwnerProfileView(),
           ],
         ),
