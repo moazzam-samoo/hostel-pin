@@ -8,6 +8,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../core/enums/verification_step.dart';
 import '../../../core/enums/amenity.dart';
+import '../../../core/enums/hostel_gender.dart';
 import '../../../core/enums/availability_status.dart';
 import '../../../core/enums/listing_status.dart';
 import '../../../core/routes/app_routes.dart';
@@ -108,6 +109,7 @@ class VerificationController extends GetxController {
   final hostelPhoneController = TextEditingController();
   final hostelWhatsappController = TextEditingController();
   final selectedAmenities = <Amenity>{}.obs;
+  final hostelGender = Rxn<HostelGender>();
   final availability = AvailabilityStatus.available.obs;
   final photos = <UploadResultModel>[].obs;
   final latitude = 25.3960.obs;
@@ -266,6 +268,7 @@ class VerificationController extends GetxController {
     hostelPhoneController.text = hostel.contactPhone;
     hostelWhatsappController.text = hostel.contactWhatsapp;
     selectedAmenities.assignAll(hostel.amenities);
+    hostelGender.value = hostel.gender;
     photos.assignAll(hostel.photos);
     availability.value = hostel.availability;
     latitude.value = hostel.latitude;
@@ -421,6 +424,11 @@ class VerificationController extends GetxController {
 
   Future<void> _completeHostelInfoStep() async {
     if (!hostelInfoFormKey.currentState!.validate()) return;
+    if (hostelGender.value == null) {
+      AppSnackbar.showGlobal(
+          message: AppStrings.errorHostelTypeRequired, type: SnackbarType.error);
+      return;
+    }
     if (photos.length < 3) {
       AppSnackbar.showGlobal(message: AppStrings.errorMinPhotos, type: SnackbarType.error);
       return;
@@ -486,6 +494,7 @@ class VerificationController extends GetxController {
         location: GeoPoint(latitude.value, longitude.value),
         geohash: geohash,
         ownershipDocumentId: _ownershipId.isNotEmpty ? _ownershipId : null,
+        gender: hostelGender.value,
       );
 
       if (_hostelId == null) {

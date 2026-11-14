@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:geoflutterfire_plus/geoflutterfire_plus.dart';
 import '../models/hostel_model.dart';
+import '../../core/enums/hostel_gender.dart';
 import '../../core/enums/listing_status.dart';
 import '../../core/utils/logger.dart';
 
@@ -50,9 +51,21 @@ class HostelRepository {
   /// re-sorted them, hiding every new listing past the first page.
   /// Requires the composite index `status ASC, __name__ DESC`
   /// (firestore.indexes.json) — deploy it with the app.
-  Stream<List<HostelModel>> streamAllPublished({int limit = kHostelPageSize}) {
-    return _hostelsRef
-        .where('status', isEqualTo: ListingStatus.published.name)
+  ///
+  /// [gender] narrows to Boys or Girls hostels on the server (so paging stays
+  /// correct); null returns every published hostel, including legacy ones
+  /// without a gender. Needs the composite index
+  /// `status ASC, gender ASC, __name__ DESC` for the filtered form.
+  Stream<List<HostelModel>> streamAllPublished({
+    int limit = kHostelPageSize,
+    HostelGender? gender,
+  }) {
+    Query<HostelModel> query = _hostelsRef
+        .where('status', isEqualTo: ListingStatus.published.name);
+    if (gender != null) {
+      query = query.where('gender', isEqualTo: gender.name);
+    }
+    return query
         .orderBy(FieldPath.documentId, descending: true)
         .limit(limit)
         .snapshots()

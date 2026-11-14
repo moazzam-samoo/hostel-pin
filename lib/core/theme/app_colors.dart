@@ -14,6 +14,7 @@ class AppColors {
   // Neutrals
   static const Color background = Color(0xffF6F7FB);
   static const Color surfaceTonal = Color(0xFFF3F4F5);
+  static const Color surface = Color(0xFFFFFFFF);
   static const Color navBackground = Color(0xFFFAFAFD);
 
   // Text

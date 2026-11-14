@@ -47,7 +47,10 @@ service cloud.firestore {
              d.fullAddress is string && d.fullAddress.size() > 0 &&
              d.city is string && d.city.size() > 0 && d.city.size() < 100 &&
              d.pricePerMonth is number && d.pricePerMonth > 0 &&
-             d.ownerId is string && d.ownerId.size() > 0;
+             d.ownerId is string && d.ownerId.size() > 0 &&
+             // Boys/Girls type: optional (legacy listings have none) but, when
+             // present, must be one of the two allowed values.
+             (!('gender' in d) || d.gender in ['boys', 'girls']);
     }
 
     // Users Collection

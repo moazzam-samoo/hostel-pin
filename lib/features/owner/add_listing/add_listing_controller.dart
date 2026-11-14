@@ -17,6 +17,7 @@ import '../verification/widgets/image_source_sheet.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../../core/enums/amenity.dart';
+import '../../../core/enums/hostel_gender.dart';
 import '../../../core/enums/listing_status.dart';
 import '../../../core/enums/availability_status.dart';
 import '../../../core/routes/app_routes.dart';
@@ -62,6 +63,10 @@ class AddListingController extends GetxController {
   final whatsappController = TextEditingController();
 
   final selectedAmenities = <Amenity>{}.obs;
+
+  /// Boys / Girls hostel type: required to publish.
+  final gender = Rxn<HostelGender>();
+  HostelGender? _initialGender;
   final sameAsPhone = false.obs;
   final availability = AvailabilityStatus.available.obs;
 
@@ -123,6 +128,8 @@ class AddListingController extends GetxController {
     _initialWhatsapp = whatsappController.text;
     _initialAmenities = Set.of(selectedAmenities);
     _initialPhotos = List.of(photos);
+    _initialGender = gender.value;
+    ever(gender, (_) => update());
 
     ever(sameAsPhone, (isSame) {
       if (isSame) {
@@ -185,6 +192,7 @@ class AddListingController extends GetxController {
         Validators.rooms(roomsController.text) == null &&
         Validators.phone(phoneController.text) == null &&
         (sameAsPhone.value || Validators.phone(whatsappController.text) == null) &&
+        gender.value != null &&
         photos.length >= 3 &&
         photos.length <= 10 &&
         (!_requiresOwnershipDocument || _hasOwnershipDocument);
@@ -200,6 +208,7 @@ class AddListingController extends GetxController {
         roomsController.text != _initialRooms ||
         phoneController.text != _initialPhone ||
         whatsappController.text != _initialWhatsapp ||
+        gender.value != _initialGender ||
         !setEquals(selectedAmenities.toSet(), _initialAmenities) ||
         !listEquals(photos.toList(), _initialPhotos) ||
         // _populateForm never sets a local path (only the uploaded flag from
@@ -217,6 +226,7 @@ class AddListingController extends GetxController {
     phoneController.text = hostel.contactPhone;
     whatsappController.text = hostel.contactWhatsapp;
     selectedAmenities.assignAll(hostel.amenities);
+    gender.value = hostel.gender;
     photos.assignAll(hostel.photos);
     latitude.value = hostel.latitude;
     longitude.value = hostel.longitude;
@@ -412,6 +422,13 @@ class AddListingController extends GetxController {
       );
       return;
     }
+    if (gender.value == null) {
+      AppSnackbar.showGlobal(
+        message: AppStrings.errorHostelTypeRequired,
+        type: SnackbarType.error,
+      );
+      return;
+    }
     if (photos.length < 3) {
       AppSnackbar.showGlobal(
         message: AppStrings.errorMinPhotos,
@@ -555,6 +572,7 @@ class AddListingController extends GetxController {
         location: GeoPoint(latitude.value, longitude.value),
         geohash: geohash,
         ownershipDocumentId: _ownershipId.isNotEmpty ? _ownershipId : null,
+        gender: gender.value,
       );
 
       if (_editingHostel == null) {
@@ -737,6 +755,8 @@ class AddListingController extends GetxController {
     phoneController.clear();
     whatsappController.clear();
     selectedAmenities.clear();
+    gender.value = null;
+    _initialGender = null;
     photos.clear();
     availability.value = AvailabilityStatus.available;
     sameAsPhone.value = false;

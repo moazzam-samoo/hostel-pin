@@ -757,3 +757,27 @@ describe('release hardening (self-verification, block bypass, self-featuring, ac
     await assertFails(asStudent.collection('reports').doc('r4').set({ ...ok, details: 'x'.repeat(2001) }));
   });
 });
+
+
+describe('hostel gender (boys/girls)', () => {
+  const base = { ...publishedHostel, status: 'pending', rating: 0, reviewCount: 0, viewCount: 0 };
+
+  it('an owner can create a listing with gender boys or girls, or without one (legacy)', async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await ctx.firestore().collection('users').doc(OWNER_A).set({ role: 'owner' });
+    });
+    const asOwner = testEnv.authenticatedContext(OWNER_A).firestore();
+    await assertSucceeds(asOwner.collection('hostels').doc('g1').set({ ...base, gender: 'boys' }));
+    await assertSucceeds(asOwner.collection('hostels').doc('g2').set({ ...base, gender: 'girls' }));
+    await assertSucceeds(asOwner.collection('hostels').doc('g3').set(base));
+  });
+
+  it('an owner cannot create a listing with any other gender value', async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await ctx.firestore().collection('users').doc(OWNER_A).set({ role: 'owner' });
+    });
+    const asOwner = testEnv.authenticatedContext(OWNER_A).firestore();
+    await assertFails(asOwner.collection('hostels').doc('g4').set({ ...base, gender: 'co-ed' }));
+    await assertFails(asOwner.collection('hostels').doc('g5').set({ ...base, gender: '' }));
+  });
+});

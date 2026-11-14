@@ -6,6 +6,7 @@ import '../../../core/theme/app_spacing.dart';
 import '../../../core/routes/app_routes.dart';
 import '../../../shared/widgets/navigation/app_top_bar.dart';
 import '../../../shared/widgets/inputs/app_search_bar.dart';
+import '../../../shared/widgets/inputs/category_chip_row.dart';
 import '../../../shared/widgets/layout/section_header.dart';
 import '../../../shared/widgets/feedback/state_view.dart';
 import '../../../shared/widgets/feedback/empty_state.dart';
@@ -57,51 +58,73 @@ class HomeView extends GetView<HomeController> {
               onTap: () => Get.toNamed(Routes.studentSearch),
             ),
           ),
-          if (controller.featuredHostels.isNotEmpty) ...[
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: AppSpacing.gutter),
-              child: const SectionHeader(
-                title: AppStrings.featuredHostels,
-              ),
-            ),
-            SizedBox(height: AppSpacing.md),
-            FeaturedCarousel(hostels: controller.featuredHostels),
-            SizedBox(height: AppSpacing.xl),
-          ],
           Padding(
             padding: EdgeInsets.symmetric(horizontal: AppSpacing.gutter),
             child: const SectionHeader(
-              title: AppStrings.allHostelsSection,
+              title: AppStrings.featuredHostels,
             ),
           ),
-          ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            padding: EdgeInsets.all(AppSpacing.gutter),
-            itemCount: controller.regularHostels.length,
-            separatorBuilder: (context, index) =>
-                SizedBox(height: AppSpacing.md),
-            itemBuilder: (context, index) {
-              final hostel = controller.regularHostels[index];
-              return Obx(() => HostelCard(
-                    id: hostel.id,
-                    name: hostel.name,
-                    location: hostel.city,
-                    price: hostel.pricePerMonth,
-                    rating: hostel.rating,
-                    imageUrl: hostel.photos.isNotEmpty
-                        ? hostel.photos.first.url
-                        : '',
-                    amenities: hostel.amenities,
-                    layout: HostelCardLayout.compact,
-                    surface: HostelCardSurface.tonal,
-                    isSaved: controller.isSaved(hostel.id),
-                    onHeartTap: () => controller.toggleSaved(hostel.id),
-                    onTap: () => Get.toNamed(Routes.studentHostelDetail,
-                        arguments: hostel),
-                  ));
-            },
+          SizedBox(height: AppSpacing.sm),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: AppSpacing.gutter),
+            child: CategoryChipRow(
+              selected: controller.selectedGender.value,
+              onChanged: controller.selectGender,
+            ),
           ),
+          SizedBox(height: AppSpacing.md),
+          if (controller.isCategoryLoading.value)
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: AppSpacing.xl),
+              child: const Center(child: CircularProgressIndicator()),
+            )
+          else if (controller.featuredHostels.isEmpty &&
+              controller.regularHostels.isEmpty)
+            SizedBox(
+              height: 280,
+              child: EmptyState(
+                title: AppStrings.noHostelsInCategoryTitle(
+                  controller.selectedGender.value?.label ??
+                      AppStrings.categoryAll,
+                ),
+                message: AppStrings.noHostelsInCategoryMessage,
+                icon: Icons.apartment_rounded,
+              ),
+            )
+          else ...[
+            if (controller.featuredHostels.isNotEmpty) ...[
+              FeaturedCarousel(hostels: controller.featuredHostels),
+              SizedBox(height: AppSpacing.md),
+            ],
+            ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              padding: EdgeInsets.all(AppSpacing.gutter),
+              itemCount: controller.regularHostels.length,
+              separatorBuilder: (context, index) =>
+                  SizedBox(height: AppSpacing.md),
+              itemBuilder: (context, index) {
+                final hostel = controller.regularHostels[index];
+                return Obx(() => HostelCard(
+                      id: hostel.id,
+                      name: hostel.name,
+                      location: hostel.city,
+                      price: hostel.pricePerMonth,
+                      rating: hostel.rating,
+                      imageUrl: hostel.photos.isNotEmpty
+                          ? hostel.photos.first.url
+                          : '',
+                      amenities: hostel.amenities,
+                      layout: HostelCardLayout.compact,
+                      surface: HostelCardSurface.tonal,
+                      isSaved: controller.isSaved(hostel.id),
+                      onHeartTap: () => controller.toggleSaved(hostel.id),
+                      onTap: () => Get.toNamed(Routes.studentHostelDetail,
+                          arguments: hostel),
+                    ));
+              },
+            ),
+          ],
           Obx(() => controller.isLoadingMore.value
               ? Padding(
                   padding: EdgeInsets.only(bottom: AppSpacing.xl),

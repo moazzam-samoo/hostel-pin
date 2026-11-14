@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../core/enums/amenity.dart';
 import '../../core/enums/availability_status.dart';
+import '../../core/enums/hostel_gender.dart';
 import '../../core/enums/listing_status.dart';
 import 'upload_result_model.dart';
 
@@ -47,6 +48,9 @@ class HostelModel {
   // created before this field existed.
   final String? ownershipDocumentId;
 
+  /// Boys / Girls hostel; null for listings created before this field.
+  final HostelGender? gender;
+
   const HostelModel({
     required this.id,
     required this.ownerId,
@@ -73,6 +77,7 @@ class HostelModel {
     this.location,
     this.geohash,
     this.ownershipDocumentId,
+    this.gender,
   });
 
   HostelModel copyWith({
@@ -101,6 +106,7 @@ class HostelModel {
     GeoPoint? location,
     String? geohash,
     String? ownershipDocumentId,
+    HostelGender? gender,
   }) {
     return HostelModel(
       id: id ?? this.id,
@@ -128,6 +134,7 @@ class HostelModel {
       location: location ?? this.location,
       geohash: geohash ?? this.geohash,
       ownershipDocumentId: ownershipDocumentId ?? this.ownershipDocumentId,
+      gender: gender ?? this.gender,
     );
   }
 
@@ -215,6 +222,7 @@ class HostelModel {
       location: parsedLocation,
       geohash: parsedGeohash,
       ownershipDocumentId: data['ownershipDocumentId'] as String?,
+      gender: HostelGender.tryParse(data['gender']),
     );
   }
 
@@ -250,6 +258,7 @@ class HostelModel {
       if (location != null && geohash != null)
         'location': {'geopoint': location, 'geohash': geohash},
       if (ownershipDocumentId != null) 'ownershipDocumentId': ownershipDocumentId,
+      if (gender != null) 'gender': gender!.name,
       // Stamped server-side on create (FIX-7.5/FIX-7.11).
       // `HostelRepository.update` strips this key before merging so an edit
       // never re-dates the listing. Documents created before this field
@@ -289,7 +298,8 @@ class HostelModel {
         other.status == status &&
         other.location == location &&
         other.geohash == geohash &&
-        other.ownershipDocumentId == ownershipDocumentId;
+        other.ownershipDocumentId == ownershipDocumentId &&
+        other.gender == gender;
   }
 
   @override
@@ -320,6 +330,7 @@ class HostelModel {
       location,
       geohash,
       ownershipDocumentId,
+      gender,
     ]);
   }
 }

@@ -11,6 +11,15 @@ class AppShadows {
     ),
   ];
 
+  /// Soft, wide, borderless-card shadow used by every hostel card.
+  static final softCard = [
+    BoxShadow(
+      color: Colors.black.withValues(alpha: 0.08),
+      blurRadius: 24,
+      offset: const Offset(0, 8),
+    ),
+  ];
+
   static final nav = [
     BoxShadow(
       color: Colors.black.withValues(alpha: 0.05),

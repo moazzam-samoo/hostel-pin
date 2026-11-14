@@ -1,4 +1,6 @@
 import 'dart:io';
+import '../../../core/enums/hostel_gender.dart';
+import '../../../shared/widgets/inputs/segmented_toggle.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'add_listing_controller.dart';
@@ -73,6 +75,18 @@ class AddListingView extends StatelessWidget {
                             hintText: AppStrings.hostelNameHint,
                             validator: Validators.required,
                           ),
+                          SizedBox(height: AppSpacing.md),
+                          const FieldLabel(AppStrings.hostelTypeLabel,
+                              style: FieldLabelStyle.form),
+                          SizedBox(height: AppSpacing.xs),
+                          Obx(() => SegmentedToggle<HostelGender>(
+                                selected: controller.gender.value,
+                                onChanged: (g) => controller.gender.value = g,
+                                options: [
+                                  for (final g in HostelGender.values)
+                                    SegmentOption(value: g, label: g.label),
+                                ],
+                              )),
                           SizedBox(height: AppSpacing.md),
                           ValidatedTextField(
                             label: AppStrings.fullAddressLabel,

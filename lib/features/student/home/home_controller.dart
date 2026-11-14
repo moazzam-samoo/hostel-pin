@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:get/get.dart';
+import '../../../core/enums/hostel_gender.dart';
 import '../../../data/models/hostel_model.dart';
 import '../../../data/repositories/hostel_repository.dart';
 import '../../../data/repositories/saved_repository.dart';
@@ -17,6 +18,13 @@ class HomeController extends GetxController {
   final RxList<HostelModel> featuredHostels = <HostelModel>[].obs;
   final RxList<HostelModel> regularHostels = <HostelModel>[].obs;
   final RxSet<String> savedHostelIds = <String>{}.obs;
+
+  /// Selected category chip: null = All, otherwise Boys or Girls.
+  final Rxn<HostelGender> selectedGender = Rxn<HostelGender>();
+
+  /// True from a category switch until its first result arrives, so the old
+  /// category's hostels are never shown under the new chip.
+  final RxBool isCategoryLoading = false.obs;
 
   StreamSubscription? _featuredSub;
   StreamSubscription? _publishedSub;
@@ -46,10 +54,24 @@ class HomeController extends GetxController {
     _loadData();
   }
 
-  Future<void> _loadData() async {
+  /// Switches the category chip: resets paging and re-subscribes with the
+  /// server-side gender filter. The chips themselves stay on screen.
+  void selectGender(HostelGender? gender) {
+    if (selectedGender.value == gender) return;
+    selectedGender.value = gender;
+    pageLimit.value = kHostelPageSize;
+    hasMore.value = true;
+    isLoadingMore.value = false;
+    featuredHostels.clear();
+    regularHostels.clear();
+    isCategoryLoading.value = true;
+    _loadData(showFullLoader: false);
+  }
+
+  Future<void> _loadData({bool showFullLoader = true}) async {
     // Only show the full-screen loader for the first page — widening the
     // window must not blank out the list the user is already reading.
-    if (pageLimit.value == kHostelPageSize) {
+    if (showFullLoader && pageLimit.value == kHostelPageSize) {
       status.value = StateViewStatus.loading;
     }
 
@@ -58,13 +80,17 @@ class HomeController extends GetxController {
 
     try {
       _publishedSub = _hostelRepo
-          .streamAllPublished(limit: pageLimit.value)
+          .streamAllPublished(
+            limit: pageLimit.value,
+            gender: selectedGender.value,
+          )
           .listen(
         (hostels) {
           // A short page means the collection is exhausted; a full one means
           // there may be more behind it.
           hasMore.value = hostels.length >= pageLimit.value;
           isLoadingMore.value = false;
+          isCategoryLoading.value = false;
 
           final explicitFeatured =
               hostels.where((h) => h.isFeatured).toList();
@@ -82,6 +108,7 @@ class HomeController extends GetxController {
         onError: (e) {
           Logger.e('Error streaming published hostels: $e');
           isLoadingMore.value = false;
+          isCategoryLoading.value = false;
           status.value = StateViewStatus.error;
         },
       );
@@ -112,7 +139,11 @@ class HomeController extends GetxController {
   }
 
   void _updateStatus() {
-    if (featuredHostels.isEmpty && regularHostels.isEmpty) {
+    // With a category selected, an empty result is shown inline (chips stay
+    // visible) instead of replacing the whole screen.
+    if (featuredHostels.isEmpty &&
+        regularHostels.isEmpty &&
+        selectedGender.value == null) {
       status.value = StateViewStatus.empty;
     } else {
       status.value = StateViewStatus.content;

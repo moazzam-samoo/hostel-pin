@@ -5,7 +5,6 @@ import '../../../core/theme/app_spacing.dart';
 import '../../../core/constants/app_sizes.dart';
 import '../../../core/theme/app_shadows.dart';
 import '../../../core/theme/app_text_styles.dart';
-import '../../../core/utils/formatters.dart';
 import '../../../core/utils/cloudinary_thumbnail.dart';
 import '../../../core/enums/amenity.dart';
 import '../media/network_image_box.dart';
@@ -52,9 +51,11 @@ class HostelCard extends StatelessWidget {
     List<BoxShadow>? shadows;
 
     switch (surface) {
+      // tonal + elevated are the app's hostel-card look: white, NO border, soft
+      // wide shadow (they differ only by name; every screen gets the same card).
       case HostelCardSurface.tonal:
-        bgColor = Colors.white;
-        border = Border.all(color: AppColors.border, width: 1.0);
+        bgColor = AppColors.surface;
+        shadows = AppShadows.softCard;
         break;
       case HostelCardSurface.lavender:
         bgColor = AppColors.primaryContainer;
@@ -65,9 +66,8 @@ class HostelCard extends StatelessWidget {
         border = Border.all(color: AppColors.border, width: 1.0);
         break;
       case HostelCardSurface.elevated:
-        bgColor = Colors.white;
-        border = Border.all(color: AppColors.border, width: 1.0);
-        shadows = AppShadows.card;
+        bgColor = AppColors.surface;
+        shadows = AppShadows.softCard;
         break;
     }
 
@@ -108,9 +108,17 @@ class HostelCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        AspectRatio(
-          aspectRatio: 16 / 10,
-          child: _buildImage(),
+        // Image inset inside the card (not full-bleed), near square.
+        Padding(
+          padding: EdgeInsets.fromLTRB(
+              AppSpacing.md, AppSpacing.md, AppSpacing.md, 0),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(AppRadius.card),
+            child: AspectRatio(
+              aspectRatio: 1,
+              child: _buildImage(),
+            ),
+          ),
         ),
         Padding(
           padding: EdgeInsets.all(AppSpacing.md),
@@ -390,7 +398,7 @@ class HostelCard extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          Formatters.currency(price),
+          'Rs:${price.toStringAsFixed(0)}',
           style: AppTextStyles.body.copyWith(
             color: AppColors.secondary,
             fontWeight: FontWeight.w600,

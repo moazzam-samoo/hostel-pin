@@ -55,7 +55,7 @@ void main() {
         layout: HostelCardLayout.featured,
       ),
       wrapper: _wrapper,
-      surfaceSize: const Size(343, 300),
+      surfaceSize: const Size(260, 330),
     );
     await screenMatchesGolden(tester, 'hostel_card_featured');
   });

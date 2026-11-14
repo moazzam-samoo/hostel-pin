@@ -31,6 +31,8 @@ class StudentShellView extends GetView<StudentShellController> {
       child: Scaffold(
         body: PageView(
           controller: controller.pageController,
+          // Tabs change only via the bottom navigation bar, never by swiping.
+          physics: const NeverScrollableScrollPhysics(),
           onPageChanged: controller.onPageChanged,
           children: const [
             HomeView(),

@@ -2,10 +2,36 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hostel_finder_app/core/constants/legal_content.dart';
+import 'package:hostel_finder_app/core/enums/availability_status.dart';
+import 'package:hostel_finder_app/core/enums/hostel_gender.dart';
+import 'package:hostel_finder_app/core/enums/listing_status.dart';
+import 'package:hostel_finder_app/data/models/hostel_model.dart';
 import 'package:hostel_finder_app/data/models/report_model.dart';
 import 'package:hostel_finder_app/data/repositories/account_repository.dart';
 import 'package:hostel_finder_app/data/repositories/hostel_repository.dart';
 import 'package:hostel_finder_app/data/repositories/report_repository.dart';
+
+class HostelModelProbe {
+  const HostelModelProbe();
+  HostelModel get noGender => const HostelModel(
+        id: 'x',
+        ownerId: 'o',
+        ownerName: 'n',
+        name: 'n',
+        fullAddress: 'a',
+        city: 'c',
+        latitude: 0,
+        longitude: 0,
+        description: '',
+        pricePerMonth: 1,
+        photos: [],
+        amenities: {},
+        availability: AvailabilityStatus.available,
+        contactPhone: '',
+        contactWhatsapp: '',
+        status: ListingStatus.draft,
+      );
+}
 
 void main() {
   group('HostelRepository.streamAllPublished', () {
@@ -102,6 +128,45 @@ void main() {
       expect(doc.data()!['reportedBy'], 'u1');
       expect(doc.data()!['status'], 'open');
       expect(doc.data()!['createdAt'], isA<Timestamp>());
+    });
+  });
+
+
+  group('Hostel gender (Boys/Girls)', () {
+    test('streamAllPublished(gender:) returns only that gender, newest first', () async {
+      final db = FakeFirebaseFirestore();
+      await db.collection('hostels').doc('2001').set({'status': 'published', 'gender': 'boys'});
+      await db.collection('hostels').doc('2002').set({'status': 'published', 'gender': 'girls'});
+      await db.collection('hostels').doc('2003').set({'status': 'published', 'gender': 'boys'});
+      await db.collection('hostels').doc('2004').set({'status': 'published'}); // legacy
+      await db.collection('hostels').doc('2005').set({'status': 'draft', 'gender': 'boys'});
+
+      final repo = HostelRepository(firestore: db);
+      final boys = await repo.streamAllPublished(gender: HostelGender.boys).first;
+      expect(boys.map((h) => h.id), ['2003', '2001']);
+
+      final girls = await repo.streamAllPublished(gender: HostelGender.girls).first;
+      expect(girls.map((h) => h.id), ['2002']);
+
+      final all = await repo.streamAllPublished().first;
+      expect(all.length, 4, reason: 'All includes legacy hostels without a gender');
+    });
+
+    test('HostelModel round-trips gender and tolerates a missing or invalid value', () async {
+      final db = FakeFirebaseFirestore();
+      await db.collection('hostels').doc('a').set({'status': 'published', 'gender': 'girls'});
+      await db.collection('hostels').doc('b').set({'status': 'published'});
+      await db.collection('hostels').doc('c').set({'status': 'published', 'gender': 'co-ed'});
+      final repo = HostelRepository(firestore: db);
+
+      expect((await repo.getById('a'))!.gender, HostelGender.girls);
+      expect((await repo.getById('b'))!.gender, isNull);
+      expect((await repo.getById('c'))!.gender, isNull);
+
+      final model = (await repo.getById('a'))!;
+      expect(model.toFirestore()['gender'], 'girls');
+      expect(model.copyWith(gender: HostelGender.boys).gender, HostelGender.boys);
+      expect(const HostelModelProbe().noGender.toFirestore().containsKey('gender'), isFalse);
     });
   });
 

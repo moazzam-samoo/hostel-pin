@@ -718,4 +718,15 @@ class AppStrings {
       'This email already has an $existingRole account. Log in as $existingRole, or delete that account first if you want to use this email as the other account type.';
   static const String deleteAccountPermissionDenied =
       'Could not delete your account because this app version is not allowed to. Please contact support.';
+
+  // ── Hostel type / Home categories ────────────────────────────────────
+  static const String hostelTypeLabel = 'Hostel type';
+  static const String hostelGenderBoys = 'Boys';
+  static const String hostelGenderGirls = 'Girls';
+  static const String categoryAll = 'All';
+  static const String errorHostelTypeRequired =
+      'Please choose whether this is a Boys or a Girls hostel.';
+  static String noHostelsInCategoryTitle(String label) => 'No $label hostels yet';
+  static const String noHostelsInCategoryMessage =
+      'Check back soon or try another category.';
 }
