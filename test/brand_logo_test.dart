@@ -12,11 +12,13 @@ import 'package:hostel_finder_app/features/welcome/welcome_view.dart';
 
 class _StubSplash extends SplashController {
   @override
+  // ignore: must_call_super
   void onInit() {}
 }
 
 class _StubWelcome extends WelcomeController {
   @override
+  // ignore: must_call_super
   void onInit() {}
 }
 
