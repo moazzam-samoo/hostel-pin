@@ -2,10 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'splash_controller.dart';
 import '../../core/constants/app_assets.dart';
-import '../../core/constants/app_strings.dart';
 import '../../core/constants/app_sizes.dart';
-import '../../core/theme/app_text_styles.dart';
-import '../../core/theme/app_spacing.dart';
 
 class SplashView extends GetView<SplashController> {
   const SplashView({super.key});
@@ -19,14 +16,10 @@ class SplashView extends GetView<SplashController> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image.asset(
-              AppAssets.appLogo,
-              width: AppSizes.authLogo,
-              height: AppSizes.authLogo,
-            ),
-            SizedBox(height: AppSpacing.md),
-            Text(
-              AppStrings.appName,
-              style: AppTextStyles.authTitle,
+              AppAssets.logoWithName,
+              width: AppSizes.brandLogo,
+              height: AppSizes.brandLogo,
+              fit: BoxFit.contain,
             ),
           ],
         ),

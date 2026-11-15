@@ -6,6 +6,9 @@ class AppAssets {
 
   // Images
   static const String appLogo = '$imagesPath/app_logo.png';
+  /// Full brand logo (pin icon + "HOSTEL PIN" wordmark in the image itself).
+  /// Use it on its own: do not add the app name as separate text next to it.
+  static const String logoWithName = '$imagesPath/logo_1.png';
   static const String adminLoginBg = '$imagesPath/admin_login_bg.jpg';
   static const String placeholderHostel = '$imagesPath/placeholder_hostel.png';
   static const String avatarPlaceholder = '$imagesPath/avatar_placeholder.png';

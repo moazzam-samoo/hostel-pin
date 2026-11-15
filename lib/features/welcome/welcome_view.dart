@@ -67,18 +67,11 @@ class WelcomeView extends GetView<WelcomeController> {
                       SizedBox(height: AppSpacing.xl),
                       ConfettiDots(
                         child: Image.asset(
-                          AppAssets.appLogo,
-                          width: AppSizes.authLogo,
-                          height: AppSizes.authLogo,
+                          AppAssets.logoWithName,
+                          width: AppSizes.brandLogo,
+                          height: AppSizes.brandLogo,
+                          fit: BoxFit.contain,
                         ),
-                      ),
-                      SizedBox(height: AppSpacing.md),
-                      Text(
-                        AppStrings.appName,
-                        style: AppTextStyles.authTitle.copyWith(
-                            color: AppColors.secondary,
-                            fontWeight: FontWeight.bold),
-                        textAlign: TextAlign.center,
                       ),
                       const Spacer(),
                       PrimaryButton(

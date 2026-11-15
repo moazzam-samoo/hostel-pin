@@ -12,6 +12,8 @@ class AppSizes {
   static double get roleIcon => 100.r;
   static double get authLogo => 145.r;
   static double get authLogoSmall => 56.r;
+  /// Full brand logo (with wordmark) on Splash and Welcome.
+  static double get brandLogo => 220.r;
   static double get segment => 40.h;
 
   static double get iconSmall => 16.r;
