@@ -20,12 +20,16 @@ OwnerAddAccess resolveOwnerAddAccess({
   required List<HostelModel> hostels,
 }) {
   if (userStatus == VerificationStatus.verified) return OwnerAddAccess.allowed;
-  if (userStatus == VerificationStatus.rejected ||
-      verificationDocStatus == 'rejected') {
-    return OwnerAddAccess.rejected;
-  }
   final submitted = verificationDocStatus == 'pending' ||
       verificationDocStatus == 'changesRequested';
+  // A rejected owner who resubmitted has a pending verification doc, but their
+  // own `verificationStatus` stays `rejected` until an admin approves, so the
+  // doc wins over the user flag.
+  if (!submitted &&
+      (userStatus == VerificationStatus.rejected ||
+          verificationDocStatus == 'rejected')) {
+    return OwnerAddAccess.rejected;
+  }
   if (!submitted) return OwnerAddAccess.needsVerification;
   final inReview = hostels.where((h) => h.status == ListingStatus.pending).length;
   return inReview >= kMaxPendingHostels

@@ -20,12 +20,14 @@ class AdminSettingsView extends GetView<AdminSettingsController> {
         children: [
           Text(AppStrings.adminSettingsTitle, style: AppTextStyles.screenTitle),
           const SizedBox(height: 4),
-          Text(AppStrings.adminSettingsSubtitle, style: AppTextStyles.screenSubtitle),
+          Text(AppStrings.adminSettingsSubtitle,
+              style: AppTextStyles.screenSubtitle),
           const SizedBox(height: 24),
           Expanded(
             child: Obx(() {
               if (controller.isLoading.value) {
-                return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+                return const Center(
+                    child: CircularProgressIndicator(color: AppColors.primary));
               }
 
               final config = controller.config.value;
@@ -34,7 +36,8 @@ class AdminSettingsView extends GetView<AdminSettingsController> {
                 children: [
                   _buildProfileCard(context),
                   const SizedBox(height: 24),
-                  Text(AppStrings.adminFeatureControlsTitle, style: AppTextStyles.sectionHeader),
+                  Text(AppStrings.adminFeatureControlsTitle,
+                      style: AppTextStyles.sectionHeader),
                   const SizedBox(height: 12),
                   // Global System's Default Language / System Timezone
                   // dropdowns (mockup, Settings.png) are deliberately not
@@ -100,11 +103,13 @@ class AdminSettingsView extends GetView<AdminSettingsController> {
               CircleAvatar(
                 radius: 36,
                 backgroundColor: AppColors.primaryContainer,
-                backgroundImage: (admin?.photoUrl != null && admin!.photoUrl!.isNotEmpty)
-                    ? NetworkImage(admin.photoUrl!)
-                    : null,
+                backgroundImage:
+                    (admin?.photoUrl != null && admin!.photoUrl!.isNotEmpty)
+                        ? NetworkImage(admin.photoUrl!)
+                        : null,
                 child: (admin?.photoUrl == null || admin!.photoUrl!.isEmpty)
-                    ? const Icon(Icons.person, size: 36, color: AppColors.primary)
+                    ? const Icon(Icons.person,
+                        size: 36, color: AppColors.primary)
                     : null,
               ),
               const SizedBox(height: 12),
@@ -112,14 +117,16 @@ class AdminSettingsView extends GetView<AdminSettingsController> {
               const SizedBox(height: 4),
               Text(
                 admin?.email ?? '',
-                style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary),
+                style: AppTextStyles.caption
+                    .copyWith(color: AppColors.textSecondary),
               ),
               const SizedBox(height: 16),
               SizedBox(
                 width: 180,
                 child: PrimaryButton(
                   text: AppStrings.adminEditProfileButton,
-                  onPressed: () => _showEditProfileDialog(context, admin?.displayName ?? ''),
+                  onPressed: () =>
+                      _showEditProfileDialog(context, admin?.displayName ?? ''),
                 ),
               ),
             ],
@@ -133,14 +140,16 @@ class AdminSettingsView extends GetView<AdminSettingsController> {
     final nameController = TextEditingController(text: currentName);
     Get.dialog(
       Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.dialog)),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppRadius.dialog)),
         child: Padding(
           padding: const EdgeInsets.all(24.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(AppStrings.adminEditProfileDialogTitle, style: AppTextStyles.sectionHeader),
+              Text(AppStrings.adminEditProfileDialogTitle,
+                  style: AppTextStyles.sectionHeader),
               const SizedBox(height: 16),
               AppTextField(
                 controller: nameController,
@@ -151,7 +160,8 @@ class AdminSettingsView extends GetView<AdminSettingsController> {
               Obx(() => PrimaryButton(
                     text: AppStrings.adminSaveButton,
                     isLoading: controller.isSavingProfile.value,
-                    onPressed: () => controller.saveDisplayName(nameController.text),
+                    onPressed: () =>
+                        controller.saveDisplayName(nameController.text),
                   )),
             ],
           ),
@@ -171,7 +181,9 @@ class AdminSettingsView extends GetView<AdminSettingsController> {
       color: Colors.white,
       elevation: 0,
       shape: RoundedRectangleBorder(
-        side: BorderSide(color: destructive ? AppColors.error.withAlpha(60) : AppColors.border),
+        side: BorderSide(
+            color:
+                destructive ? AppColors.error.withAlpha(60) : AppColors.border),
         borderRadius: BorderRadius.circular(AppRadius.card),
       ),
       child: Padding(
@@ -179,11 +191,14 @@ class AdminSettingsView extends GetView<AdminSettingsController> {
         child: SwitchListTile(
           title: Text(
             title,
-            style: AppTextStyles.cardTitle.copyWith(color: destructive ? AppColors.error : AppColors.textPrimary),
+            style: AppTextStyles.cardTitle.copyWith(
+                color: destructive ? AppColors.error : AppColors.textPrimary),
           ),
           subtitle: Padding(
             padding: const EdgeInsets.only(top: 4.0),
-            child: Text(subtitle, style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary)),
+            child: Text(subtitle,
+                style: AppTextStyles.caption
+                    .copyWith(color: AppColors.textSecondary)),
           ),
           value: value,
           activeThumbColor: destructive ? AppColors.error : AppColors.primary,

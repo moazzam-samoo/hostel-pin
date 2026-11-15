@@ -22,18 +22,21 @@ class AdminHostelsView extends GetView<AdminHostelsController> {
       children: [
         Padding(
           padding: const EdgeInsets.all(24.0),
-          child: Text(AppStrings.adminManageHostelsTitle, style: AppTextStyles.screenTitle),
+          child: Text(AppStrings.adminManageHostelsTitle,
+              style: AppTextStyles.screenTitle),
         ),
         Expanded(
           child: Obx(() {
             if (controller.isLoading.value && controller.hostels.isEmpty) {
-              return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+              return const Center(
+                  child: CircularProgressIndicator(color: AppColors.primary));
             }
             if (controller.hostels.isEmpty) {
               return Center(
                 child: Text(
                   AppStrings.adminNoHostelsFound,
-                  style: AppTextStyles.body.copyWith(color: AppColors.textSecondary),
+                  style: AppTextStyles.body
+                      .copyWith(color: AppColors.textSecondary),
                 ),
               );
             }
@@ -41,32 +44,56 @@ class AdminHostelsView extends GetView<AdminHostelsController> {
             return SingleChildScrollView(
               padding: EdgeInsets.symmetric(
                   horizontal: Responsive.isDesktop(context) ? 24.0 : 12.0),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(minWidth: 720),
-                  child: Theme(
-                    data: Theme.of(context).copyWith(
-                      dataTableTheme: DataTableThemeData(
-                        headingRowColor: WidgetStateProperty.all(AppColors.background),
-                        dataRowColor: WidgetStateProperty.resolveWith<Color?>((Set<WidgetState> states) => Colors.white),
-                      ),
-                    ),
-                    child: PaginatedDataTable(
-                      header: Text(AppStrings.adminHostelsDirectory, style: AppTextStyles.cardTitle),
-                      rowsPerPage: controller.hostels.length > 10 ? 10 : (controller.hostels.isNotEmpty ? controller.hostels.length : 1),
-                      columns: [
-                        DataColumn(label: Text(AppStrings.adminColName, style: AppTextStyles.labelMicro)),
-                        DataColumn(label: Text(AppStrings.adminColCity, style: AppTextStyles.labelMicro)),
-                        DataColumn(label: Text(AppStrings.adminColStatus, style: AppTextStyles.labelMicro)),
-                        DataColumn(label: Text(AppStrings.adminColPrice, style: AppTextStyles.labelMicro)),
-                        DataColumn(label: Text(AppStrings.adminColActions, style: AppTextStyles.labelMicro)),
-                      ],
-                      source: _HostelDataString(controller.hostels, controller),
-                    ),
-                  ),
-                ),
-              ),
+              child: LayoutBuilder(
+                  builder: (context, box) => SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        // A horizontal scroll view gives its child unbounded width, which
+                        // PaginatedDataTable cannot lay out; give it a definite width
+                        // (the available width, but never narrower than 720).
+                        child: SizedBox(
+                          width: box.maxWidth < 720 ? 720 : box.maxWidth,
+                          child: Theme(
+                            data: Theme.of(context).copyWith(
+                              dataTableTheme: DataTableThemeData(
+                                headingRowColor: WidgetStateProperty.all(
+                                    AppColors.background),
+                                dataRowColor:
+                                    WidgetStateProperty.resolveWith<Color?>(
+                                        (Set<WidgetState> states) =>
+                                            Colors.white),
+                              ),
+                            ),
+                            child: PaginatedDataTable(
+                              header: Text(AppStrings.adminHostelsDirectory,
+                                  style: AppTextStyles.cardTitle),
+                              rowsPerPage: controller.hostels.length > 10
+                                  ? 10
+                                  : (controller.hostels.isNotEmpty
+                                      ? controller.hostels.length
+                                      : 1),
+                              columns: [
+                                DataColumn(
+                                    label: Text(AppStrings.adminColName,
+                                        style: AppTextStyles.labelMicro)),
+                                DataColumn(
+                                    label: Text(AppStrings.adminColCity,
+                                        style: AppTextStyles.labelMicro)),
+                                DataColumn(
+                                    label: Text(AppStrings.adminColStatus,
+                                        style: AppTextStyles.labelMicro)),
+                                DataColumn(
+                                    label: Text(AppStrings.adminColPrice,
+                                        style: AppTextStyles.labelMicro)),
+                                DataColumn(
+                                    label: Text(AppStrings.adminColActions,
+                                        style: AppTextStyles.labelMicro)),
+                              ],
+                              source: _HostelDataString(
+                                  controller.hostels, controller),
+                            ),
+                          ),
+                        ),
+                      )),
             );
           }),
         ),
@@ -117,13 +144,15 @@ class _HostelDataString extends DataTableSource {
           ),
         ),
       ),
-      DataCell(Text(Formatters.currency(hostel.pricePerMonth), style: AppTextStyles.body)),
+      DataCell(Text(Formatters.currency(hostel.pricePerMonth),
+          style: AppTextStyles.body)),
       DataCell(Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           if (hostel.status == ListingStatus.pending) ...[
             IconButton(
-              icon: const Icon(Icons.check_circle_outline, color: AppColors.primary),
+              icon: const Icon(Icons.check_circle_outline,
+                  color: AppColors.primary),
               onPressed: () => controller.approve(hostel),
               tooltip: AppStrings.adminApproveHostelTooltip,
             ),
@@ -168,8 +197,8 @@ class _HostelDataString extends DataTableSource {
                   final reason = reasonController.text.trim();
                   if (reason.isEmpty) return;
                   Get.back();
-                  controller.reject(
-                      hostel, reason.length > 500 ? reason.substring(0, 500) : reason);
+                  controller.reject(hostel,
+                      reason.length > 500 ? reason.substring(0, 500) : reason);
                 },
               ),
             ],

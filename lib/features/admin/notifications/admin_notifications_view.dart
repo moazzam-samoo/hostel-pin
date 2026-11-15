@@ -47,21 +47,24 @@ class AdminNotificationsView extends GetView<AdminNotificationsController> {
                 ? Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(AppStrings.adminNotificationsTitle, style: AppTextStyles.screenTitle),
+                      Text(AppStrings.adminNotificationsTitle,
+                          style: AppTextStyles.screenTitle),
                       actionsRow,
                     ],
                   )
                 : Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(AppStrings.adminNotificationsTitle, style: AppTextStyles.screenTitle),
+                      Text(AppStrings.adminNotificationsTitle,
+                          style: AppTextStyles.screenTitle),
                       const SizedBox(height: 8),
                       actionsRow,
                     ],
                   ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
             child: TabBar(
               labelColor: AppColors.primary,
               unselectedLabelColor: AppColors.textSecondary,
@@ -82,9 +85,12 @@ class AdminNotificationsView extends GetView<AdminNotificationsController> {
             child: TabBarView(
               children: [
                 _buildNotificationList(context, () => controller.notifications),
-                _buildNotificationList(context, () => controller.verificationNotifications),
-                _buildNotificationList(context, () => controller.reportNotifications),
-                _buildNotificationList(context, () => controller.systemNotifications),
+                _buildNotificationList(
+                    context, () => controller.verificationNotifications),
+                _buildNotificationList(
+                    context, () => controller.reportNotifications),
+                _buildNotificationList(
+                    context, () => controller.systemNotifications),
               ],
             ),
           ),
@@ -93,11 +99,13 @@ class AdminNotificationsView extends GetView<AdminNotificationsController> {
     );
   }
 
-  Widget _buildNotificationList(BuildContext context, List<dynamic> Function() getList) {
+  Widget _buildNotificationList(
+      BuildContext context, List<dynamic> Function() getList) {
     return Obx(() {
       final list = getList();
       if (controller.isLoading.value && list.isEmpty) {
-        return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+        return const Center(
+            child: CircularProgressIndicator(color: AppColors.primary));
       }
       if (list.isEmpty) {
         return Center(
@@ -111,7 +119,8 @@ class AdminNotificationsView extends GetView<AdminNotificationsController> {
       return ListView.separated(
         padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
         itemCount: list.length,
-        separatorBuilder: (context, index) => const Divider(height: 1, color: AppColors.border),
+        separatorBuilder: (context, index) =>
+            const Divider(height: 1, color: AppColors.border),
         itemBuilder: (context, index) {
           final notification = list[index];
           final isRead = controller.isRead(notification.id);
@@ -154,14 +163,16 @@ class AdminNotificationsView extends GetView<AdminNotificationsController> {
                   const SizedBox(height: 8),
                   Text(
                     _timeAgo(notification.createdAt),
-                    style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary, fontSize: 11),
+                    style: AppTextStyles.caption
+                        .copyWith(color: AppColors.textSecondary, fontSize: 11),
                   ),
                 ],
               ),
             ),
             trailing: !isRead
                 ? IconButton(
-                    icon: const Icon(Icons.circle, color: AppColors.primary, size: 12),
+                    icon: const Icon(Icons.circle,
+                        color: AppColors.primary, size: 12),
                     onPressed: () => controller.markAsRead(notification.id),
                     tooltip: AppStrings.adminMarkAsReadTooltip,
                   )

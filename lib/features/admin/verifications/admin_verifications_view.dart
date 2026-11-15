@@ -53,28 +53,34 @@ class _QueueList extends GetView<AdminVerificationsController> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(AppStrings.adminVerificationQueueTitle, style: AppTextStyles.screenTitle),
+                      Text(AppStrings.adminVerificationQueueTitle,
+                          style: AppTextStyles.screenTitle),
                       const SizedBox(height: 4),
-                      Text(AppStrings.adminVerificationQueueSubtitle, style: AppTextStyles.screenSubtitle),
+                      Text(AppStrings.adminVerificationQueueSubtitle,
+                          style: AppTextStyles.screenSubtitle),
                     ],
                   ),
                 ),
                 Obx(() => Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 10),
                       decoration: BoxDecoration(
                         color: AppColors.primary,
                         borderRadius: BorderRadius.circular(AppRadius.pill),
                       ),
                       child: Text(
-                        AppStrings.adminPendingCountBadge(controller.identityPendingTab.length),
-                        style: AppTextStyles.body.copyWith(color: Colors.white, fontWeight: FontWeight.w600),
+                        AppStrings.adminPendingCountBadge(
+                            controller.identityPendingTab.length),
+                        style: AppTextStyles.body.copyWith(
+                            color: Colors.white, fontWeight: FontWeight.w600),
                       ),
                     )),
               ],
             ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
             child: TabBar(
               labelColor: AppColors.primary,
               unselectedLabelColor: AppColors.textSecondary,
@@ -108,7 +114,8 @@ class _QueueList extends GetView<AdminVerificationsController> {
 
   Widget _buildTable(BuildContext context, List<VerificationModel> rows) {
     if (controller.isLoading.value && rows.isEmpty) {
-      return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+      return const Center(
+          child: CircularProgressIndicator(color: AppColors.primary));
     }
     if (rows.isEmpty) {
       return Center(
@@ -126,13 +133,27 @@ class _QueueList extends GetView<AdminVerificationsController> {
         child: DataTable(
           headingRowColor: WidgetStateProperty.all(AppColors.background),
           columns: [
-            DataColumn(label: Text(AppStrings.adminColSubmissionDate, style: AppTextStyles.labelMicro)),
-            DataColumn(label: Text(AppStrings.adminColOwnerName, style: AppTextStyles.labelMicro)),
-            DataColumn(label: Text(AppStrings.adminColHostelName, style: AppTextStyles.labelMicro)),
-            DataColumn(label: Text(AppStrings.adminColCity, style: AppTextStyles.labelMicro)),
-            DataColumn(label: Text(AppStrings.adminColType, style: AppTextStyles.labelMicro)),
-            DataColumn(label: Text(AppStrings.adminColStatus, style: AppTextStyles.labelMicro)),
-            DataColumn(label: Text(AppStrings.adminColActions, style: AppTextStyles.labelMicro)),
+            DataColumn(
+                label: Text(AppStrings.adminColSubmissionDate,
+                    style: AppTextStyles.labelMicro)),
+            DataColumn(
+                label: Text(AppStrings.adminColOwnerName,
+                    style: AppTextStyles.labelMicro)),
+            DataColumn(
+                label: Text(AppStrings.adminColHostelName,
+                    style: AppTextStyles.labelMicro)),
+            DataColumn(
+                label: Text(AppStrings.adminColCity,
+                    style: AppTextStyles.labelMicro)),
+            DataColumn(
+                label: Text(AppStrings.adminColType,
+                    style: AppTextStyles.labelMicro)),
+            DataColumn(
+                label: Text(AppStrings.adminColStatus,
+                    style: AppTextStyles.labelMicro)),
+            DataColumn(
+                label: Text(AppStrings.adminColActions,
+                    style: AppTextStyles.labelMicro)),
           ],
           rows: rows.map((submission) => _buildRow(submission)).toList(),
         ),
@@ -141,8 +162,11 @@ class _QueueList extends GetView<AdminVerificationsController> {
   }
 
   DataRow _buildRow(VerificationModel submission) {
-    final hostel = submission.hostelId != null ? controller.hostelCache[submission.hostelId] : null;
-    final isHostelType = submission.hostelId != null && submission.hostelId!.isNotEmpty;
+    final hostel = submission.hostelId != null
+        ? controller.hostelCache[submission.hostelId]
+        : null;
+    final isHostelType =
+        submission.hostelId != null && submission.hostelId!.isNotEmpty;
     final fullName = (submission.personalInfo['fullName'] as String?) ?? '';
 
     Color statusColor;
@@ -159,14 +183,19 @@ class _QueueList extends GetView<AdminVerificationsController> {
 
     return DataRow(cells: [
       DataCell(Text(
-        submission.submittedAt?.toString().split(' ')[0] ?? AppStrings.notAvailableDash,
+        submission.submittedAt?.toString().split(' ')[0] ??
+            AppStrings.notAvailableDash,
         style: AppTextStyles.body,
       )),
       DataCell(Text(fullName, style: AppTextStyles.body)),
-      DataCell(Text(hostel?.name ?? AppStrings.adminLoadingLabel, style: AppTextStyles.body)),
-      DataCell(Text(hostel?.city ?? AppStrings.notAvailableDash, style: AppTextStyles.body)),
+      DataCell(Text(hostel?.name ?? AppStrings.adminLoadingLabel,
+          style: AppTextStyles.body)),
+      DataCell(Text(hostel?.city ?? AppStrings.notAvailableDash,
+          style: AppTextStyles.body)),
       DataCell(Text(
-        isHostelType ? AppStrings.adminTypeHostel : AppStrings.adminTypeIdentity,
+        isHostelType
+            ? AppStrings.adminTypeHostel
+            : AppStrings.adminTypeIdentity,
         style: AppTextStyles.body,
       )),
       DataCell(
@@ -176,7 +205,8 @@ class _QueueList extends GetView<AdminVerificationsController> {
             color: statusColor.withAlpha(25),
             borderRadius: BorderRadius.circular(12),
           ),
-          child: Text(statusLabel, style: AppTextStyles.labelMicro.copyWith(color: statusColor)),
+          child: Text(statusLabel,
+              style: AppTextStyles.labelMicro.copyWith(color: statusColor)),
         ),
       ),
       DataCell(
@@ -213,14 +243,17 @@ class _ReviewDetail extends GetView<AdminVerificationsController> {
               children: [
                 TextButton.icon(
                   onPressed: controller.clearSelection,
-                  icon: const Icon(Icons.arrow_back, size: 18, color: AppColors.textSecondary),
+                  icon: const Icon(Icons.arrow_back,
+                      size: 18, color: AppColors.textSecondary),
                   label: Text(
                     AppStrings.adminBackToQueue,
-                    style: AppTextStyles.body.copyWith(color: AppColors.textSecondary),
+                    style: AppTextStyles.body
+                        .copyWith(color: AppColors.textSecondary),
                   ),
                 ),
                 const SizedBox(height: 8),
-                Text(AppStrings.adminReviewHeading(fullName), style: AppTextStyles.screenTitle),
+                Text(AppStrings.adminReviewHeading(fullName),
+                    style: AppTextStyles.screenTitle),
                 const SizedBox(height: 20),
                 LayoutBuilder(builder: (context, constraints) {
                   final isWide = constraints.maxWidth > 900;
@@ -265,7 +298,8 @@ class _ReviewDetail extends GetView<AdminVerificationsController> {
                   );
 
                   if (!isWide) {
-                    return Column(children: [left, const SizedBox(height: 20), right]);
+                    return Column(
+                        children: [left, const SizedBox(height: 20), right]);
                   }
                   return Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -333,7 +367,9 @@ class _ReviewDetail extends GetView<AdminVerificationsController> {
         children: [
           const Icon(Icons.verified, size: 14, color: AppColors.primary),
           const SizedBox(width: 4),
-          Text(AppStrings.adminAiMatchedBadge, style: AppTextStyles.labelMicro.copyWith(color: AppColors.primary)),
+          Text(AppStrings.adminAiMatchedBadge,
+              style:
+                  AppTextStyles.labelMicro.copyWith(color: AppColors.primary)),
         ],
       ),
     );
@@ -360,11 +396,15 @@ class _ReviewDetail extends GetView<AdminVerificationsController> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Expanded(
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           _field(AppStrings.adminFullNameLabel, fullName),
           _field(AppStrings.adminPhoneNumberLabel, phone),
         ])),
-        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Expanded(
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           _field(AppStrings.adminCnicNumberLabel, cnic),
           _field(AppStrings.adminDobLabel, dob),
         ])),
@@ -376,7 +416,10 @@ class _ReviewDetail extends GetView<AdminVerificationsController> {
     return Obx(() {
       final hostels = controller.ownerHostels;
       if (controller.isLoadingDetail.value && hostels.isEmpty) {
-        return const Center(child: Padding(padding: EdgeInsets.all(16), child: CircularProgressIndicator(color: AppColors.primary)));
+        return const Center(
+            child: Padding(
+                padding: EdgeInsets.all(16),
+                child: CircularProgressIndicator(color: AppColors.primary)));
       }
       if (hostels.isEmpty) {
         return Text(AppStrings.notAvailableDash, style: AppTextStyles.body);
@@ -407,15 +450,21 @@ class _ReviewDetail extends GetView<AdminVerificationsController> {
         children: [
           Row(
             children: [
-              Expanded(child: Text(hostel.name, style: AppTextStyles.cardTitle)),
-              Text(hostel.status.name.toUpperCase(), style: AppTextStyles.labelMicro),
+              Expanded(
+                  child: Text(hostel.name, style: AppTextStyles.cardTitle)),
+              Text(hostel.status.name.toUpperCase(),
+                  style: AppTextStyles.labelMicro),
             ],
           ),
           const SizedBox(height: 8),
           _field(AppStrings.adminAddressLabel, hostel.fullAddress),
           Row(children: [
             Expanded(child: _field(AppStrings.adminCityLabel, hostel.city)),
-            Expanded(child: _field(AppStrings.adminCapacityLabel, AppStrings.adminCapacityValue(hostel.totalRooms, hostel.totalBeds))),
+            Expanded(
+                child: _field(
+                    AppStrings.adminCapacityLabel,
+                    AppStrings.adminCapacityValue(
+                        hostel.totalRooms, hostel.totalBeds))),
           ]),
           if (hostel.status == ListingStatus.rejected &&
               (hostel.rejectionReason ?? '').isNotEmpty)
@@ -429,7 +478,8 @@ class _ReviewDetail extends GetView<AdminVerificationsController> {
                   intent: ButtonIntent.secondary,
                   onPressed: () => _showReasonDialog(
                     title: AppStrings.adminRejectHostelDialogTitle,
-                    onSubmit: (reason) => controller.rejectHostel(hostel, reason),
+                    onSubmit: (reason) =>
+                        controller.rejectHostel(hostel, reason),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -447,7 +497,8 @@ class _ReviewDetail extends GetView<AdminVerificationsController> {
 
   Widget _docThumb(String? publicId, String label) {
     return Obx(() {
-      final url = publicId != null ? controller.resolvedDocUrls[publicId] : null;
+      final url =
+          publicId != null ? controller.resolvedDocUrls[publicId] : null;
       return Expanded(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -465,7 +516,8 @@ class _ReviewDetail extends GetView<AdminVerificationsController> {
                 clipBehavior: Clip.antiAlias,
                 child: url == null
                     ? (controller.isLoadingDetail.value
-                        ? const Center(child: CircularProgressIndicator(strokeWidth: 2))
+                        ? const Center(
+                            child: CircularProgressIndicator(strokeWidth: 2))
                         : Center(
                             child: Text(
                               AppStrings.adminDocumentLoadError,
@@ -477,7 +529,8 @@ class _ReviewDetail extends GetView<AdminVerificationsController> {
                         url,
                         fit: BoxFit.cover,
                         errorBuilder: (_, __, ___) => Center(
-                          child: Text(AppStrings.adminDocumentLoadError, style: AppTextStyles.caption),
+                          child: Text(AppStrings.adminDocumentLoadError,
+                              style: AppTextStyles.caption),
                         ),
                       ),
               ),
@@ -511,12 +564,16 @@ class _ReviewDetail extends GetView<AdminVerificationsController> {
           child: Row(
             children: [
               Obx(() {
-                final url = selfieId != null ? controller.resolvedDocUrls[selfieId] : null;
+                final url = selfieId != null
+                    ? controller.resolvedDocUrls[selfieId]
+                    : null;
                 return CircleAvatar(
                   radius: 28,
                   backgroundColor: AppColors.border,
                   backgroundImage: url != null ? NetworkImage(url) : null,
-                  child: url == null ? const Icon(Icons.person, color: AppColors.textSecondary) : null,
+                  child: url == null
+                      ? const Icon(Icons.person, color: AppColors.textSecondary)
+                      : null,
                 );
               }),
               const SizedBox(width: 16),
@@ -524,7 +581,9 @@ class _ReviewDetail extends GetView<AdminVerificationsController> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(AppStrings.adminLiveSelfieCheckLabel, style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600)),
+                    Text(AppStrings.adminLiveSelfieCheckLabel,
+                        style: AppTextStyles.body
+                            .copyWith(fontWeight: FontWeight.w600)),
                     const SizedBox(height: 8),
                     ClipRRect(
                       borderRadius: BorderRadius.circular(4),
@@ -538,10 +597,13 @@ class _ReviewDetail extends GetView<AdminVerificationsController> {
                     const SizedBox(height: 6),
                     Text(
                       AppStrings.adminAiMatchDecorativeValue,
-                      style: AppTextStyles.caption.copyWith(color: AppColors.primary, fontWeight: FontWeight.w700),
+                      style: AppTextStyles.caption.copyWith(
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.w700),
                     ),
                     const SizedBox(height: 4),
-                    Text(AppStrings.adminAiMatchDecorativeCaption, style: AppTextStyles.caption),
+                    Text(AppStrings.adminAiMatchDecorativeCaption,
+                        style: AppTextStyles.caption),
                   ],
                 ),
               ),
@@ -555,7 +617,8 @@ class _ReviewDetail extends GetView<AdminVerificationsController> {
   Widget _ownershipProof() {
     final publicId = submission.ownershipDocumentUrl;
     if (publicId == null || publicId.isEmpty) {
-      return Text(AppStrings.adminDocumentNotProvided, style: AppTextStyles.body);
+      return Text(AppStrings.adminDocumentNotProvided,
+          style: AppTextStyles.body);
     }
     return Row(
       children: [
@@ -589,14 +652,16 @@ class _ReviewDetail extends GetView<AdminVerificationsController> {
           child: url == null
               ? Padding(
                   padding: const EdgeInsets.all(32.0),
-                  child: Text(AppStrings.adminDocumentLoadError, style: AppTextStyles.body),
+                  child: Text(AppStrings.adminDocumentLoadError,
+                      style: AppTextStyles.body),
                 )
               : Image.network(
                   url,
                   fit: BoxFit.contain,
                   errorBuilder: (_, __, ___) => Padding(
                     padding: const EdgeInsets.all(32.0),
-                    child: Text(AppStrings.adminDocumentLoadError, style: AppTextStyles.body),
+                    child: Text(AppStrings.adminDocumentLoadError,
+                        style: AppTextStyles.body),
                   ),
                 ),
         ),
@@ -638,12 +703,14 @@ class _ReviewDetail extends GetView<AdminVerificationsController> {
   Widget _actionBar(BuildContext context) {
     final infoWidget = Row(
       children: [
-        const Icon(Icons.info_outline, size: 16, color: AppColors.textSecondary),
+        const Icon(Icons.info_outline,
+            size: 16, color: AppColors.textSecondary),
         const SizedBox(width: 8),
         Expanded(
           child: Text(
             AppStrings.adminReviewFooterNote,
-            style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary),
+            style:
+                AppTextStyles.caption.copyWith(color: AppColors.textSecondary),
           ),
         ),
       ],
@@ -688,8 +755,8 @@ class _ReviewDetail extends GetView<AdminVerificationsController> {
     );
 
     return Container(
-      padding: EdgeInsets.symmetric(
-          horizontal: isDesktop ? 24 : 16, vertical: 16),
+      padding:
+          EdgeInsets.symmetric(horizontal: isDesktop ? 24 : 16, vertical: 16),
       decoration: const BoxDecoration(
         color: Colors.white,
         border: Border(top: BorderSide(color: AppColors.border)),
@@ -729,11 +796,14 @@ class _ReviewDetail extends GetView<AdminVerificationsController> {
     );
   }
 
-  void _showReasonDialog({required String title, required Future<void> Function(String reason) onSubmit}) {
+  void _showReasonDialog(
+      {required String title,
+      required Future<void> Function(String reason) onSubmit}) {
     final reasonController = TextEditingController();
     Get.dialog(
       Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.dialog)),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppRadius.dialog)),
         child: Padding(
           padding: const EdgeInsets.all(24.0),
           child: Column(

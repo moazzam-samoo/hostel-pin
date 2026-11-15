@@ -18,18 +18,21 @@ class AdminOwnersView extends GetView<AdminOwnersController> {
       children: [
         Padding(
           padding: const EdgeInsets.all(24.0),
-          child: Text(AppStrings.adminManageOwnersTitle, style: AppTextStyles.screenTitle),
+          child: Text(AppStrings.adminManageOwnersTitle,
+              style: AppTextStyles.screenTitle),
         ),
         Expanded(
           child: Obx(() {
             if (controller.isLoading.value && controller.owners.isEmpty) {
-              return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+              return const Center(
+                  child: CircularProgressIndicator(color: AppColors.primary));
             }
             if (controller.owners.isEmpty) {
               return Center(
                 child: Text(
                   AppStrings.adminNoOwnersFound,
-                  style: AppTextStyles.body.copyWith(color: AppColors.textSecondary),
+                  style: AppTextStyles.body
+                      .copyWith(color: AppColors.textSecondary),
                 ),
               );
             }
@@ -37,33 +40,57 @@ class AdminOwnersView extends GetView<AdminOwnersController> {
             return SingleChildScrollView(
               padding: EdgeInsets.symmetric(
                   horizontal: Responsive.isDesktop(context) ? 24.0 : 12.0),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(minWidth: 720),
-                  child: Theme(
-                    data: Theme.of(context).copyWith(
-                      dataTableTheme: DataTableThemeData(
-                        headingRowColor: WidgetStateProperty.all(AppColors.background),
-                        dataRowColor: WidgetStateProperty.all(Colors.white),
-                      ),
-                    ),
-                    child: PaginatedDataTable(
-                      header: Text(AppStrings.adminOwnersDirectory, style: AppTextStyles.cardTitle),
-                      rowsPerPage: controller.owners.length > 10 ? 10 : (controller.owners.isNotEmpty ? controller.owners.length : 1),
-                      columns: [
-                        DataColumn(label: Text(AppStrings.adminColName, style: AppTextStyles.labelMicro)),
-                        DataColumn(label: Text(AppStrings.adminColEmail, style: AppTextStyles.labelMicro)),
-                        DataColumn(label: Text(AppStrings.adminColListings, style: AppTextStyles.labelMicro)),
-                        DataColumn(label: Text(AppStrings.adminColVerification, style: AppTextStyles.labelMicro)),
-                        DataColumn(label: Text(AppStrings.adminColStatus, style: AppTextStyles.labelMicro)),
-                        DataColumn(label: Text(AppStrings.adminColActions, style: AppTextStyles.labelMicro)),
-                      ],
-                      source: _OwnerDataString(controller.owners, controller),
-                    ),
-                  ),
-                ),
-              ),
+              child: LayoutBuilder(
+                  builder: (context, box) => SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        // A horizontal scroll view gives its child unbounded width, which
+                        // PaginatedDataTable cannot lay out; give it a definite width
+                        // (the available width, but never narrower than 720).
+                        child: SizedBox(
+                          width: box.maxWidth < 720 ? 720 : box.maxWidth,
+                          child: Theme(
+                            data: Theme.of(context).copyWith(
+                              dataTableTheme: DataTableThemeData(
+                                headingRowColor: WidgetStateProperty.all(
+                                    AppColors.background),
+                                dataRowColor:
+                                    WidgetStateProperty.all(Colors.white),
+                              ),
+                            ),
+                            child: PaginatedDataTable(
+                              header: Text(AppStrings.adminOwnersDirectory,
+                                  style: AppTextStyles.cardTitle),
+                              rowsPerPage: controller.owners.length > 10
+                                  ? 10
+                                  : (controller.owners.isNotEmpty
+                                      ? controller.owners.length
+                                      : 1),
+                              columns: [
+                                DataColumn(
+                                    label: Text(AppStrings.adminColName,
+                                        style: AppTextStyles.labelMicro)),
+                                DataColumn(
+                                    label: Text(AppStrings.adminColEmail,
+                                        style: AppTextStyles.labelMicro)),
+                                DataColumn(
+                                    label: Text(AppStrings.adminColListings,
+                                        style: AppTextStyles.labelMicro)),
+                                DataColumn(
+                                    label: Text(AppStrings.adminColVerification,
+                                        style: AppTextStyles.labelMicro)),
+                                DataColumn(
+                                    label: Text(AppStrings.adminColStatus,
+                                        style: AppTextStyles.labelMicro)),
+                                DataColumn(
+                                    label: Text(AppStrings.adminColActions,
+                                        style: AppTextStyles.labelMicro)),
+                              ],
+                              source: _OwnerDataString(
+                                  controller.owners, controller),
+                            ),
+                          ),
+                        ),
+                      )),
             );
           }),
         ),
@@ -87,21 +114,27 @@ class _OwnerDataString extends DataTableSource {
       DataCell(Text(user.displayName, style: AppTextStyles.body)),
       DataCell(Text(user.email, style: AppTextStyles.body)),
       DataCell(Obx(() => Text(
-            controller.ownerListingCounts[user.uid]?.toString() ?? AppStrings.adminLoadingLabel,
+            controller.ownerListingCounts[user.uid]?.toString() ??
+                AppStrings.adminLoadingLabel,
             style: AppTextStyles.body,
           ))),
-      DataCell(Text(user.verificationStatus.name.capitalizeFirst ?? '', style: AppTextStyles.body)),
+      DataCell(Text(user.verificationStatus.name.capitalizeFirst ?? '',
+          style: AppTextStyles.body)),
       DataCell(
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
-            color: user.status == 'blocked' ? AppColors.error.withAlpha(25) : AppColors.success.withAlpha(25),
+            color: user.status == 'blocked'
+                ? AppColors.error.withAlpha(25)
+                : AppColors.success.withAlpha(25),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Text(
             user.status.toUpperCase(),
             style: AppTextStyles.labelMicro.copyWith(
-              color: user.status == 'blocked' ? AppColors.error : AppColors.success,
+              color: user.status == 'blocked'
+                  ? AppColors.error
+                  : AppColors.success,
             ),
           ),
         ),
@@ -110,9 +143,12 @@ class _OwnerDataString extends DataTableSource {
         mainAxisSize: MainAxisSize.min,
         children: [
           IconButton(
-            icon: Icon(user.status == 'blocked' ? Icons.lock_open : Icons.block, color: AppColors.textSecondary),
+            icon: Icon(user.status == 'blocked' ? Icons.lock_open : Icons.block,
+                color: AppColors.textSecondary),
             onPressed: () => controller.toggleUserStatus(user),
-            tooltip: user.status == 'blocked' ? AppStrings.adminUnblockOwnerTooltip : AppStrings.adminBlockOwnerTooltip,
+            tooltip: user.status == 'blocked'
+                ? AppStrings.adminUnblockOwnerTooltip
+                : AppStrings.adminBlockOwnerTooltip,
           ),
           IconButton(
             icon: const Icon(Icons.delete_outline, color: AppColors.error),

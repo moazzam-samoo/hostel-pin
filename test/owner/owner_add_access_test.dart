@@ -81,4 +81,15 @@ void main() {
         OwnerAddAccess.rejected);
     expect(_access(unverified, 'rejected', []), OwnerAddAccess.rejected);
   });
+
+  test('a rejected owner who resubmitted (doc pending) can add hostels again', () {
+    // users.verificationStatus stays `rejected` until an admin approves, so
+    // the verification doc is the signal that the owner resubmitted.
+    expect(_access(VerificationStatus.rejected, 'pending', _pending(1)),
+        OwnerAddAccess.allowed);
+    expect(_access(VerificationStatus.rejected, 'pending', _pending(3)),
+        OwnerAddAccess.limitReached);
+    expect(_access(VerificationStatus.rejected, 'changesRequested', []),
+        OwnerAddAccess.allowed);
+  });
 }

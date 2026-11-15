@@ -18,18 +18,21 @@ class AdminUsersView extends GetView<AdminUsersController> {
       children: [
         Padding(
           padding: const EdgeInsets.all(24.0),
-          child: Text(AppStrings.adminManageUsersTitle, style: AppTextStyles.screenTitle),
+          child: Text(AppStrings.adminManageUsersTitle,
+              style: AppTextStyles.screenTitle),
         ),
         Expanded(
           child: Obx(() {
             if (controller.isLoading.value && controller.users.isEmpty) {
-              return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+              return const Center(
+                  child: CircularProgressIndicator(color: AppColors.primary));
             }
             if (controller.users.isEmpty) {
               return Center(
                 child: Text(
                   AppStrings.adminNoUsersFound,
-                  style: AppTextStyles.body.copyWith(color: AppColors.textSecondary),
+                  style: AppTextStyles.body
+                      .copyWith(color: AppColors.textSecondary),
                 ),
               );
             }
@@ -37,48 +40,54 @@ class AdminUsersView extends GetView<AdminUsersController> {
             return SingleChildScrollView(
               padding: EdgeInsets.symmetric(
                   horizontal: Responsive.isDesktop(context) ? 24.0 : 12.0),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(minWidth: 720),
-                  child: Theme(
-                    data: Theme.of(context).copyWith(
-                      dataTableTheme: DataTableThemeData(
-                        headingRowColor:
-                            WidgetStateProperty.all(AppColors.background),
-                        dataRowColor: WidgetStateProperty.all(Colors.white),
-                      ),
-                    ),
-                    child: PaginatedDataTable(
-                      header: Text(AppStrings.adminStudentsDirectory,
-                          style: AppTextStyles.cardTitle),
-                      rowsPerPage: controller.users.length > 10
-                          ? 10
-                          : (controller.users.isNotEmpty
-                              ? controller.users.length
-                              : 1),
-                      columns: [
-                        DataColumn(
-                            label: Text(AppStrings.adminColName,
-                                style: AppTextStyles.labelMicro)),
-                        DataColumn(
-                            label: Text(AppStrings.adminColEmail,
-                                style: AppTextStyles.labelMicro)),
-                        DataColumn(
-                            label: Text(AppStrings.adminColJoined,
-                                style: AppTextStyles.labelMicro)),
-                        DataColumn(
-                            label: Text(AppStrings.adminColStatus,
-                                style: AppTextStyles.labelMicro)),
-                        DataColumn(
-                            label: Text(AppStrings.adminColActions,
-                                style: AppTextStyles.labelMicro)),
-                      ],
-                      source: _UserDataString(controller.users, controller),
-                    ),
-                  ),
-                ),
-              ),
+              child: LayoutBuilder(
+                  builder: (context, box) => SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        // A horizontal scroll view gives its child unbounded width, which
+                        // PaginatedDataTable cannot lay out; give it a definite width
+                        // (the available width, but never narrower than 720).
+                        child: SizedBox(
+                          width: box.maxWidth < 720 ? 720 : box.maxWidth,
+                          child: Theme(
+                            data: Theme.of(context).copyWith(
+                              dataTableTheme: DataTableThemeData(
+                                headingRowColor: WidgetStateProperty.all(
+                                    AppColors.background),
+                                dataRowColor:
+                                    WidgetStateProperty.all(Colors.white),
+                              ),
+                            ),
+                            child: PaginatedDataTable(
+                              header: Text(AppStrings.adminStudentsDirectory,
+                                  style: AppTextStyles.cardTitle),
+                              rowsPerPage: controller.users.length > 10
+                                  ? 10
+                                  : (controller.users.isNotEmpty
+                                      ? controller.users.length
+                                      : 1),
+                              columns: [
+                                DataColumn(
+                                    label: Text(AppStrings.adminColName,
+                                        style: AppTextStyles.labelMicro)),
+                                DataColumn(
+                                    label: Text(AppStrings.adminColEmail,
+                                        style: AppTextStyles.labelMicro)),
+                                DataColumn(
+                                    label: Text(AppStrings.adminColJoined,
+                                        style: AppTextStyles.labelMicro)),
+                                DataColumn(
+                                    label: Text(AppStrings.adminColStatus,
+                                        style: AppTextStyles.labelMicro)),
+                                DataColumn(
+                                    label: Text(AppStrings.adminColActions,
+                                        style: AppTextStyles.labelMicro)),
+                              ],
+                              source:
+                                  _UserDataString(controller.users, controller),
+                            ),
+                          ),
+                        ),
+                      )),
             );
           }),
         ),
@@ -109,13 +118,17 @@ class _UserDataString extends DataTableSource {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
-            color: user.status == 'blocked' ? AppColors.error.withAlpha(25) : AppColors.success.withAlpha(25),
+            color: user.status == 'blocked'
+                ? AppColors.error.withAlpha(25)
+                : AppColors.success.withAlpha(25),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Text(
             user.status.toUpperCase(),
             style: AppTextStyles.labelMicro.copyWith(
-              color: user.status == 'blocked' ? AppColors.error : AppColors.success,
+              color: user.status == 'blocked'
+                  ? AppColors.error
+                  : AppColors.success,
             ),
           ),
         ),
@@ -124,9 +137,12 @@ class _UserDataString extends DataTableSource {
         mainAxisSize: MainAxisSize.min,
         children: [
           IconButton(
-            icon: Icon(user.status == 'blocked' ? Icons.lock_open : Icons.block, color: AppColors.textSecondary),
+            icon: Icon(user.status == 'blocked' ? Icons.lock_open : Icons.block,
+                color: AppColors.textSecondary),
             onPressed: () => controller.toggleUserStatus(user),
-            tooltip: user.status == 'blocked' ? AppStrings.adminUnblockUserTooltip : AppStrings.adminBlockUserTooltip,
+            tooltip: user.status == 'blocked'
+                ? AppStrings.adminUnblockUserTooltip
+                : AppStrings.adminBlockUserTooltip,
           ),
           IconButton(
             icon: const Icon(Icons.delete_outline, color: AppColors.error),

@@ -14,7 +14,8 @@ class AdminDashboardView extends GetView<AdminDashboardController> {
   Widget build(BuildContext context) {
     return Obx(() {
       if (controller.isLoading.value) {
-        return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+        return const Center(
+            child: CircularProgressIndicator(color: AppColors.primary));
       }
 
       return SingleChildScrollView(
@@ -22,7 +23,8 @@ class AdminDashboardView extends GetView<AdminDashboardController> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(AppStrings.adminDashboardOverview, style: AppTextStyles.screenTitle),
+            Text(AppStrings.adminDashboardOverview,
+                style: AppTextStyles.screenTitle),
             const SizedBox(height: 4),
             Obx(() => Text(
                   AppStrings.adminDashboardWelcome(controller.adminDisplayName),
@@ -140,8 +142,10 @@ class AdminDashboardView extends GetView<AdminDashboardController> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(AppStrings.adminUserGrowthTitle, style: AppTextStyles.sectionHeader),
-          Text(AppStrings.adminUserGrowthSubtitle, style: AppTextStyles.caption),
+          Text(AppStrings.adminUserGrowthTitle,
+              style: AppTextStyles.sectionHeader),
+          Text(AppStrings.adminUserGrowthSubtitle,
+              style: AppTextStyles.caption),
           const SizedBox(height: 24),
           SizedBox(
             height: 300,
@@ -156,7 +160,20 @@ class AdminDashboardView extends GetView<AdminDashboardController> {
                     sideTitles: SideTitles(
                       showTitles: true,
                       getTitlesWidget: (value, meta) {
-                        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                        const months = [
+                          'Jan',
+                          'Feb',
+                          'Mar',
+                          'Apr',
+                          'May',
+                          'Jun',
+                          'Jul',
+                          'Aug',
+                          'Sep',
+                          'Oct',
+                          'Nov',
+                          'Dec'
+                        ];
                         if (value.toInt() >= 1 && value.toInt() <= 12) {
                           return Padding(
                             padding: const EdgeInsets.only(top: 8.0),
@@ -182,14 +199,17 @@ class AdminDashboardView extends GetView<AdminDashboardController> {
                       },
                     ),
                   ),
-                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  topTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false)),
+                  rightTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false)),
                 ),
                 gridData: FlGridData(
                   show: true,
                   drawVerticalLine: false,
                   horizontalInterval: 10,
-                  getDrawingHorizontalLine: (value) => const FlLine(color: AppColors.border, strokeWidth: 1),
+                  getDrawingHorizontalLine: (value) =>
+                      const FlLine(color: AppColors.border, strokeWidth: 1),
                 ),
                 borderData: FlBorderData(show: false),
                 // Mockup shows a single series ("Monthly student
@@ -200,7 +220,8 @@ class AdminDashboardView extends GetView<AdminDashboardController> {
                 // would be inventing UI the mockup doesn't show.
                 barGroups: List.generate(12, (index) {
                   final month = index + 1;
-                  final students = controller.studentGrowth[month]?.toDouble() ?? 0.0;
+                  final students =
+                      controller.studentGrowth[month]?.toDouble() ?? 0.0;
                   return BarChartGroupData(
                     x: month,
                     barRods: [
@@ -208,7 +229,8 @@ class AdminDashboardView extends GetView<AdminDashboardController> {
                         toY: students,
                         color: AppColors.primary,
                         width: 18,
-                        borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
+                        borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(4)),
                       ),
                     ],
                   );
@@ -245,12 +267,16 @@ class AdminDashboardView extends GetView<AdminDashboardController> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(AppStrings.adminUserDistributionTitle, style: AppTextStyles.sectionHeader),
+          Text(AppStrings.adminUserDistributionTitle,
+              style: AppTextStyles.sectionHeader),
           const SizedBox(height: 24),
           SizedBox(
             height: 200,
             child: total == 0
-                ? Center(child: Text(AppStrings.adminNoData, style: AppTextStyles.body.copyWith(color: AppColors.textSecondary)))
+                ? Center(
+                    child: Text(AppStrings.adminNoData,
+                        style: AppTextStyles.body
+                            .copyWith(color: AppColors.textSecondary)))
                 : PieChart(
                     PieChartData(
                       sectionsSpace: 0,
@@ -299,7 +325,8 @@ class AdminDashboardView extends GetView<AdminDashboardController> {
           decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         ),
         const SizedBox(width: 8),
-        Text(label, style: AppTextStyles.body.copyWith(color: AppColors.textSecondary)),
+        Text(label,
+            style: AppTextStyles.body.copyWith(color: AppColors.textSecondary)),
       ],
     );
   }
@@ -342,7 +369,9 @@ class _StatCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: AppTextStyles.body.copyWith(color: AppColors.textSecondary)),
+                Text(title,
+                    style: AppTextStyles.body
+                        .copyWith(color: AppColors.textSecondary)),
                 const SizedBox(height: 4),
                 Text(value, style: AppTextStyles.screenTitle),
               ],
