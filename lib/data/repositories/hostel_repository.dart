@@ -29,13 +29,34 @@ class HostelRepository {
         toFirestore: (model, options) => model.toFirestore(),
       );
 
+  /// Converts a snapshot to models, skipping (and logging) any document that
+  /// cannot be parsed. Without this, ONE malformed hostel document made the
+  /// whole stream fail, which blanked the owner's listings, the admin Hostels
+  /// tab and the student feed at once.
+  List<HostelModel> _safeModels(QuerySnapshot<Map<String, dynamic>> snapshot) {
+    final models = <HostelModel>[];
+    for (final doc in snapshot.docs) {
+      try {
+        models.add(HostelModel.fromFirestore(doc, null));
+      } catch (e) {
+        Logger.e('Skipping unreadable hostel ${doc.id}: $e');
+      }
+    }
+    return models;
+  }
+
+  /// Raw (converter-free) collection used by the list streams so each
+  /// document is parsed on its own inside [_safeModels].
+  CollectionReference<Map<String, dynamic>> get _rawRef =>
+      _firestore.collection('hostels');
+
   Stream<List<HostelModel>> streamFeatured({int limit = kHostelPageSize}) {
-    return _hostelsRef
+    return _rawRef
         .where('status', isEqualTo: ListingStatus.published.name)
         .where('isFeatured', isEqualTo: true)
         .limit(limit)
         .snapshots()
-        .map((snapshot) => snapshot.docs.map((doc) => doc.data()).toList());
+        .map(_safeModels);
   }
 
   /// Published listings, newest first, capped at [limit] (FIX-7.5).
@@ -60,7 +81,7 @@ class HostelRepository {
     int limit = kHostelPageSize,
     HostelGender? gender,
   }) {
-    Query<HostelModel> query = _hostelsRef
+    Query<Map<String, dynamic>> query = _rawRef
         .where('status', isEqualTo: ListingStatus.published.name);
     if (gender != null) {
       query = query.where('gender', isEqualTo: gender.name);
@@ -69,17 +90,17 @@ class HostelRepository {
         .orderBy(FieldPath.documentId, descending: true)
         .limit(limit)
         .snapshots()
-        .map((snapshot) => snapshot.docs.map((doc) => doc.data()).toList());
+        .map(_safeModels);
   }
 
   /// Admin-facing stream for all listings regardless of status (E.4),
   /// newest first (same server-side ordering rationale as above).
   Stream<List<HostelModel>> streamAllAdmin({int limit = kHostelPageSize}) {
-    return _hostelsRef
+    return _rawRef
         .orderBy(FieldPath.documentId, descending: true)
         .limit(limit)
         .snapshots()
-        .map((snapshot) => snapshot.docs.map((doc) => doc.data()).toList());
+        .map(_safeModels);
   }
 
   Stream<List<HostelModel>> streamNearbyHostels(double latitude, double longitude, double radiusInKm) {
@@ -101,11 +122,11 @@ class HostelRepository {
   /// Pagination targets the catalogue-sized student queries above; a correct
   /// owner-side cap needs the server-maintained counters of FIX-7.9 first.
   Stream<List<HostelModel>> streamByOwner(String ownerId) {
-    return _hostelsRef
+    return _rawRef
         .where('ownerId', isEqualTo: ownerId)
         .snapshots()
         .map((snapshot) {
-      final list = snapshot.docs.map((doc) => doc.data()).toList();
+      final list = _safeModels(snapshot);
       // Sort client-side by document ID (which is epoch time) descending
       // so newest hostels appear at the top.
       list.sort((a, b) => b.id.compareTo(a.id));
