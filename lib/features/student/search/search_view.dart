@@ -194,7 +194,7 @@ class SearchView extends GetView<SearchController> {
           ),
           Expanded(
             child: Obx(() {
-              if (controller.searchQuery.value.trim().isEmpty) {
+              if (!controller.showResults) {
                 return _buildRecentSearches();
               }
               if (controller.searchResults.isEmpty) {

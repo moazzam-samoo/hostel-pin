@@ -143,7 +143,7 @@ class AppStrings {
   static const String fullStatus = 'Full';
   static const String ownerConnectivitySection = 'Owner Connectivity';
   static const String phoneNoLabel = 'Phone no:';
-  static const String phoneHint = '+92-320605300';
+  static const String phoneHint = '03123456789';
   static const String whatsappNumberLabel = 'Whatsapp number:';
   static const String sameAsPhoneLabel = 'Same as phone number';
   // Property ownership document — required for every brand-new listing
@@ -270,9 +270,12 @@ class AppStrings {
   static const String errorConfirmPasswordRequired =
       'Please confirm your password';
   static const String errorConfirmPasswordMatch = 'Passwords do not match';
+  static const String mapCameraError = 'Could not update camera position.';
+  static const String errorDraftNameRequired =
+      'Enter the hostel name to save a draft.';
   static const String errorPhoneRequired = 'Phone number is required';
   static const String errorPhoneInvalid =
-      'Enter a valid number starting with +92';
+      'Enter an 11-digit number starting with 0, e.g. 03123456789';
   static const String errorPriceInvalid = 'Enter a valid price';
   static const String errorRoomsInvalid = 'Enter a valid number of rooms';
   static const String errorBedsInvalid = 'Enter a valid number of beds';

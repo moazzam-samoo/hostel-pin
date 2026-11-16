@@ -476,6 +476,17 @@ describe('verifications/{uid}', () => {
  * and fixed, not a hypothetical).
  */
 describe('isAdmin() — Phase 9 admin-broad rules', () => {
+  it('an owner can save a half-filled DRAFT hostel but not a half-filled pending one', async () => {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await ctx.firestore().collection('users').doc(OWNER_A).set({ role: 'owner' });
+    });
+    const asOwner = testEnv.authenticatedContext(OWNER_A).firestore();
+    const base = { ownerId: OWNER_A, name: 'Draft', fullAddress: '', city: 'c', pricePerMonth: 0,
+                   rating: 0, reviewCount: 0, viewCount: 0 };
+    await assertSucceeds(asOwner.collection('hostels').doc('dr1').set({ ...base, status: 'draft' }));
+    await assertFails(asOwner.collection('hostels').doc('dr2').set({ ...base, status: 'pending' }));
+  });
+
   it('an admin can reject a hostel with a reason; an owner cannot set the reason', async () => {
     await testEnv.withSecurityRulesDisabled(async (ctx) => {
       await ctx.firestore().collection('users').doc(ADMIN).set({ role: 'admin' });

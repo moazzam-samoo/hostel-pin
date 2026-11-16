@@ -412,6 +412,15 @@ class AddListingController extends GetxController {
   }
 
   void saveAsDraft() {
+    // A draft may be incomplete, but it needs a name so the owner can find it
+    // again (and the server requires one).
+    if (nameController.text.trim().isEmpty) {
+      AppSnackbar.showGlobal(
+        message: AppStrings.errorDraftNameRequired,
+        type: SnackbarType.error,
+      );
+      return;
+    }
     _saveListing(ListingStatus.draft);
   }
 

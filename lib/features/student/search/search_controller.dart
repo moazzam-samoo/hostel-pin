@@ -88,15 +88,32 @@ class SearchController extends GetxController {
   // moves server-side, which isn't justified for this catalog's size yet;
   // revisit if the real hostel count grows past what's reasonable to hold
   // in memory.
-  List<HostelModel> get searchResults {
-    if (searchQuery.value.trim().isEmpty) return [];
+  /// Any filter (amenities, a narrowed price range, a sort) the user applied.
+  bool get hasActiveFilters =>
+      selectedAmenities.isNotEmpty ||
+      priceRange.value.start > minPrice ||
+      priceRange.value.end < maxPrice ||
+      isSortPriceLowToHigh.value ||
+      isSortRatingHighToLow.value;
 
-    final query = searchQuery.value.toLowerCase();
+  /// Results are shown once there is a query OR a filter, so choosing
+  /// amenities alone (no typed text) lists the matching hostels.
+  bool get showResults =>
+      searchQuery.value.trim().isNotEmpty || hasActiveFilters;
+
+  List<HostelModel> get searchResults {
+    if (!showResults) return [];
+
+    final query = searchQuery.value.trim().toLowerCase();
+    final range = priceRange.value;
     var results = _allPublished.where((h) {
-      final matchesQuery = h.name.toLowerCase().contains(query) ||
+      final matchesQuery = query.isEmpty ||
+          h.name.toLowerCase().contains(query) ||
           h.city.toLowerCase().contains(query);
-      final matchesPrice = h.pricePerMonth >= priceRange.value.start &&
-          h.pricePerMonth <= priceRange.value.end;
+      // The slider's top end means "no upper limit", so costly hostels are
+      // not hidden by the default range.
+      final matchesPrice = h.pricePerMonth >= range.start &&
+          (range.end >= maxPrice || h.pricePerMonth <= range.end);
       final matchesAmenities = selectedAmenities.isEmpty ||
           selectedAmenities.every(h.amenities.contains);
       return matchesQuery && matchesPrice && matchesAmenities;

@@ -50,7 +50,8 @@ class Validators {
       return AppStrings.errorPhoneRequired;
     }
     final clean = value.replaceAll(RegExp(r'[\s\-\(\)]'), '');
-    final pakPhoneRegex = RegExp(r'^(?:\+92|92|0)?3[0-9]{9}$');
+    // 11 digits starting with 0, e.g. 03123456775 (no +92 / 92 prefix).
+    final pakPhoneRegex = RegExp(r'^03[0-9]{9}$');
     if (!pakPhoneRegex.hasMatch(clean)) {
       return AppStrings.errorPhoneInvalid;
     }

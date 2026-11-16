@@ -44,4 +44,30 @@ void main() {
       expect(Validators.email(''), isNotNull);
     });
   });
+
+  group('Validators.phone (Pakistan mobile, 11 digits starting with 0)', () {
+    test('accepts 03123456775 and tolerates spaces/dashes', () {
+      expect(Validators.phone('03123456775'), isNull);
+      expect(Validators.phone('0312 3456775'), isNull);
+      expect(Validators.phone('0312-3456775'), isNull);
+    });
+    test('rejects +92 / 92 forms, wrong length, wrong prefix and empty', () {
+      for (final bad in [
+        '+923123456775',
+        '923123456775',
+        '3123456775',
+        '0312345677',
+        '031234567751',
+        '02123456775',
+        '03a23456775',
+        '',
+        '   ',
+      ]) {
+        expect(Validators.phone(bad), isNotNull, reason: '"$bad"');
+      }
+    });
+    test('the error message no longer asks for +92', () {
+      expect(Validators.phone('+923123456775'), isNot(contains('+92')));
+    });
+  });
 }

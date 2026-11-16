@@ -43,10 +43,13 @@ service cloud.firestore {
     // defense-in-depth job for this rules layer.
     function isValidHostelData() {
       let d = request.resource.data;
+      // A draft may be saved half-filled (only a name is required); every other
+      // status (pending/published/rejected) must be complete.
+      let isDraft = d.get('status', '') == 'draft';
       return d.name is string && d.name.size() > 0 && d.name.size() < 200 &&
-             d.fullAddress is string && d.fullAddress.size() > 0 &&
+             d.fullAddress is string && (isDraft || d.fullAddress.size() > 0) &&
              d.city is string && d.city.size() > 0 && d.city.size() < 100 &&
-             d.pricePerMonth is number && d.pricePerMonth > 0 &&
+             d.pricePerMonth is number && (isDraft || d.pricePerMonth > 0) &&
              d.ownerId is string && d.ownerId.size() > 0 &&
              // Boys/Girls type: optional (legacy listings have none) but, when
              // present, must be one of the two allowed values.

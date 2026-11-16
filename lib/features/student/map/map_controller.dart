@@ -11,6 +11,7 @@ import '../../../data/services/location_service.dart';
 import '../../../shared/widgets/feedback/app_snackbar.dart';
 import '../../../core/utils/hostel_marker_builder.dart';
 import '../../../core/constants/app_strings.dart';
+import '../../../core/utils/logger.dart';
 
 class MapController extends GetxController {
   final HostelRepository _hostelRepo = Get.find<HostelRepository>();
@@ -135,14 +136,19 @@ class MapController extends GetxController {
     // pop a permission prompt the instant the map appears. First-time users
     // are asked when they tap the "my location" button.
     _locationService.hasPermission().then((granted) {
-      if (granted) getCurrentLocation();
+      // Automatic recentre: stay silent if it cannot be done (the map may
+      // not be on screen yet, e.g. while the user is on the Home tab).
+      if (granted) getCurrentLocation(userInitiated: false);
     });
   }
 
-  Future<void> getCurrentLocation() async {
+  /// [userInitiated] is false for the automatic recentre when the map is
+  /// created: nothing is shown to the user if that fails.
+  Future<void> getCurrentLocation({bool userInitiated = true}) async {
     final position = await _locationService.getCurrentLocation();
     
     if (position == null) {
+      if (!userInitiated) return;
       // Denied, denied-forever or the device location switch is off: the app
       // cannot re-prompt, so offer the one thing that can actually fix it.
       final openIt = await _showLocationRationale();
@@ -151,7 +157,7 @@ class MapController extends GetxController {
     }
     
     try {
-      mapController?.animateCamera(
+      await mapController?.animateCamera(
         CameraUpdate.newCameraPosition(
           CameraPosition(
             target: LatLng(position.latitude, position.longitude),
@@ -160,8 +166,11 @@ class MapController extends GetxController {
         ),
       );
     } catch (e) {
-      AppSnackbar.showGlobal(
-          message: 'Could not update camera position.', type: SnackbarType.error);
+      Logger.w('Map recentre failed: $e');
+      if (userInitiated) {
+        AppSnackbar.showGlobal(
+            message: AppStrings.mapCameraError, type: SnackbarType.error);
+      }
     }
   }
 
