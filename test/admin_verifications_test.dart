@@ -23,6 +23,7 @@ class FakeAuthService extends GetxService implements AuthService {
 void main() {
   tearDown(() => Get.reset());
   adminMultiHostelTests();
+  adminApproveTests();
 
   testWidgets('AdminVerificationsView smoke test', (tester) async {
     final fakeFirestore = FakeFirebaseFirestore();
@@ -102,5 +103,55 @@ void adminMultiHostelTests() {
     expect(h3['status'], 'rejected');
     expect(h3['rejectionReason'], 'Bad photos');
     expect((await db.collection('hostels').doc('h1').get())['status'], 'pending');
+  });
+}
+
+void adminApproveTests() {
+  Future<FakeFirebaseFirestore> seed({required String? hostelStatus}) async {
+    final db = FakeFirebaseFirestore();
+    _setUpRepos(db);
+    await db.collection('users').doc('o1').set({'role': 'owner', 'verificationStatus': 'unverified'});
+    await db.collection('verifications').doc('o1').set({
+      'uid': 'o1',
+      'status': 'pending',
+      'hostelId': 'h1',
+      'personalInfo': {'fullName': 'Ali'},
+      'submittedAt': Timestamp.now(),
+    });
+    if (hostelStatus != null) {
+      await db.collection('hostels').doc('h1').set({
+        'ownerId': 'o1', 'name': 'H', 'status': hostelStatus, 'city': 'C', 'pricePerMonth': 10,
+      });
+    }
+    return db;
+  }
+
+  Future<void> approve(FakeFirebaseFirestore db) {
+    return VerificationRepository(firestore: db).approveSubmission(
+      verificationId: 'o1',
+      userId: 'o1',
+      adminId: 'admin',
+      hostelId: 'h1',
+    );
+  }
+
+  test('approving works even when the linked hostel no longer exists', () async {
+    final db = await seed(hostelStatus: null);
+    await approve(db);
+    expect((await db.collection('users').doc('o1').get())['verificationStatus'], 'verified');
+    expect((await db.collection('verifications').doc('o1').get())['status'], 'approved');
+  });
+
+  test('approving publishes a pending linked hostel', () async {
+    final db = await seed(hostelStatus: 'pending');
+    await approve(db);
+    expect((await db.collection('hostels').doc('h1').get())['status'], 'published');
+  });
+
+  test('approving the identity does not re-publish a hostel the admin rejected', () async {
+    final db = await seed(hostelStatus: 'rejected');
+    await approve(db);
+    expect((await db.collection('hostels').doc('h1').get())['status'], 'rejected');
+    expect((await db.collection('users').doc('o1').get())['verificationStatus'], 'verified');
   });
 }

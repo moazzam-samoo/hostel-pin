@@ -226,7 +226,10 @@ class AdminVerificationsController extends GetxController {
       AppSnackbar.showGlobal(message: AppStrings.adminSubmissionApproved, type: SnackbarType.success);
       clearSelection();
     } catch (e) {
-      AppSnackbar.showGlobal(message: AppStrings.adminReviewActionError, type: SnackbarType.error);
+      Logger.e('Admin approve submission failed: $e');
+      AppSnackbar.showGlobal(
+          message: '${AppStrings.adminReviewActionError} (${errorCode(e)})',
+          type: SnackbarType.error);
     } finally {
       isSubmittingDecision.value = false;
     }

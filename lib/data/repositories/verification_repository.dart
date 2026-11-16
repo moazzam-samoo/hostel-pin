@@ -107,6 +107,17 @@ class VerificationRepository {
     required String adminId,
     String? hostelId,
   }) async {
+    // Only publish the linked hostel if it still exists AND is still waiting
+    // for review. A batch update on a deleted hostel fails with not-found and
+    // used to make the whole approval fail; a hostel the admin already
+    // rejected must not be silently re-published by approving the identity.
+    var publishHostel = false;
+    if (hostelId != null && hostelId.isNotEmpty) {
+      final hostelDoc =
+          await _firestore.collection('hostels').doc(hostelId).get();
+      publishHostel = hostelDoc.exists && hostelDoc.data()?['status'] == 'pending';
+    }
+
     final batch = _firestore.batch();
 
     batch.update(_getCollection().doc(verificationId), {
@@ -121,8 +132,8 @@ class VerificationRepository {
       'updatedAt': FieldValue.serverTimestamp(),
     });
 
-    if (hostelId != null && hostelId.isNotEmpty) {
-      batch.update(_firestore.collection('hostels').doc(hostelId), {
+    if (publishHostel) {
+      batch.update(_firestore.collection('hostels').doc(hostelId!), {
         'status': 'published',
       });
     }
