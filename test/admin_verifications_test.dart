@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:hostel_finder_app/data/repositories/verification_repository.dart';
+import 'package:hostel_finder_app/data/repositories/activity_repository.dart';
 import 'package:hostel_finder_app/data/repositories/hostel_repository.dart';
 import 'package:hostel_finder_app/data/services/auth_service.dart';
 import 'package:hostel_finder_app/features/admin/verifications/admin_verifications_controller.dart';
@@ -153,5 +154,18 @@ void adminApproveTests() {
     await approve(db);
     expect((await db.collection('hostels').doc('h1').get())['status'], 'rejected');
     expect((await db.collection('users').doc('o1').get())['verificationStatus'], 'verified');
+  });
+
+  test('approving the identity tells the owner they are verified', () async {
+    final db = await seed(hostelStatus: 'pending');
+    await VerificationRepository(firestore: db).approveSubmission(
+      verificationId: 'o1', userId: 'o1', adminId: 'admin', hostelId: 'h1');
+    // The controller is what notifies; drive it the way the panel does.
+    Get.put(ActivityRepository(firestore: db));
+    final c = Get.put(AdminVerificationsController());
+    await Future<void>.delayed(const Duration(milliseconds: 50));
+    await c.notifyIdentityApproved('o1', hostelName: 'H', hostelPublished: true);
+    final feed = (await db.collection('activities').where('ownerId', isEqualTo: 'o1').get()).docs;
+    expect(feed.map((d) => d['type']).toSet(), {'account_verified', 'hostel_approved'});
   });
 }

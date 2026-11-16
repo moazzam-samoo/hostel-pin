@@ -2,6 +2,7 @@ import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:hostel_finder_app/core/enums/listing_status.dart';
+import 'package:hostel_finder_app/data/repositories/activity_repository.dart';
 import 'package:hostel_finder_app/data/repositories/hostel_repository.dart';
 import 'package:hostel_finder_app/features/admin/hostels/admin_hostels_controller.dart';
 
@@ -17,6 +18,7 @@ void main() {
     db = FakeFirebaseFirestore();
     repo = HostelRepository(firestore: db);
     Get.put(repo);
+    Get.put(ActivityRepository(firestore: db));
     await db.collection('hostels').doc('h1').set({
       'ownerId': 'o1',
       'name': 'Hostel One',
@@ -81,5 +83,30 @@ void main() {
     final h = (await repo.getById('h1'))!;
     await c.reject(h, '   ');
     expect((await _doc('h1'))['status'], 'pending');
+  });
+
+  test('approving a hostel tells the owner (activity feed)', () async {
+    final c = AdminHostelsController();
+    await c.approve((await repo.getById('h1'))!);
+    final feed = (await db.collection('activities').where('ownerId', isEqualTo: 'o1').get()).docs;
+    expect(feed.length, 1);
+    expect(feed.first['type'], 'hostel_approved');
+    expect(feed.first['message'], contains('Hostel One'));
+    expect(feed.first['hostelId'], 'h1');
+  });
+
+  test('rejecting a hostel tells the owner the reason', () async {
+    final c = AdminHostelsController();
+    await c.reject((await repo.getById('h1'))!, 'Photos are blurry');
+    final feed = (await db.collection('activities').where('ownerId', isEqualTo: 'o1').get()).docs;
+    expect(feed.length, 1);
+    expect(feed.first['type'], 'hostel_rejected');
+    expect(feed.first['message'], contains('Photos are blurry'));
+  });
+
+  test('a failed status change tells the owner nothing', () async {
+    final c = AdminHostelsController();
+    await c.reject((await repo.getById('h1'))!, '   ');
+    expect((await db.collection('activities').get()).docs, isEmpty);
   });
 }

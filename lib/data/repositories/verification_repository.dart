@@ -101,7 +101,8 @@ class VerificationRepository {
   /// collections (added alongside this method) — without them this batch
   /// fails with permission-denied on every field, since the pre-existing
   /// owner-scoped rules never granted an admin session write access here.
-  Future<void> approveSubmission({
+  /// Returns true when the linked hostel was published as part of this approval.
+  Future<bool> approveSubmission({
     required String verificationId,
     required String userId,
     required String adminId,
@@ -139,6 +140,7 @@ class VerificationRepository {
     }
 
     await batch.commit();
+    return publishHostel;
   }
 
   /// Block G.6 — Reject. `users/{uid}.verificationStatus` moves to the new

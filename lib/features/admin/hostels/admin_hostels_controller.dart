@@ -1,6 +1,7 @@
 import '../../../../core/utils/error_code.dart';
 import '../../../../core/utils/logger.dart';
 import 'package:get/get.dart';
+import '../../../../data/repositories/activity_repository.dart';
 import '../../../../data/repositories/hostel_repository.dart';
 import '../../../../data/models/hostel_model.dart';
 import '../../../../core/constants/app_strings.dart';
@@ -39,9 +40,32 @@ class AdminHostelsController extends GetxController {
     _subscribeToHostels();
   }
 
+  Future<void> _notifyOwner(
+    HostelModel hostel, {
+    required String type,
+    required String title,
+    required String message,
+  }) async {
+    if (!Get.isRegistered<ActivityRepository>()) return;
+    await Get.find<ActivityRepository>().notifyOwner(
+      ownerId: hostel.ownerId,
+      type: type,
+      title: title,
+      message: message,
+      hostelId: hostel.id,
+      hostelName: hostel.name,
+    );
+  }
+
   Future<void> approve(HostelModel hostel) async {
     try {
       await _hostelRepository.setStatus(hostel.id, ListingStatus.published);
+      await _notifyOwner(
+        hostel,
+        type: 'hostel_approved',
+        title: AppStrings.hostelApprovedActivityTitle,
+        message: AppStrings.hostelApprovedActivityMessage(hostel.name),
+      );
       AppSnackbar.showGlobal(
         message: AppStrings.adminHostelApproved(hostel.name),
         type: SnackbarType.success,
@@ -59,6 +83,12 @@ class AdminHostelsController extends GetxController {
         hostel.id,
         ListingStatus.rejected,
         rejectionReason: reason,
+      );
+      await _notifyOwner(
+        hostel,
+        type: 'hostel_rejected',
+        title: AppStrings.hostelRejectedActivityTitle,
+        message: AppStrings.hostelRejectedActivityMessage(hostel.name, reason.trim()),
       );
       AppSnackbar.showGlobal(
         message: AppStrings.adminHostelRejected(hostel.name),

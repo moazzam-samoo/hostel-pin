@@ -629,6 +629,15 @@ class AppStrings {
   static const String adminDocumentLoadError = 'Could not load this document.';
   static const String adminRequestChangesButton = 'Request Changes';
   static const String adminRejectButton = 'Reject';
+  static const String hostelApprovedActivityTitle = 'Hostel approved';
+  static String hostelApprovedActivityMessage(String name) =>
+      '$name is approved and now visible to students.';
+  static const String hostelRejectedActivityTitle = 'Hostel rejected';
+  static String hostelRejectedActivityMessage(String name, String reason) =>
+      '$name was rejected: $reason';
+  static const String accountVerifiedActivityTitle = 'Account verified';
+  static const String accountVerifiedActivityMessage =
+      'Your identity is verified. You can now add hostels without the review limit.';
   static const String adminApproveHostelTooltip = 'Approve hostel';
   static const String adminRejectHostelTooltip = 'Reject hostel';
   static const String adminRejectHostelDialogTitle = 'Reject Hostel';

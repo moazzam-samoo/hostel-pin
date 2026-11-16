@@ -8,6 +8,7 @@ import '../../../../core/config/edge_signer_config.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../../../../data/models/hostel_model.dart';
 import '../../../../data/models/verification_model.dart';
+import '../../../../data/repositories/activity_repository.dart';
 import '../../../../data/repositories/hostel_repository.dart';
 import '../../../../data/repositories/verification_repository.dart';
 import '../../../../data/services/auth_service.dart';
@@ -97,9 +98,56 @@ class AdminVerificationsController extends GetxController {
     );
   }
 
+  Future<void> _notify(
+    String ownerId, {
+    required String type,
+    required String title,
+    required String message,
+    HostelModel? hostel,
+  }) async {
+    if (!Get.isRegistered<ActivityRepository>()) return;
+    await Get.find<ActivityRepository>().notifyOwner(
+      ownerId: ownerId,
+      type: type,
+      title: title,
+      message: message,
+      hostelId: hostel?.id,
+      hostelName: hostel?.name,
+    );
+  }
+
+  /// Tells the owner their identity was verified and, when the linked hostel
+  /// went live with it, that too.
+  Future<void> notifyIdentityApproved(
+    String ownerId, {
+    String? hostelName,
+    String? hostelId,
+    required bool hostelPublished,
+  }) async {
+    await _notify(ownerId,
+        type: 'account_verified',
+        title: AppStrings.accountVerifiedActivityTitle,
+        message: AppStrings.accountVerifiedActivityMessage);
+    if (hostelPublished && hostelName != null) {
+      await Get.find<ActivityRepository>().notifyOwner(
+        ownerId: ownerId,
+        type: 'hostel_approved',
+        title: AppStrings.hostelApprovedActivityTitle,
+        message: AppStrings.hostelApprovedActivityMessage(hostelName),
+        hostelId: hostelId,
+        hostelName: hostelName,
+      );
+    }
+  }
+
   Future<void> approveHostel(HostelModel hostel) async {
     try {
       await _hostelRepo.setStatus(hostel.id, ListingStatus.published);
+      await _notify(hostel.ownerId,
+          type: 'hostel_approved',
+          title: AppStrings.hostelApprovedActivityTitle,
+          message: AppStrings.hostelApprovedActivityMessage(hostel.name),
+          hostel: hostel);
       AppSnackbar.showGlobal(
         message: AppStrings.adminHostelApproved(hostel.name),
         type: SnackbarType.success,
@@ -119,6 +167,11 @@ class AdminVerificationsController extends GetxController {
         ListingStatus.rejected,
         rejectionReason: reason.length > 500 ? reason.substring(0, 500) : reason,
       );
+      await _notify(hostel.ownerId,
+          type: 'hostel_rejected',
+          title: AppStrings.hostelRejectedActivityTitle,
+          message: AppStrings.hostelRejectedActivityMessage(hostel.name, reason.trim()),
+          hostel: hostel);
       AppSnackbar.showGlobal(
         message: AppStrings.adminHostelRejected(hostel.name),
         type: SnackbarType.success,
@@ -217,11 +270,18 @@ class AdminVerificationsController extends GetxController {
 
     isSubmittingDecision.value = true;
     try {
-      await _verificationRepo.approveSubmission(
+      final published = await _verificationRepo.approveSubmission(
         verificationId: submission.uid,
         userId: submission.uid,
         adminId: adminId,
         hostelId: submission.hostelId,
+      );
+      final linked = selectedHostel.value;
+      await notifyIdentityApproved(
+        submission.uid,
+        hostelName: linked?.name,
+        hostelId: submission.hostelId,
+        hostelPublished: published,
       );
       AppSnackbar.showGlobal(message: AppStrings.adminSubmissionApproved, type: SnackbarType.success);
       clearSelection();

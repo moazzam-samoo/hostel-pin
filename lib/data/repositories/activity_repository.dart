@@ -27,6 +27,33 @@ class ActivityRepository {
         .map((snapshot) => snapshot.docs.map((doc) => doc.data()).toList());
   }
 
+  /// Admin -> owner notice shown in the owner's Recent Activity feed (for
+  /// example "Hostel approved"). Best effort: a failure here must never undo
+  /// or block the review decision that triggered it.
+  Future<void> notifyOwner({
+    required String ownerId,
+    required String type,
+    required String title,
+    required String message,
+    String? hostelId,
+    String? hostelName,
+  }) async {
+    try {
+      await create(ActivityModel(
+        id: '${DateTime.now().microsecondsSinceEpoch}_$type',
+        ownerId: ownerId,
+        type: type,
+        title: title,
+        message: message,
+        hostelId: hostelId,
+        hostelName: hostelName,
+        createdAt: DateTime.now(),
+      ));
+    } catch (e) {
+      Logger.e('Could not notify owner $ownerId: $e');
+    }
+  }
+
   Future<void> create(ActivityModel activity) async {
     try {
       await _activitiesRef.doc(activity.id).set(activity);
