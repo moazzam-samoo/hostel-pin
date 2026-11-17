@@ -90,6 +90,13 @@ class AppStrings {
   static const String trafficLabel = 'Traffic';
   static const String viewListingButton = 'View listing';
   static const String pendingVerificationTitle = 'Pending Verification';
+  static const String verifyAccountTitle = 'Verify your account';
+  static const String verifyAccountMessage =
+      'Verify your identity and add your first hostel to start listing. It only takes a few minutes.';
+  static const String verificationUnderReviewMessage =
+      'Your verification is under review by our team. This usually takes 24 hours.';
+  static const String verificationRejectedTitle = 'Verification not approved';
+  static const String verificationResubmitButton = 'Review and resubmit';
   static String pendingVerificationMessage(String hostelName) =>
       'Hostel "$hostelName" is currently under review by our team. This usually takes 24 hours.';
   // Distinct from pendingVerificationTitle/Message above (identity

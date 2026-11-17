@@ -9,6 +9,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../core/enums/verification_status.dart';
 import '../../../core/enums/listing_status.dart';
+import '../shell/owner_add_access.dart';
 import '../../../shared/widgets/navigation/app_top_bar.dart';
 import '../../../shared/widgets/layout/section_header.dart';
 import '../../../shared/widgets/cards/stat_row_tile.dart';
@@ -170,24 +171,37 @@ class DashboardView extends GetView<DashboardController> {
           VerificationStatus.unverified;
       if (status == VerificationStatus.verified) return const SizedBox.shrink();
 
-      // Prefer the first pending/draft listing's name, since that's what's
-      // actually "under review" — falling back to any listing, then to a
-      // generic name, only when nothing is pending/draft.
-      final pendingOrDraft = controller.ownerListings.where(
-        (h) =>
-            h.status == ListingStatus.pending ||
-            h.status == ListingStatus.draft,
-      );
-      final String hostelName = pendingOrDraft.isNotEmpty
-          ? pendingOrDraft.first.name
-          : controller.ownerListings.isNotEmpty
-              ? controller.ownerListings.first.name
-              : AppStrings.genericPropertyName;
-
-      return AlertCard(
-        title: AppStrings.pendingVerificationTitle,
-        message: AppStrings.pendingVerificationMessage(hostelName),
-      );
+      switch (controller.verificationAccess) {
+        case OwnerAddAccess.needsVerification:
+          // Nothing submitted yet: ask the owner to start, never claim a
+          // review is in progress.
+          return AlertCard(
+            icon: Icons.verified_user_outlined,
+            title: AppStrings.verifyAccountTitle,
+            message: AppStrings.verifyAccountMessage,
+            actionLabel: AppStrings.addTabGateButton,
+            onAction: controller.startVerification,
+          );
+        case OwnerAddAccess.rejected:
+          return AlertCard(
+            title: AppStrings.verificationRejectedTitle,
+            message: AppStrings.addTabRejectedMessage,
+            actionLabel: AppStrings.verificationResubmitButton,
+            onAction: controller.startVerification,
+          );
+        case OwnerAddAccess.allowed:
+        case OwnerAddAccess.limitReached:
+          // Submitted and waiting for the admin.
+          final pending = controller.ownerListings
+              .where((h) => h.status == ListingStatus.pending)
+              .toList();
+          return AlertCard(
+            title: AppStrings.pendingVerificationTitle,
+            message: pending.isNotEmpty
+                ? AppStrings.pendingVerificationMessage(pending.first.name)
+                : AppStrings.verificationUnderReviewMessage,
+          );
+      }
     });
   }
 

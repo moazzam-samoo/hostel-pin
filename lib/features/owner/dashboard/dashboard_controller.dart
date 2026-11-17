@@ -9,6 +9,7 @@ import '../../../data/repositories/hostel_repository.dart';
 import '../../../data/repositories/activity_repository.dart';
 import '../../../data/services/session_service.dart';
 import '../../../core/utils/logger.dart';
+import '../shell/owner_add_access.dart';
 import '../shell/owner_shell_controller.dart';
 
 class DashboardController extends GetxController {
@@ -23,6 +24,15 @@ class DashboardController extends GetxController {
   StreamSubscription? _activitiesSub;
 
   UserModel? get currentUser => _sessionService.currentUser.value;
+
+  /// What the owner's verification looks like right now, from the same source
+  /// the Add tab uses. Before the shell is up (or in isolation) it falls back
+  /// to "not started", never to "under review".
+  OwnerAddAccess get verificationAccess => Get.isRegistered<OwnerShellController>()
+      ? Get.find<OwnerShellController>().addAccess.value
+      : OwnerAddAccess.needsVerification;
+
+  void startVerification() => Get.toNamed(Routes.ownerVerification);
 
   /// Hostels an admin rejected, newest first (ownerListings is newest first).
   List<HostelModel> get rejectedListings => ownerListings
